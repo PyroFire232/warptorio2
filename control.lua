@@ -22,9 +22,9 @@ function Vector2:Length() return math.sqrt(self.x^2+self.y^2) end
 
 warptorio=warptorio or {}
 
-
 function warptorio.FlipDirection(v) return (v+4)%8 end
 
+require("control_planets")
 -- --------
 -- Logistics & Teleporters
 
@@ -543,6 +543,10 @@ ups["warptorio-beacon-1"] = {"factory-beacon"}
 ups["warptorio-beacon-2"] = {"factory-beacon"}
 ups["warptorio-beacon-3"] = {"factory-beacon"}
 
+ups["warptorio-radar-1"] = {"radar"}
+ups["warptorio-radar-2"] = {"radar"}
+ups["warptorio-radar-3"] = {"radar"}
+
 ups["warptorio-stabilizer-1"] = {"stabilizer"}
 ups["warptorio-stabilizer-2"] = {"stabilizer"}
 ups["warptorio-stabilizer-3"] = {"stabilizer"}
@@ -692,6 +696,31 @@ function warptorio.CountEntities() local c=0 for k,v in pairs(gwarptorio.Floors)
 
 
 
+
+function warptorio.RandomPlanet(z) z=z or gwarptorio.warpzone local zp={} for k,v in pairs(warptorio.Planets)do if((v.zone or 0)<z)then for i=1,(v.rng or 1) do table.insert(zp,k) end end end
+	return warptorio.Planets[table.Random(zp)] end
+
+function warptorio.DoNextPlanet()
+	local w=warptorio.RandomPlanet(gwarptorio.warpzone+1)
+	return w
+end
+
+function warptorio.BuildNewPlanet()
+	local rng=math.random(1,table.Count(warptorio.Planets))
+	local w if(gwarptorio.nextplanet)then w=warptorio.Planets[gwarptorio.nextplanet] gwarptorio.nextplanet=warptorio.DoNextPlanet() else w=warptorio.RandomPlanet() end
+	local lvl=gwarptorio.Research["radar"] or 0
+
+	if(lvl>=2)then game.print(w.name) end
+	game.print(w.desc)
+
+	local seed=(game.surfaces["nauvis"].map_gen_settings.seed + math.random(0,4294967295)) % 4294967296
+	local t=(w.gen and table.deepcopy(w.gen) or {}) t.seed=seed if(w.fgen)then w.fgen(t,lvl>=3) end local f = game.create_surface("warpsurf_"..gwarptorio.warpzone,t)
+	f.request_to_generate_chunks({0,0},2) f.force_generate_chunk_requests()
+	if(w.spawn)then w.spawn(f) end
+	return f
+end
+
+
 function warptorio.Warpout()
 	gwarptorio.warp_charge = 0
 	gwarptorio.warp_charging=0
@@ -700,14 +729,15 @@ function warptorio.Warpout()
 
 	-- charge time
 	local c=warptorio.CountEntities()
-	gwarptorio.warp_charge_time=10+c/settings.global['warptorio_warp_charge_factor'].value + gwarptorio.warpzone*0.5
-	gwarptorio.warp_time_left = 60*gwarptorio.warp_charge_time
+	gwarptorio.warp_charge_time=1 --10+c/settings.global['warptorio_warp_charge_factor'].value + gwarptorio.warpzone*0.5
+	gwarptorio.warp_time_left = 1 --60*gwarptorio.warp_charge_time
 	warptorio.updatelabel("time_left","   Charge Time : " .. util.formattime(gwarptorio.warp_time_left))
 
 	-- create next surface
-	local f = game.create_surface("warpsurf_"..gwarptorio.warpzone,{seed=(game.surfaces["nauvis"].map_gen_settings.seed + math.random(0,4294967295)) % 4294967296})
-	f.request_to_generate_chunks({0,0},1)
-	f.force_generate_chunk_requests()
+	 local f=warptorio.BuildNewPlanet()
+	--local f = game.create_surface("warpsurf_"..gwarptorio.warpzone,{seed=(game.surfaces["nauvis"].map_gen_settings.seed + math.random(0,4294967295)) % 4294967296})
+	--f.request_to_generate_chunks({0,0},1)
+	--f.force_generate_chunk_requests()
 
 	-- Do the thing
 	for k,v in pairs(gwarptorio.Teleporters)do v:Warpout() end
@@ -725,6 +755,9 @@ function warptorio.Warpout()
 		local p,b=m:GetPos(),m:GetBBox()
 		if(v.character~=nil and warptorio.isinbbox(v.character.position,{x=p[1],y=p[2]},{x=b[1],y=b[2]}))then v.teleport(f.find_non_colliding_position("character",{0,-4},0,1,1),f) end
 	end
+
+	-- radar stuff -- game.forces.player.chart(game.player.surface, {lefttop = {x = -1024, y = -1024}, rightbottom = {x = 1024, y = 1024}})
+	game.forces.player.chart(f,{lefttop={x=-1024,y=-1024},rightbottom={x=1024,y=1024}})
 
 	-- build void
 	warptorio.LayFloorVec("out-of-map",c,m:GetPos(),m:GetSize())
@@ -795,7 +828,7 @@ function warptorio.Initialize() if(not global.warptorio)then global.warptorio={}
 	gwarptorio.surf_to_leave_angry_biters_counter = 0
 	gwarptorio.pollution_amount = 1
 
-	gwarptorio.warp_charge_time=10 --in seconds
+	gwarptorio.warp_charge_time= 1--10 --in seconds
 	gwarptorio.warp_charge_start_tick = 0
 	gwarptorio.warp_charging = 0
 	gwarptorio.warp_timeleft = 60*10
