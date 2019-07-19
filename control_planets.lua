@@ -1,6 +1,7 @@
 local planet={} warptorio.Planets=planet
 
 local resourceTypes={"coal","crude-oil","copper-ore","iron-ore","stone","uranium-ore"}
+warptorio.OreTypes=resourceTypes
 --["iron-ore"]={size=0},["copper-ore"]={size=0},["coal"]={size=0},["crude-oil"]={size=0},["uranium-ore"}={size=0},["stone"]={size=0}
 
 
@@ -55,7 +56,7 @@ planet.barren={ zone=3, rng=4, name="A Barren Planet", desc="This world looks de
 	end,
 }
 
-planet.water={ zone=7, rng=5, name="An Ocean Planet", desc="You look around and see nothing but ocean. The local fish gather around the platform to greet you.",
+planet.water={ zone=7, rng=5, name="An Ocean Planet", desc="There is water all around and seems to go on forever. The nearby fish that greet you fills you with determination.",
 	gen={ starting_area="none",water=999999,default_enable_all_autoplace_controls=false,autoplace_settings={
 		tile={treat_missing_as_default=false,settings={["water"]={frequency=5,size=5},["deepwater"]={frequency=5,size=5}}},
 		entity={treat_missing_as_default=false,settings={["fish"]={frequency=5,size=5,richness=10}}},decorative = { treat_missing_as_default = false },
