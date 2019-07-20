@@ -24,6 +24,13 @@ function Vector2:Length() return math.sqrt(self.x^2+self.y^2) end
 
 warptorio=warptorio or {}
 
+function warptorio.CopyChestEntity(a,b)
+	local c=b.get_inventory(defines.inventory.chest)
+	for k,v in pairs(a.get_inventory(defines.inventory.chest).get_contents())do c.insert{name=k,count=v} end
+	for c,tbl in pairs(a.circuit_connected_entities)do for k,v in pairs(tbl)do v.connect_neighbour{target_entity=b,wire=defines.wire_type[c]} end end
+end
+
+
 function warptorio.FlipDirection(v) return (v+4)%8 end
 
 require("control_planets")
@@ -34,16 +41,32 @@ local TELL={} TELL.__index=TELL warptorio.TeleporterMeta=TELL
 function TELL.__init(self,n) self.name=n self.dir={{"input","output"},{"input","output"}} self.logcont={} gwarptorio.Teleporters[n]=self end
 TELL.LogisticsEnts={"loader1","loader2","chest1","chest2","pipe1","pipe2","pipe3","pipe4","pipe5","pipe6"}
 
+
+function TELL:SwapLoaderChests(i,a,b)
+	local lv=gwarptorio.Research["factory-logistics"] or 0
+	if(lv>=4)then -- buffer chests
+		local ea=self.logs["chest"..i.."-a"] local eax=(a.loader_type=="input" and "logistic-chest-requester" or "logistic-chest-active-provider")
+		local eb=self.logs["chest"..i.."-b"] local ebx=(a.loader_type=="output" and "logistic-chest-requester" or "logistic-chest-active-provider")
+		local va=warptorio.SpawnEntity(ea.surface,eax,ea.position.x,ea.position.y)
+		local vb=warptorio.SpawnEntity(eb.surface,ebx,eb.position.x,eb.position.y)
+		warptorio.CopyChestEntity(ea,va) warptorio.CopyChestEntity(eb,vb)
+		ea.destroy() eb.destroy()
+		self.logs["chest"..i.."-a"]=va self.logs["chest"..i.."-b"]=vb
+	end
+end
+
 function TELL:CheckLoaderDirection(i,a,b) if(not a or not a.valid or not b or not b.valid)then return end
-	--local lv=gwarptorio.Research["factory-logistics"] or 0
+	local lv=gwarptorio.Research["factory-logistics"] or 0
 	if(a.loader_type ~= self.dir[i][1])then -- A has rotated
 		self.dir[i][1]=a.loader_type
 		self.dir[i][2]=(a.loader_type=="input" and "output" or "input")
 		b.loader_type=self.dir[i][2]
+		self:SwapLoaderChests(i,a,b)
 	elseif(b.loader_type ~= self.dir[i][2])then -- B has rotated
 		self.dir[i][2]=b.loader_type
 		self.dir[i][1]=(b.loader_type=="input" and "output" or "input")
 		a.loader_type=self.dir[i][1]
+		self:SwapLoaderChests(i,a,b)
 	end
 end
 
@@ -91,6 +114,20 @@ function TELL:DestroyLogistics() self:DestroyLogisticsA() self:DestroyLogisticsB
 function TELL:UpgradeLogistics() if(self.logs)then self:DestroyLogistics() end self:SpawnLogistics() end
 function TELL:UpgradeEnergy() self:Warpout() self:Warpin() end
 
+--[[
+a.temperature
+]]
+
+--[[function logz.MoveFluid(a,b) local af,bf=a.get_fluid_contents(),b.get_fluid_contents() local aff,afv=table.First(af) local bff,bfv=table.First(bf)
+	if((not aff and not bff) or (aff and bff and aff~=bff) or (afv==0 and bfv==0))then return end
+	if(aff=="steam")then
+		local temp=15 local at=warptorio.GetSteamTemperature(a) local bt=warptorio.GetSteamTemperature(b) temp=math.max(at,bt)
+		local c=b.insert_fluid({name=aff,amount=afv,temperature=temp}) if(c>0)then a.remove_fluid{name=aff,amount=c} end
+	else
+		local c=b.insert_fluid({name=aff,amount=afv}) if(c>0)then a.remove_fluid{name=aff,amount=c} end
+	end
+end
+]]
 
 
 function TELL:ConnectCircuit()
@@ -916,6 +953,9 @@ function warptorio.BuildNewPlanet()
 	local t=(w.gen and table.deepcopy(w.gen) or {}) t.seed=seed if(w.fgen)then w.fgen(t,lvl>=3) end local f = game.create_surface("warpsurf_"..gwarptorio.warpzone,t)
 	f.request_to_generate_chunks({0,0},3) f.force_generate_chunk_requests()
 	if(w.spawn)then w.spawn(f,lvl==1) end
+
+	game.forces.player.chart_all(f)
+
 	return f
 end
 
@@ -955,6 +995,8 @@ function warptorio.Warpout()
 		local p,b=m:GetPos(),m:GetBBox()
 		if(v.character~=nil and v.surface.name==c.name and warptorio.isinbbox(v.character.position,{x=p[1],y=p[2]},{x=b[1],y=b[2]}))then
 			table.insert(tpply,{v,{v.position.x,v.position.y}})
+		elseif(v.character~=nil and v.surface.name==gwarptorio.Floors.b1:GetSurface().name or v.surface.name==gwarptorio.Floors.b2:GetSurface().name)then
+			table.insert(tpply,{v,{0,0}})
 		end
 	end
 
@@ -980,7 +1022,7 @@ function warptorio.Warpout()
 
 
 	-- radar stuff -- game.forces.player.chart(game.player.surface, {lefttop = {x = -1024, y = -1024}, rightbottom = {x = 1024, y = 1024}})
-	--game.forces.player.chart(f,{lefttop={x=-1024,y=-1024},rightbottom={x=1024,y=1024}})
+	--game.forces.player.chart(f,{lefttop={x=-256,y=-256},rightbottom={x=256,y=256}})
 
 	-- build void
 
