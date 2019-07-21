@@ -187,7 +187,7 @@ function TELL:DestroyLogisticsB() if(self.logs)then for k,v in pairs(self.Logist
 end self.logs[v.."-b"]=nil end end end end
 function TELL:DestroyLogistics() self:DestroyLogisticsA() self:DestroyLogisticsB() end
 function TELL:UpgradeLogistics() if(self.logs)then self:DestroyLogistics() end self:SpawnLogistics() end
-function TELL:UpgradeEnergy() self:Warpout() self:Warpin() end
+function TELL:UpgradeEnergy() self:Warpin() end
 
 --[[
 a.temperature
@@ -338,7 +338,7 @@ function tpcls.offworld()
 end
 function tpcls.b1(lv)
 	local lv=gwarptorio.Research["factory-energy"] or 0 local lgv=gwarptorio.Research["factory-logistics"] or 0
-	local x=gwarptorio.Teleporters["b1"] if(not x)then x=new(TELL,"b1") end
+	local x=gwarptorio.Teleporters["b1"] if(not x)then x=new(TELL,"b1`") end
 	local m=gwarptorio.Floors.main local f=m:GetSurface()
 	local mb=gwarptorio.Floors.b1 local fb=mb:GetSurface()
 	local makeA,makeB="warptorio-underground-"..lv,"warptorio-underground-"..lv

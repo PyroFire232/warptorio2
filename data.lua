@@ -35,16 +35,16 @@ local t=ExtendDataCopy("pipe-to-ground","pipe-to-ground",{name="warptorio-logist
 -- Fuel
 data:extend{{type="fuel-category", name="warp"}}
 
-ExtendDataCopy("item","uranium-fuel-cell",{name="warptorio-warponium-fuel-cell",fuel_category="warp",burnt_result="uranium-fuel-cell",fuel_value="16GJ",stack_size=50,
+ExtendDataCopy("item","uranium-fuel-cell",{name="warptorio-warponium-fuel-cell",fuel_category="warp",burnt_result="uranium-fuel-cell",fuel_value="24GJ",stack_size=50,
 	icon=false,icon_size=32,icons={ {icon="__base__/graphics/icons/uranium-fuel-cell.png",tint={r=1,g=0.2,b=1,a=0.8}}, }, })
 
 ExtendDataCopy("recipe","uranium-fuel-cell",{name="warptorio-warponium-fuel-cell",enabled=false,result="warptorio-warponium-fuel-cell",result_count=1},false,
-	{ingredients={{"uranium-fuel-cell",4}},
+	{ingredients={{"uranium-fuel-cell",8}},
 	icon=false,icon_size=32,icons={ {icon="__base__/graphics/icons/uranium-fuel-cell.png",tint={r=1,g=0.2,b=1,a=0.8}}, },
 })
 
 ExtendDataCopy("item","nuclear-fuel",{name="warptorio-warponium-fuel",fuel_category="chemical",
-	fuel_acceleration_multiplier=5,fuel_value="4GJ",stack_size=1,fuel_top_speed_multiplier=1.25,
+	fuel_acceleration_multiplier=5,fuel_value="7GJ",stack_size=1,fuel_top_speed_multiplier=1.25,
 	icon=false,icon_size=32,icons={ {icon="__base__/graphics/icons/nuclear-fuel.png",tint={r=1,g=0.2,b=1,a=0.8}}, },
 })
 
@@ -521,4 +521,4 @@ data:extend{{type="equipment-grid",name="warptorio-warparmor-grid",equipment_cat
 local t=ExtendDataCopy("armor","power-armor-mk2",{name="warptorio-armor",equipment_grid="warptorio-warparmor-grid",
 	icon_size=32,icons={{icon="__base__/graphics/icons/power-armor-mk2.png",tint={r=0.2,g=0.2,b=1,a=0.8},}},inventory_size_bonus=100},false)
 
-local t=ExtendDataCopy("recipe","power-armor-mk2",{name="warptorio-armor",enabled=true,ingredients={{"power-armor-mk2",5}},result="warptorio-armor"})
+local t=ExtendDataCopy("recipe","power-armor-mk2",{name="warptorio-armor",enabled=false,ingredients={{"power-armor-mk2",5}},result="warptorio-armor"})
