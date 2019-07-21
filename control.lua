@@ -1000,7 +1000,7 @@ ups["warptorio-bridgesize-2"] = {"bridgesize"}
 -- Gui
 
 
-warptorio.PlanetTypes={{"(Random)","(Random)"},{"Normal","normal"},{"Average","average"},{"Jungle","jungle"},{"Barren","barren"},{"Ocean","water"},
+warptorio.PlanetTypes={{"(Random)","(Random)"},{"Normal","normal"},{"Average","average"},{"Rich","rich"},{"Jungle","jungle"},{"Barren","barren"},{"Ocean","water"},
 	{"Coal","coal"},{"Iron","iron"},{"Copper","copper"},{"Stone","stone"},{"Oil","oil"},{"Uranium","uranium"},{"Polluted","polluted"},{"Midnight","midnight"},{"Biter","biter"}}
 local planetDropdown={} for k,v in ipairs(warptorio.PlanetTypes)do table.insert(planetDropdown,v[1]) end
 
@@ -1087,11 +1087,9 @@ function warptorio.TryRadar() if(game.tick<(gwarptorio.ability_next or 0))then r
 	warptorio.playsound("reactor-stabilized", f)
 end
 
-function warptorio.TryAccelerator() if(game.tick<(gwarptorio.ability_next or 0))then return end warptorio.IncrementAbility(2.5,5)
-	gwarptorio.warp_charge_time=math.max(gwarptorio.warp_charge_time^0.75,10)
-	if(gwarptorio.warp_charging==1)then warptorio.updatelabel("warptorio_time_left","    Warp-out In : " .. util.formattime(math.ceil(gwarptorio.warp_charge_time*60)) )
-	else warptorio.updatelabel("warptorio_time_left","    Charge Time : " .. util.formattime(math.ceil(gwarptorio.warp_charge_time*60)) )
-	end
+function warptorio.TryAccelerator() if(game.tick<(gwarptorio.ability_next or 0) or gwarptorio.warp_charge_time<=10)then return end warptorio.IncrementAbility(2.5,5)
+	gwarptorio.warp_charge_time=math.max(math.ceil(gwarptorio.warp_charge_time^0.8),10)
+	if(gwarptorio.warp_charging~=1)then warptorio.updatelabel("warptorio_time_left","    Charge Time : " .. util.formattime(math.ceil(gwarptorio.warp_charge_time*60)) ) end
 	local f=gwarptorio.Floors.main:GetSurface()
 	warptorio.playsound("reactor-stabilized", f)
 end
@@ -1111,13 +1109,11 @@ script.on_event(defines.events.on_gui_click, function(event)
 		end
 
 	elseif(gui.name == "warptorio_dostabilize")then -- Stabilizer
-		game.print("stabilizer")
 		warptorio.TryStabilizer()
 
 	elseif(gui.name == "warptorio_radar")then -- Radar
 		warptorio.TryRadar()
 	elseif(gui.name=="warptorio_accel")then -- Accelerator
-		game.print("accel")
 		warptorio.TryAccelerator()
 	end
 end)
