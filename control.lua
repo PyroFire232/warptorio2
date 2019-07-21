@@ -814,14 +814,6 @@ end script.on_event(defines.events.on_tick,warptorio.Tick)
 
 
 
-
-function warptorio.OnPlayerRespawned(event) -- teleport to warp platform on respawn
-	local cf=warptorio.Floors.main:GetSurface() local gp=game.players[event.player_index]
-	if(gp.character.surface~=cf)then local pos=cf.find_non_colliding_position("character",{0,-5},0,1,1) gp.teleport(pos,cf) end
-end script.on_event(defines.events.on_player_respawned,warptorio.OnPlayerRespawned)
-
-
-
 -- -------
 -- Upgrades
 
@@ -1125,6 +1117,35 @@ function warptorio.InitPlayer(e)
 	--if(i==1)then warptorio.PostPlayerInit() end
 	warptorio.safeteleport(p.character,{0,-5},gwarptorio.Floors.main:GetSurface())
 end script.on_event(defines.events.on_player_created,warptorio.InitPlayer)
+
+
+function warptorio.OnPlayerRemoved(ev) local i=ev.player_index
+end script.on_event(defines.events.on_player_removed,warptorio.OnPlayerRemoved)
+function warptorio.OnPlayerPreRemoved(ev) local i=ev.player_index
+end script.on_event(defines.events.on_pre_player_removed,warptorio.OnPlayerPreRemoved)
+
+
+function warptorio.OnPlayerLeft(ev) local i=ev.player_index
+end script.on_event(defines.events.on_player_left_game,warptorio.OnPlayerLeft)
+function warptorio.OnPlayerPreLeft(ev) local i=ev.player_index
+end script.on_event(defines.events.on_pre_player_left_game,warptorio.OnPlayerPreLeft)
+
+function warptorio.OnPlayerJoined(ev)
+	local i=ev.player_index local p=game.players[i]
+	warptorio.BuildGui(p)
+	warptorio.safeteleport(p.character,{0,-5},gwarptorio.Floors.main:GetSurface())
+end script.on_event(defines.events.on_player_joined_game,warptorio.OnPlayerJoined)
+
+
+
+
+
+function warptorio.OnPlayerRespawned(event) -- teleport to warp platform on respawn
+	--local i=ev.player_index local player_port=ev.player_port
+	local cf=gwarptorio.Floors.main:GetSurface() local gp=game.players[event.player_index]
+	if(gp.character.surface~=cf)then local pos=cf.find_non_colliding_position("character",{0,-5},0,1,1) gp.teleport(pos,cf) end
+end script.on_event(defines.events.on_player_respawned,warptorio.OnPlayerRespawned)
+
 
 
 
