@@ -599,7 +599,9 @@ function warptorio.TickTeleporters(e) for k,v in pairs(gwarptorio.Teleporters)do
 end end end
 
 -- Teleporter mined/destroyed/rebuilt
-function warptorio.OnBuiltEntity(event) local e=event.created_entity if(warptorio.IsTeleporterGate(e))then local t=gwarptorio.Teleporters["offworld"]
+function warptorio.OnBuiltEntity(event) local e=event.created_entity if(warptorio.IsTeleporterGate(e))then
+	if(e.surface.name==gwarptorio.Floors.b1:GetSurface().name)then game.print("The Teleporter only functions on the Planet") return end
+	local t=gwarptorio.Teleporters["offworld"]
 	if(t:ValidPointB())then e.destroy() game.print("Unable to spawn more than 1 Planet Teleporter Gate at a time") else t:SetPointB(e) t:Warpin() end end
 end script.on_event(defines.events.on_built_entity, warptorio.OnBuiltEntity)
 
