@@ -32,6 +32,7 @@ planet.jungle={ zone=9, rng=3, name="A Jungle Planet", desc="A Jungle Planet Des
 }
 
 planet.barren={ zone=3, rng=4, name="A Barren Planet", desc="This world looks deserted and we appear to be safe. .. For now.",
+	warp_multiply=0.25,
 	gen={
 	starting_area = "none",
 	cliff_settings = { cliff_elevation_0 = 1024 },
@@ -57,6 +58,7 @@ planet.barren={ zone=3, rng=4, name="A Barren Planet", desc="This world looks de
 }
 
 planet.water={ zone=7, rng=5, name="An Ocean Planet", desc="There is water all around and seems to go on forever. The nearby fish that greet you fills you with determination.",
+	warp_multiply=0.25,
 	gen={ starting_area="none",water=999999,default_enable_all_autoplace_controls=false,autoplace_settings={
 		tile={treat_missing_as_default=false,settings={["water"]={frequency=5,size=5},["deepwater"]={frequency=5,size=5}}},
 		entity={treat_missing_as_default=false,settings={["fish"]={frequency=5,size=5,richness=10}}},decorative = { treat_missing_as_default = false },
@@ -69,12 +71,13 @@ planet.water={ zone=7, rng=5, name="An Ocean Planet", desc="There is water all a
 -- Resource Specific Planets
 
 planet.copper={ zone=8, rng=5, name="A Copper Planet", desc="The warp reactor surges with power and you feel static in the air. You are filled with determination.",
+	warp_multiply=0.5,
 	gen={
 		autoplace_controls={["copper-ore"]={frequency=4,size=2},
 			["iron-ore"]={size=0},["coal"]={size=0},["crude-oil"]={size=0},["uranium-ore"]={size=0},["stone"]={size=0},
 		},
 	},
-	spawn=function(f) for k,v in pairs(f.find_entities_filtered{type="resource"})do if(v.name~="copper-ore")then v.destroy() end end end
+	spawn=function(f) for k,v in pairs(f.find_entities_filtered{type="resource"})do if(v.name~="copper-ore")then v.destroy() game.print("iron") end end end
 }
 
 
@@ -138,6 +141,7 @@ planet.stone={ zone=15, rng=5, name="A Stone Planet", desc="A Stone Planet Descr
 -- Biter Planets
 
 planet.midnight={ zone=20,rng=5,name="A Planet Called Midnight", desc="Your hands disappear before your eyes as you are shrouded in darkness. This place seems dangerous.",
+	warp_multiply=2,
 	gen={
 		autoplace_controls={["enemy-base"]={frequency=2,size=2}},
 	},
@@ -149,6 +153,7 @@ planet.midnight={ zone=20,rng=5,name="A Planet Called Midnight", desc="Your hand
 
 
 planet.biter={ zone=40,rng=5,name="A Biter Planet", desc="Within moments of warping in, your base is immediately under siege. We must survive until the next warp!",
+	warp_multiply=3,
 	gen={
 		starting_area=0.3,
 		autoplace_controls={["enemy-base"]={frequency=8,size=8}},

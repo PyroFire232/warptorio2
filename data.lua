@@ -238,9 +238,10 @@ ExtendTech(t,{name="warptorio-reactor-6",unit={count=100,time=90}, prerequisites
 ExtendTech(t,{name="warptorio-reactor-7",unit={count=1000,time=30}, effects={{recipe="warptorio-heatpipe",type="unlock-recipe"}}, prerequisites={"nuclear-power","warptorio-reactor-6"}}, {red=1,green=1,black=1,blue=1,yellow=1})
 ExtendTech(t,{name="warptorio-reactor-8",unit={count=1000,time=30}, prerequisites={"warptorio-reactor-7"}}, {red=1,green=1,black=1,blue=1,purple=1,yellow=1,white=1}) -- steering
 
-ExtendTech(t,{name="warptorio-charting-1",unit={count=300,time=30}, prerequisites={"warptorio-reactor-6"}}, {red=1,green=1,black=1,blue=1,purple=1,yellow=1}) -- charting
-ExtendTech(t,{name="warptorio-stabilizer-1",unit={count=300,time=30}, prerequisites={"warptorio-reactor-6"}}, {red=1,green=1,black=1,blue=1,purple=1,yellow=1}) -- stabilizer
-ExtendTech(t,{name="warptorio-accelerator-1",unit={count=300,time=30}, prerequisites={"warptorio-reactor-6"}}, {red=1,green=1,black=1,blue=1,purple=1,yellow=1}) -- accelerator
+t.upgrade=false
+ExtendTech(t,{name="warptorio-charting",unit={count=300,time=30}, prerequisites={"warptorio-reactor-6"}}, {red=1,green=1,black=1,blue=1,purple=1,yellow=1}) -- charting
+ExtendTech(t,{name="warptorio-stabilizer",unit={count=300,time=30}, prerequisites={"warptorio-reactor-6"}}, {red=1,green=1,black=1,blue=1,purple=1,yellow=1}) -- stabilizer
+ExtendTech(t,{name="warptorio-accelerator",unit={count=300,time=30}, prerequisites={"warptorio-reactor-6"}}, {red=1,green=1,black=1,blue=1,purple=1,yellow=1}) -- accelerator
 
 -- ----
 -- Warp Energy Pipe
@@ -311,8 +312,6 @@ ExtendTech(t,{name="warptorio-bot-cap-7",unit={count_formula="(20*L)-100",time=3
 ExtendTech(t,{name="warptorio-bot-cap-11",unit={count_formula="(20*L)-150",time=30},max_level=13,prerequisites={"warptorio-bot-cap-7","production-science-pack"}}, {red=4,green=3,blue=2,purple=1} )
 ExtendTech(t,{name="warptorio-bot-cap-14",unit={count_formula="(20*L)-200",time=30},max_level=16,prerequisites={"warptorio-bot-cap-11","utility-science-pack"}}, {red=5,green=4,blue=3,purple=2,yellow=1} )
 
-
-
 local t={type="technology",upgrade=true,icon_size=128,icons={ {icon="__base__/graphics/technology/toolbelt.png",tint={r=0.2,g=0.2,b=1,a=0.8}} },
 	effects={ {type="character-inventory-slots-bonus",modifier=10} }, }
 ExtendTech(t,{name="warptorio-toolbelt-1",unit={count=70,time=30},prerequisites={}}, {red=1})
@@ -337,9 +336,9 @@ ExtendTech(t,{name="warptorio-platform-size-7", unit={count=300,time=30}, prereq
 -- ----
 -- Train Stops
 
-local t={type="technology",upgrade=true,icon_size=128,icons={ {icon="__base__/graphics/technology/railway.png",tint={r=0.2,g=0.2,b=1,a=0.8}} }, }
+local t={type="technology",upgrade=false,icon_size=128,icons={ {icon="__base__/graphics/technology/railway.png",tint={r=0.2,g=0.2,b=1,a=0.8}} }, }
 for k,v in pairs({"nw","ne","se","sw"})do
-ExtendTech(t,{name="warptorio-rail-"..v.."-1", unit={count=1000,time=40}, prerequisites={"railway","warptorio-platform-size-6","warptorio-factory-7"}}, {red=1,green=1,black=1,purple=1} )
+ExtendTech(t,{name="warptorio-rail-"..v, unit={count=1000,time=40}, prerequisites={"railway","warptorio-platform-size-6","warptorio-factory-7"}}, {red=1,green=1,black=1,purple=1} )
 end
 
 
@@ -354,7 +353,7 @@ ExtendTech(t,{name="warptorio-turret-"..v.."-2", unit={count=400,time=30}, prere
 ExtendTech(t,{name="warptorio-turret-"..v.."-3", unit={count=500,time=40}, prerequisites={"warptorio-turret-"..v.."-2"}}, {red=3,green=3,black=3,blue=2,purple=2,yellow=1} )
 end
 
-ExtendTech(t,{name="warptorio-bridgesize-1",unit={count=1000,time=40},prerequisites={"warptorio-turret-nw-0","warptorio-turret-ne-0","warptorio-turret-se-0","warptorio-turret-sw-0"},
+ExtendTech(t,{name="warptorio-bridgesize-1",unit={count=1000,time=40},prerequisites={"warptorio-factory-0","warptorio-turret-nw-0","warptorio-turret-ne-0","warptorio-turret-se-0","warptorio-turret-sw-0"},
 		unit={count=200,time=40}},{red=1,green=1,black=1,blue=1})
 ExtendTech(t,{name="warptorio-bridgesize-2",unit={count=1000,time=40},prerequisites={"warptorio-bridgesize-1"},
 		unit={count=400,time=40}},{red=1,green=1,black=1,blue=1,purple=1})
@@ -372,6 +371,7 @@ ExtendTech(t,{name="warptorio-factory-5",unit={count=240,time=20}, prerequisites
 ExtendTech(t,{name="warptorio-factory-6",unit={count=290,time=20}, prerequisites={"warptorio-factory-5"}}, {red=2,green=2,blue=1,purple=2})
 ExtendTech(t,{name="warptorio-factory-7",unit={count=350,time=20}, prerequisites={"warptorio-factory-6"}}, {red=1,green=3,blue=1,purple=3})
 
+t.upgrade=false
 ExtendTech(t,{name="warptorio-factory-n",unit={count=1000,time=30}, prerequisites={"warptorio-factory-7"}}, {red=3,green=2,blue=3,purple=2,yellow=1,white=1})
 ExtendTech(t,{name="warptorio-factory-s",unit={count=1000,time=30}, prerequisites={"warptorio-factory-7"}}, {red=3,green=2,blue=3,purple=2,yellow=1,white=1})
 ExtendTech(t,{name="warptorio-factory-e",unit={count=1000,time=30}, prerequisites={"warptorio-factory-7"}}, {red=3,green=2,blue=3,purple=2,yellow=1,white=1})
@@ -395,6 +395,7 @@ ExtendTech(t,{name="warptorio-boiler-water-2",upgrade=true,unit={count=700,time=
 
 ExtendTech(t,{name="warptorio-boiler-water-3",upgrade=true,unit={count=2000,time=30}, prerequisites={"warptorio-boiler-water-2"}}, {red=1,green=1,blue=1,purple=1,yellow=1,white=1})
 
+t.upgrade=false
 ExtendTech(t,{name="warptorio-boiler-n",unit={count=1000,time=30}, prerequisites={"warptorio-boiler-7"}}, {red=3,green=2,blue=3,purple=2,yellow=1,white=1})
 ExtendTech(t,{name="warptorio-boiler-s",unit={count=1000,time=30}, prerequisites={"warptorio-boiler-7"}}, {red=3,green=2,blue=3,purple=2,yellow=1,white=1})
 ExtendTech(t,{name="warptorio-boiler-e",unit={count=1000,time=30}, prerequisites={"warptorio-boiler-7"}}, {red=3,green=2,blue=3,purple=2,yellow=1,white=1})
@@ -413,7 +414,8 @@ ExtendTech(t,{name="warptorio-logistics-4", unit={count=150,time=20}, prerequisi
 ExtendTech(t,{name="warptorio-dualloader-1", unit={count=1000,time=20}, prerequisites={"warptorio-logistics-1"}}, {red=1} )
 ExtendTech(t,{name="warptorio-dualloader-2", unit={count=1000,time=20}, prerequisites={"warptorio-dualloader-1"}}, {red=2,green=1} )
 ExtendTech(t,{name="warptorio-dualloader-3", unit={count=1000,time=20}, prerequisites={"warptorio-dualloader-2"}}, {red=3,green=2,purple=1} )
-ExtendTech(t,{name="warptorio-triloader-1", unit={count=2000,time=20}, prerequisites={"warptorio-dualloader-3"}}, {red=1,green=1,purple=1,blue=1,black=1,yellow=1} )
+t.upgrade=false
+ExtendTech(t,{name="warptorio-triloader", unit={count=2000,time=20}, prerequisites={"warptorio-dualloader-3"}}, {red=1,green=1,purple=1,blue=1,black=1,yellow=1} )
 
 -- ----
 -- Energy Upgrades
@@ -458,7 +460,7 @@ ExtendTech(t,{name="warptorio-radar-1",unit={count=300,time=15},prerequisites={"
 -- ----
 -- Warp Armor
 local t={type="technology",icon_size=128,icons={ {icon="__base__/graphics/technology/power-armor-mk2.png",tint={r=0.2,g=0.2,b=1,a=0.8}},},prerequisites={"power-armor-mk2"} }
-ExtendTech(t,{name="warptorio-armor-1",unit={count=500,time=60},effects={{recipe="warptorio-armor",type="unlock-recipe"}}},{red=4,green=4,blue=4,black=5,yellow=2})
+ExtendTech(t,{name="warptorio-armor",unit={count=500,time=60},effects={{recipe="warptorio-armor",type="unlock-recipe"}}},{red=4,green=4,blue=4,black=5,yellow=2})
 
 
 data:extend{{type="equipment-grid",name="warptorio-warparmor-grid",equipment_categories={"armor"},height=16,width=16}}

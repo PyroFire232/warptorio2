@@ -159,7 +159,7 @@ function TELL:SwapLoaderChests(i,a,b)
 		local va=warptorio.SpawnEntity(ea.surface,eax,ea.position.x,ea.position.y)
 		local vb=warptorio.SpawnEntity(eb.surface,ebx,eb.position.x,eb.position.y)
 		warptorio.CopyChestEntity(ea,va) warptorio.CopyChestEntity(eb,vb)
-		local cb if(a.loader_type=="input")then cb=va.get_or_create_control_behavior() else game.print("vb" .. vb.name) cb=vb.get_or_create_control_behavior() end
+		local cb if(a.loader_type=="input")then cb=va.get_or_create_control_behavior() else cb=vb.get_or_create_control_behavior() end
 		cb.circuit_mode_of_operation=defines.control_behavior.logistic_container.circuit_mode_of_operation.set_requests
 			
 		ea.destroy() eb.destroy()
@@ -519,6 +519,8 @@ function warptorio.BuildB1() local m=gwarptorio.Floors.b1 local f=m:GetSurface()
 			warptorio.LaySquare("warp-tile",f,-9-1.5,c.north-zxn,zxc,zxc) warptorio.LaySquare("warp-tile",f,9-1.5,c.north-zxn,zxc,zxc) end
 		if(gwarptorio.factory_s or true)then warptorio.LaySquare("warp-tile",f,-2,z+zxm+4,zvy,zvx)
 			warptorio.LaySquare("warp-tile",f,-9-1,c.south+zxn,zxc,zxc) warptorio.LaySquare("warp-tile",f,9-1,c.south+zxn,zxc,zxc) end
+
+		for k,v in pairs({nw={-1,-1},sw={-1,-1},ne={-1,-1},se={-1,-1}})do local c=warptorio.railCorn[k] warptorio.LayFloor("hazard-concrete-left",f,c.x+v[1],c.y+v[2],2,2) end
 	end
 	
 
@@ -667,12 +669,6 @@ function warptorio.InitEntities()
 	local main=gwarptorio.Floors.main
 	local b1=gwarptorio.Floors.b1
 	local b2=gwarptorio.Floors.b2
-
-	local e=main.f.create_entity{name="warptorio-reactor",position={-1,-1},force=game.forces.player}
-	main.ents.warp_reactor=e
-	e.minable=false
-
-
 end
 
 warptorio.BadCloneTypes={"offshore-pump","resource","warptorio-underground-1"}
@@ -706,16 +702,17 @@ function warptorio.OnLoad()
 	gwarptorio=global.warptorio
 	for k,v in pairs(gwarptorio.Floors)do setmetatable(v,warptorio.FloorMeta) end
 	for k,v in pairs(gwarptorio.Teleporters)do setmetatable(v,warptorio.TeleporterMeta) end
+	for k,v in pairs(gwarptorio.Rails)do setmetatable(v,warptorio.TelerailMeta) end
 end script.on_load(warptorio.OnLoad)
 
 
 
 
 function warptorio.TickWarpEnergy(e)
-	local up=gwarptorio.Research["reactor"] or 0 if(up==0)then return end
+	--local up=gwarptorio.Research["reactor"] or 0 if(up==0)then return end
 	local t={}
-	if(isvalid(gwarptorio.warp_reactor))then table.insert(gwarptorio.warp_reactor) end
-	for _,m in pairs(gwarptorio.Floors)do for k,v in pairs(m:GetSurface().find_entities_filtered{name="warptorio-heatpipe"})do table.insert(t,v) end end
+	if(isvalid(gwarptorio.warp_reactor))then table.insert(t,gwarptorio.warp_reactor) end
+	for _,m in pairs(gwarptorio.Floors)do local sf=m:GetSurface() if(sf.valid)then for k,v in pairs(sf.find_entities_filtered{name="warptorio-heatpipe"})do table.insert(t,v) end end end
 	local h=0 for k,v in pairs(t)do h=h+v.temperature end
 	for k,v in pairs(t)do v.temperature=h/#t end
 end
@@ -751,60 +748,34 @@ function warptorio.TickWarpAlarm()
 		end
 	end 
 end
-function warptorio.TickAccelerator(e)
-	
-	--*** warp accelerator logic
-	if gwarptorio.warp_accelerator ~= nil and gwarptorio.warp_charging == 0 then
-		if gwarptorio.warp_accelerator.energy > 5*math.pow(10, 6)-1 then
-			gwarptorio.warp_accelerator.energy = 0
-			gwarptorio.warp_charge_time = gwarptorio.warp_charge_time *0.99
-			local caption = "   Charge Time : " .. util.formattime(math.ceil(60*global.warp_charge_time))
-			warptorio.updatelabel("time_left",caption)
-		end
-	end
-end
-
-function warptorio.TickStabilizer(e)
-	--*** bitter anger clean capacity
-	if global.warp_stabilizer_accumulator ~= nil then
-		local stabilize = 0
-		if global.warp_stabilizer_accumulator_discharge_count == 0 and global.warp_stabilizer_accumulator.energy > 1*math.pow(10, 8)-1 then
-			global.warp_stabilizer_accumulator_discharge_count = 1
-			stabilize = 1
-			if global.warp_stabilizer_accumulator_research_level > 1 then
-				create_warp_stab_accu(2)
-			end	
-		elseif global.warp_stabilizer_accumulator_discharge_count == 1 and global.warp_stabilizer_accumulator.energy > 1*math.pow(10, 10)-1 and global.warp_stabilizer_accumulator_research_level > 1 then
-			stabilize = 1
-			if global.warp_stabilizer_accumulator_research_level > 2 then
-				create_warp_stab_accu(3)
-			end					
-		elseif global.warp_stabilizer_accumulator_discharge_count == 2 and global.warp_stabilizer_accumulator.energy > 1*math.pow(10, 11)-1 and global.warp_stabilizer_accumulator_research_level > 2 then
-			stabilize = 1
-			global.warp_stabilizer_accumulator_discharge_count = 3
-		end
-		if stabilize == 1 then
-			game.forces["enemy"].evolution_factor=0	
-			global.polution_amount = 1
-			game.surfaces[global.current_surface].clear_pollution()
-			game.surfaces[global.current_surface].set_multi_command{command={type=defines.command.flee, from=global.warp_reactor}, unit_count=1000, unit_search_distance=500}
-			surface_play_sound("reactor-stabilized", global.current_surface)	
-
-		end
-	end
-end
 
 function warptorio.TickTimers(e)
 	if(gwarptorio.warp_charging==1)then
 		gwarptorio.warp_time_left=60*gwarptorio.warp_charge_time - (e-gwarptorio.warp_charge_start_tick)
-		warptorio.updatelabel("time_left","   Time to warp : " .. util.formattime(gwarptorio.warp_time_left))
+		warptorio.updatelabel("warptorio_time_left","    Warp-out In : " .. util.formattime(gwarptorio.warp_time_left))
 		if(gwarptorio.warp_time_left<=0)then
 			warptorio.Warpout()
 			gwarptorio.time_spent_start_tick=e
 		end
 	end
 	gwarptorio.time_passed=e - gwarptorio.time_spent_start_tick
-	warptorio.updatelabel("time_passed_label","   Time passed on this planet : " .. util.formattime(gwarptorio.time_passed))
+	warptorio.updatelabel("warptorio_time_passed","    Planet Time Passed : " .. util.formattime(gwarptorio.time_passed))
+
+
+	local rta=(gwarptorio.Research.reactor or 0)
+	if(not gwarptorio.warp_reactor)then
+		gwarptorio.warp_auto_end=60*gwarptorio.warp_auto_time - (e-gwarptorio.warp_charge_start_tick)
+		warptorio.updatelabel("warptorio_autowarp","    Auto-Warp In : " .. util.formattime(gwarptorio.warp_auto_end))
+		if(gwarptorio.warp_auto_end<=0)then
+			warptorio.Warpout()
+			gwarptorio.time_spent_start_tick=e
+		end
+	else warptorio.updatelabel("warptorio_autowarp","") end
+
+	if(gwarptorio.charting or gwarptorio.accelerator or gwarptorio.stabilizer)then
+		local n=math.max((gwarptorio.ability_next or 0)-game.tick,0)
+		if(n<=0)then warptorio.updatelabel("warptorio_ability_next","    Ability Ready!") else warptorio.updatelabel("warptorio_ability_next","    Cooldown : " .. util.formattime(n)) end
+	end
 end
 
 function warptorio.Tick(ev) local e=ev.tick
@@ -871,7 +842,16 @@ upcs["factory-beacon"]=function(lv,f) local m=gwarptorio.Floors.b1 local inv={}
 	warptorio.playsound("warp_in",m:GetSurface().name)
 end
 
-upcs["reactor"]=function(lv) local m=gwarptorio.Floors.main warptorio.playsound("warp_in",m:GetSurface().name) end
+upcs["reactor"]=function(lv) local m=gwarptorio.Floors.main warptorio.playsound("warp_in",m:GetSurface().name)
+	if(lv>=6 and not gwarptorio.warp_reactor)then
+		local e=gwarptorio.Floors.main.f.create_entity{name="warptorio-reactor",position={-1,-1},force=game.forces.player}
+		gwarptorio.warp_reactor=e
+		e.minable=false
+	end
+	if(lv<6)then
+		gwarptorio.warp_auto_time=gwarptorio.warp_auto_time+60*10
+	end
+end
 --[[upcs["stabilizer"]=function(lv) local m=gwarptorio.Floors.main
 	warptorio.cleanbbox(m:GetSurface(),-6,-2,-4,0) local e=warptorio.SpawnEntity(m:GetSurface(),"warptorio-stabilizer-"..lv,-5,-1) m.stabilizer=e e.minable=false
 	warptorio.playsound("warp_in",m:GetSurface().name)
@@ -894,10 +874,10 @@ ups["warptorio-platform-size-5"] = {"platform-size",function() return 56+7 end}
 ups["warptorio-platform-size-6"] = {"platform-size",function() return 74+7 end}
 ups["warptorio-platform-size-7"] = {"platform-size",function() return 96+7 end}
 
-ups["warptorio-rail-nw-1"] = function() gwarptorio.rail_nw=true warptorio.BuildRailCorner("nw") end
-ups["warptorio-rail-ne-1"] = function() gwarptorio.rail_ne=true warptorio.BuildRailCorner("ne") end
-ups["warptorio-rail-sw-1"] = function() gwarptorio.rail_sw=true warptorio.BuildRailCorner("sw") end
-ups["warptorio-rail-se-1"] = function() gwarptorio.rail_se=true warptorio.BuildRailCorner("se") end
+ups["warptorio-rail-nw"] = function() gwarptorio.rail_nw=true warptorio.BuildRailCorner("nw") end
+ups["warptorio-rail-ne"] = function() gwarptorio.rail_ne=true warptorio.BuildRailCorner("ne") end
+ups["warptorio-rail-sw"] = function() gwarptorio.rail_sw=true warptorio.BuildRailCorner("sw") end
+ups["warptorio-rail-se"] = function() gwarptorio.rail_se=true warptorio.BuildRailCorner("se") end
 
 ups["warptorio-factory-0"] = function() warptorio.TeleCls.b1() end -- 17
 ups["warptorio-factory-1"] = {"factory-size",function() return 23 end}
@@ -921,6 +901,10 @@ ups["warptorio-reactor-1"] = {"reactor"}
 ups["warptorio-reactor-2"] = {"reactor"}
 ups["warptorio-reactor-3"] = {"reactor"}
 ups["warptorio-reactor-4"] = {"reactor"}
+ups["warptorio-reactor-5"] = {"reactor"}
+ups["warptorio-reactor-6"] = {"reactor"}
+ups["warptorio-reactor-7"] = {"reactor"}
+ups["warptorio-reactor-8"] = {"reactor"}
 
 ups["warptorio-teleporter-0"] = function() warptorio.TeleCls.offworld() end
 ups["warptorio-teleporter-1"] = {"teleporter-energy"}
@@ -957,12 +941,12 @@ ups["warptorio-dualloader-1"] = {"dualloader"}
 ups["warptorio-dualloader-2"] = {"dualloader"}
 ups["warptorio-dualloader-3"] = {"dualloader"}
 
-ups["warptorio-triloader-1"] = {"triloader"}
+ups["warptorio-triloader"] = {"triloader"}
 
 
-ups["warptorio-accelerator-1"] = {"accelerator"}
-ups["warptorio-stabilizer-1"] = {"stabilizer"}
-ups["warptorio-charting-1"] = {"charting"}
+ups["warptorio-accelerator"] = function() gwarptorio.accelerator=true for k,v in pairs(game.players)do warptorio.BuildGui(v) end end
+ups["warptorio-stabilizer"] = function() gwarptorio.stabilizer=true for k,v in pairs(game.players)do warptorio.BuildGui(v) end end
+ups["warptorio-charting"] = function() gwarptorio.charting=true for k,v in pairs(game.players)do warptorio.BuildGui(v) end end
 
 ups["warptorio-duallogistic-1"] = function() gwarptorio.duallogistic=true end
 ups["warptorio-warpenergy-0"] = function() gwarptorio.warpenergy=true end
@@ -1009,35 +993,41 @@ function warptorio.BuildGui(player)
 	local gui=player.gui
 	if(not gui.valid)then player.print("invalid gui error!") return end
 
-	local f if(gwarptorio.gui)then f=gwarptorio.gui f.clear() else f=gui.left.add{name="warptorio_frame",type="flow",direction="vertical"} gwarptorio.gui=f end
-	local fa=f.add{name="warptorio_line1",type="flow",direction="horizontal"}
-	local fb=f.add{name="warptorio_line2",type="flow",direction="horizontal"}
-	local fc=f.add{name="warptorio_line3",type="flow",direction="horizontal"}
-	local fd=f.add{name="warptorio_line4",type="flow",direction="horizontal"}
+	local f if(gwarptorio.gui)then f=gwarptorio.gui else f=gui.left.add{name="warptorio_frame",type="flow",direction="vertical"} gwarptorio.gui=f end
+	local fa=f.warptorio_line1 if(fa==nil)then fa=f.add{name="warptorio_line1",type="flow",direction="horizontal"} end
+	local fb=f.warptorio_line2 if(fb==nil)then fb=f.add{name="warptorio_line2",type="flow",direction="horizontal"} end
 
-	fa.add{type="button",name="warptorio_dowarp",caption={"warptorio-warp"}}
-	fa.add{type="drop-down",name="warptorio_target",items=planetDropdown,selected_index=1}
-	fa.add{type="label",name="warptorio_time_passed",caption={"warptorio-time-passed","-"}}
-	fa.add{type="label",name="warptorio_time_left",caption={"warptorio-time-left","-"}}
-	fa.add{type="label",name="warptorio_warpzone",caption={"warptorio-warpzone","-"}}
+	local g=fa.warptorio_dowarp if(g==nil)then g=fa.add{type="button",name="warptorio_dowarp",caption={"warptorio-warp"}} end
+	local g=fa.warptorio_target if(g==nil)then g=fa.add{type="drop-down",name="warptorio_target",items={"(Random)"}} end if(gwarptorio.charting)then g.items=planetDropdown end
+	local g=fa.warptorio_time_passed if(g==nil)then g=fa.add{type="label",name="warptorio_time_passed",caption={"warptorio-time-passed","-"}} end
+	local g=fa.warptorio_time_left if(g==nil)then g=fa.add{type="label",name="warptorio_time_left",caption={"warptorio-time-left","-"}} end
+	local g=fa.warptorio_warpzone if(g==nil)then g=fa.add{type="label",name="warptorio_warpzone",caption={"warptorio-warpzone","-"}} end
+	local g=fa.warptorio_autowarp if(g==nil)then g=fa.add{type="label",name="warptorio_autowarp",caption={"warptorio-autowarp","-"}} end
 
-	fa.warptorio_warpzone.caption="   Warp number : " .. (gwarptorio.warpzone or 0)
-	fa.warptorio_time_left.caption="   Charge Time : " .. util.formattime(gwarptorio.warp_time_left or 0)
-
-
-	fb.add{type="button",name="warptorio_dostabilize",caption={"warptorio-stabilize"}}
-	fb.add{type="label",name="warptorio_accumulator_charge",caption={"warptorio-stabilizer-charge","-"}}
-	fb.add{type="label",name="warptorio_accumulator_uses",caption={"warptorio-stabilizer-uses","-"}}
+	fa.warptorio_warpzone.caption="    Warp number : " .. (gwarptorio.warpzone or 0)
+	fa.warptorio_time_left.caption="    Charge Time : " .. util.formattime((gwarptorio.warp_time_left or 0)*60)
 
 
-	fc.add{type="button",name="warptorio_radar",caption={"warptorio-radar"}}
-	fc.add{type="label",name="warptorio_radar_charge",caption={"warptorio-radar-charge","-"}}
-	fc.add{type="label",name="warptorio_radar_uses",caption={"warptorio-radar-uses","-"}}
+	local rta=(gwarptorio.Research.reactor or 0)
+	if(not gwarptorio.warp_reactor)then
+		fa.warptorio_autowarp.caption="    Auto-Warp In : " .. util.formattime(gwarptorio.warp_auto_time*60)
+	else warptorio.updatelabel("warptorio_autowarp","") end
 
-	fd.add{type="button",name="warptorio_accel",caption={"warptorio-accel"}}
-	fd.add{type="label",name="warptorio_accel_charge",caption={"warptorio-accel-charge","-"}}
-	fd.add{type="label",name="warptorio_accel_uses",caption={"warptorio-accel-uses","-"}}
-	
+
+	fb.clear()
+	if(gwarptorio.stabilizer)then local g=fb.warptorio_dostabilize if(g==nil)then g=fb.add{type="button",name="warptorio_dostabilize",caption={"warptorio-stabilize"}} end end
+	if(gwarptorio.charting)then local g=fb.warptorio_radar if(g==nil)then g=fb.add{type="button",name="warptorio_radar",caption={"warptorio-radar"}} end end
+	if(gwarptorio.accelerator)then local g=fb.warptorio_accel if(g==nil)then g=fb.add{type="button",name="warptorio_accel",caption={"warptorio-accel"}} end end
+	if(gwarptorio.stabilizer or gwarptorio.charting or gwarptorio.accelerator)then
+		local g=fb.warptorio_ability_next if(g==nil)then g=fb.add{type="label",name="warptorio_ability_next",caption={"warptorio-ability-next","-"}} end
+		local abc=math.max((gwarptorio.ability_next or 0)-game.tick,0)
+		if(abc<=0)then g.caption="    Ability Ready!" else g.caption="    Cooldown : " .. util.formattime(abc) end
+
+		local g=fb.warptorio_ability_uses if(g==nil)then g=fb.add{type="label",name="warptorio_ability_uses",caption={"warptorio-ability-uses","-"}} end
+		g.caption="    Uses on this planet : " .. gwarptorio.ability_uses
+	end
+
+
 end
 
 script.on_event(defines.events.on_gui_selection_state_changed,function(event) local gui=event.element
@@ -1048,11 +1038,64 @@ script.on_event(defines.events.on_gui_selection_state_changed,function(event) lo
 	end
 end)
 
+
+function warptorio.TickAccelerator(e)
+end
+
+function warptorio.TickStabilizer(e)
+end
+
+function warptorio.IncrementAbility(c,m) c=c or 2.5 m=m or 5
+	local n=gwarptorio.ability_uses+1
+	gwarptorio.ability_uses=n
+	gwarptorio.ability_next= 1--game.tick+60*60*(m+(n)*c)
+	warptorio.updatelabel("warptorio_ability_uses","   Uses : " .. n)
+	warptorio.updatelabel("warptorio_ability_next","   Cooldown : " .. util.formattime(math.max(gwarptorio.ability_next-game.tick,0)) )
+end
+
+function warptorio.TryStabilizer() if(game.tick<(gwarptorio.ability_next or 0) or not gwarptorio.warp_reactor)then return end warptorio.IncrementAbility(2.5,5)
+	game.forces["enemy"].evolution_factor=0	
+	gwarptorio.pollution_amount = 1
+	local f=gwarptorio.Floors.main:GetSurface()
+	f.clear_pollution()
+	f.set_multi_command{command={type=defines.command.flee, from=gwarptorio.warp_reactor}, unit_count=1000, unit_search_distance=500}
+	warptorio.playsound("reactor-stabilized", f)
+end
+
+function warptorio.TryRadar() if(game.tick<(gwarptorio.ability_next or 0))then return end warptorio.IncrementAbility(2,3)
+	local n=gwarptorio.radar_uses+1 gwarptorio.radar_uses=n
+	warptorio.updatelabel("warptorio_radar","Radar ("..n..")")
+	local f=gwarptorio.Floors.main:GetSurface()
+	game.forces.player.chart(f,{lefttop={x=-64-128*n,y=-64-128*n},rightbottom={x=64+128*n,y=64+128*n}})
+	warptorio.playsound("reactor-stabilized", f)
+end
+
+function warptorio.TryAccelerator() if(game.tick<(gwarptorio.ability_next or 0))then return end warptorio.IncrementAbility(2.5,5)
+	gwarptorio.warp_charge_time=math.max(gwarptorio.warp_charge_time^0.75,10)
+	if(gwarptorio.warp_charging>1)then warptorio.updatelabel("warptorio_time_left","    Warp-out In : " .. util.formattime(math.ceil(gwarptorio.warp_charge_time*60)) )
+	else warptorio.updatelabel("warptorio_time_left","    Charge Time : " .. util.formattime(math.ceil(gwarptorio.warp_charge_time*60)) )
+	end
+	local f=gwarptorio.Floors.main:GetSurface()
+	warptorio.playsound("reactor-stabilized", f)
+end
+
 script.on_event(defines.events.on_gui_click, function(event)
 	local gui = event.element
-	if gui.name == "warptorio_dowarp" and gwarptorio.warp_charging<1 then
-		gwarptorio.warp_charge_start_tick = event.tick
-		gwarptorio.warp_charging = 1
+	if gui.name == "warptorio_dowarp" then
+		if(gwarptorio.warp_charging<1)then
+			gwarptorio.warp_charge_start_tick = event.tick
+			gwarptorio.warp_charging = 1
+		end
+
+	elseif(gui.name == "warptorio_dostabilize")then -- Stabilizer
+		game.print("stabilizer")
+		warptorio.TryStabilizer()
+
+	elseif(gui.name == "warptorio_radar")then -- Radar
+		warptorio.TryRadar()
+	elseif(gui.name=="warptorio_accel")then -- Accelerator
+		game.print("accel")
+		warptorio.TryAccelerator()
 	end
 end)
 
@@ -1144,7 +1187,8 @@ function warptorio.BuildNewPlanet()
 	local rng=math.random(1,table.Count(warptorio.Planets))
 	local lvl=gwarptorio.Research["reactor"] or 0
 
-	local w if(lvl>=10 and gwarptorio.planet_target and math.random(1,10)<=2)then w=warptorio.Planets[gwarptorio.planet_target] game.print("-Successful Warp-") else w=warptorio.RandomPlanet() end
+	local w if(lvl>=8 and gwarptorio.planet_target and math.random(1,10)<=2)then w=warptorio.Planets[gwarptorio.planet_target] if(w)then game.print("-Successful Warp-") end end
+	if(not w)then w=warptorio.RandomPlanet() end
 
 	if(lvl==1)then game.print(w.name) end
 	game.print(w.desc)
@@ -1156,12 +1200,8 @@ function warptorio.BuildNewPlanet()
 
 	game.forces.player.chart_all(f)
 
-	return f
+	return f,w
 end
-
-
-
-
 
 
 function warptorio.Warpout()
@@ -1172,12 +1212,35 @@ function warptorio.Warpout()
 
 	-- charge time
 	local c=warptorio.CountEntities()
-	gwarptorio.warp_charge_time=1 --10+c/settings.global['warptorio_warp_charge_factor'].value + gwarptorio.warpzone*0.5
-	gwarptorio.warp_time_left = 1 --60*gwarptorio.warp_charge_time
-	warptorio.updatelabel("warptorio_time_left","   Charge Time : " .. util.formattime(gwarptorio.warp_time_left))
+	gwarptorio.warp_charge_time=math.min((10+c/settings.global['warptorio_warp_charge_factor'].value + gwarptorio.warpzone*0.5),60*30)
+	gwarptorio.warp_time_left = 60*gwarptorio.warp_charge_time
+	gwarptorio.warp_lastwarp = game.tick
+
+	local rta=(gwarptorio.Research.reactor or 0)
+	if(not gwarptorio.warp_reactor)then
+		gwarptorio.warp_auto_end=game.tick+60*(60*30+rta*10)
+		gwarptorio.warp_auto_time=60*30+rta*10
+		warptorio.updatelabel("warptorio_autowarp","    Auto-Warp In : " .. util.formattime(gwarptorio.warp_auto_time*60))
+	end
+
+
+	-- abilities
+	if(gwarptorio.accelerator or gwarptorio.radar or gwarptorio.stabilizer)then
+		gwarptorio.ability_uses=0
+		gwarptorio.ability_next= 1--game.tick+60*60*5
+		gwarptorio.radar_uses=0
+		warptorio.updatelabel("warptorio_radar","Radar (0)")
+		warptorio.updatelabel("warptorio_ability_uses","    Uses : " .. gwarptorio.ability_uses)
+		warptorio.updatelabel("warptorio_ability_next","    Cooldown : " .. util.formattime(gwarptorio.ability_next-game.tick))
+	end
 
 	-- create next surface
-	local f=warptorio.BuildNewPlanet()
+	local f,w=warptorio.BuildNewPlanet()
+
+	-- Add planet warp multiplier
+	if(w.warp_multiply)then gwarptorio.warp_charge_time=gwarptorio.warp_charge_time*w.warp_multiply gwarptorio.warp_time_left=gwarptorio.warp_time_left*w.warp_multiply end
+	warptorio.updatelabel("warptorio_time_left","    Charge Time : " .. util.formattime(gwarptorio.warp_charge_time*60))
+
 
 	-- Do the thing
 	--for k,v in pairs(gwarptorio.Teleporters)do v:Warpout() end
@@ -1193,7 +1256,7 @@ function warptorio.Warpout()
 	-- teleport players to new surface
 	for k,v in pairs(game.players)do
 		local p,b=m:GetPos(),m:GetBBox()
-		if(v.character~=nil and v.surface.name==c.name and warptorio.isinbbox(v.character.position,{x=p[1],y=p[2]},{x=b[1],y=b[2]}))then
+		if(v.character~=nil and v.surface.name==c.name and warptorio.isinbbox(v.character.position,{x=p[1],y=p[2]},{x=b[1]-1,y=b[2]}))then
 			table.insert(tpply,{v,{v.position.x,v.position.y}})
 		elseif(v.character~=nil and v.surface.name==gwarptorio.Floors.b1:GetSurface().name or v.surface.name==gwarptorio.Floors.b2:GetSurface().name)then
 			table.insert(tpply,{v,{0,0}})
@@ -1202,13 +1265,13 @@ function warptorio.Warpout()
 
 	local cx=warptorio.corn
 	for k,v in pairs({"nw","ne","sw","se"})do local ug=gwarptorio.Research["turret-"..v] or -1 if(ug>=0)then
-		local etc=f.find_entities_filtered{position={cx[v].x,cx[v].y},radius=(11+(ug*6))/2} for a,e in pairs(etc)do e.destroy() end
+		local etc=f.find_entities_filtered{position={cx[v].x+0.5,cx[v].y+0.5},radius=(11+(ug*6))/2} for a,e in pairs(etc)do e.destroy() end
 
-		local etp=c.find_entities_filtered{type="character",position={cx[v].x,cx[v].y},radius=(11+(ug*6))/2}
+		local etp=c.find_entities_filtered{type="character",position={cx[v].x+0.5,cx[v].y+0.5},radius=(11+(ug*6))/2}
 		for a,e in pairs(etp)do if(e.player and e.player.character~=nil)then table.insert(tpply,{e.player,{e.position.x,e.position.y}}) end end
 			--e.player.teleport(f.find_non_colliding_position("character",{e.position.x,e.position.y},0,1,1),f) end end
 
-		local et=c.find_entities_filtered{type="character",invert=true,position={cx[v].x,cx[v].y},radius=(11+(ug*6))/2}
+		local et=c.find_entities_filtered{type="character",invert=true,position={cx[v].x+0.5,cx[v].y+0.5},radius=(11+(ug*6))/2}
 		c.clone_entities{entities=et,destination_offset={0,0},destination_surface=f,destination_force=game.forces.player}
 	end end
 
@@ -1274,7 +1337,7 @@ function warptorio.safeteleport(e,x,f) local xf=f.find_non_colliding_position(e.
 	if(e.type=="character")then for k,v in pairs(game.players)do if(v.character==e)then v.teleport(xf,f) end end end end
 
 function warptorio.PrintToCharacter(c,msg,x) for k,v in pairs(game.players)do if(v.character==c)then v.print(msg) end end end
-function warptorio.getlabelcontrol(x) local gx=gwarptorio.gui local g=gx.warptorio_line1[x] if(g)then return g end g=gx.warptorio_line2[x] if(g)then return g end end
+function warptorio.getlabelcontrol(x) local gx=gwarptorio.gui local g for i=1,2,1 do g=gx["warptorio_line"..i][x] if(g)then return g end end end
 function warptorio.updatelabel(lbl,txt) for k,v in pairs(game.players)do local g=warptorio.getlabelcontrol(lbl) if(g and g.valid)then g.caption=txt end end end
 function warptorio.isinbbox(pos,pos1,pos2) return not ( (pos.x<pos1.x or pos.y<pos1.y) or (pos.x>pos2.x or pos.y>pos2.y) ) end
 function warptorio.playsound(pth,f,x) for k,v in pairs(game.connected_players)do if(v.surface.name==f)then v.play_sound{path=pth,position=x} end end end
@@ -1300,11 +1363,13 @@ function warptorio.Initialize() if(not global.warptorio)then global.warptorio={}
 	gwarptorio.surf_to_leave_angry_biters_counter = 0
 	gwarptorio.pollution_amount = 1
 
-	gwarptorio.warp_charge_time= 1--10 --in seconds
+	gwarptorio.warp_charge_time= 10 --in seconds
 	gwarptorio.warp_charge_start_tick = 0
 	gwarptorio.warp_charging = 0
 	gwarptorio.warp_timeleft = 60*10
 	gwarptorio.warp_reactor = nil
+	gwarptorio.warp_auto_time = 60*30
+	gwarptorio.warp_auto_end = 60*60*30
 
 	gwarptorio.time_spent_start_tick = 0
 	gwarptorio.time_passed = 0
@@ -1313,6 +1378,9 @@ function warptorio.Initialize() if(not global.warptorio)then global.warptorio={}
 	gwarptorio.biter_expand_cooldown = 1000 * 60
 	gwarptorio.charge_factor = settings.global['warptorio_warp_charge_factor'].value
 
+	gwarptorio.ability_uses=0
+	gwarptorio.ability_next=0
+	gwarptorio.radar_uses=0
 
 	gwarptorio.Teleporters={}
 	gwarptorio.Research={}
