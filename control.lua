@@ -1094,12 +1094,18 @@ function warptorio.TryAccelerator() if(game.tick<(gwarptorio.ability_next or 0))
 	warptorio.playsound("reactor-stabilized", f)
 end
 
+function warptorio.PlayerCanStartWarp(p) for k,v in pairs(gwarptorio.Floors)do if(v:GetSurface()==p.surface)then return true end end return false end
 script.on_event(defines.events.on_gui_click, function(event)
 	local gui = event.element
+	local ply=game.players[event.player_index]
 	if gui.name == "warptorio_dowarp" then
 		if(gwarptorio.warp_charging<1)then
-			gwarptorio.warp_charge_start_tick = event.tick
-			gwarptorio.warp_charging = 1
+			if(warptorio.PlayerCanStartWarp(ply))then
+				gwarptorio.warp_charge_start_tick = event.tick
+				gwarptorio.warp_charging = 1
+			else
+				ply.print("You must be on the same planet as the platform to warp")
+			end
 		end
 
 	elseif(gui.name == "warptorio_dostabilize")then -- Stabilizer
