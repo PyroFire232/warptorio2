@@ -144,39 +144,10 @@ for i=1,8,1 do table.insert(TELL.LogisticsEnts,"loader"..i) table.insert(TELL.Lo
 for i=1,6,1 do table.insert(TELL.LogisticsEnts,"pipe"..i) end
 
 
-function TELL:SwapLoaderChests(i,a,b)
-	local lv=gwarptorio.Research["factory-logistics"] or 0
-	if(lv>=4)then -- buffer chests
-		local ea=self.logs["chest"..i.."-a"] local eax=(a.loader_type=="input" and "logistic-chest-requester" or "logistic-chest-active-provider")
-		local eb=self.logs["chest"..i.."-b"] local ebx=(a.loader_type=="output" and "logistic-chest-requester" or "logistic-chest-active-provider")
-		local va=warptorio.SpawnEntity(ea.surface,eax,ea.position.x,ea.position.y)
-		local vb=warptorio.SpawnEntity(eb.surface,ebx,eb.position.x,eb.position.y)
-		warptorio.CopyChestEntity(ea,va) warptorio.CopyChestEntity(eb,vb)
-		local cb if(a.loader_type=="input")then cb=va.get_or_create_control_behavior() else cb=vb.get_or_create_control_behavior() end
-		cb.circuit_mode_of_operation=defines.control_behavior.logistic_container.circuit_mode_of_operation.set_requests
-			
-		ea.destroy() eb.destroy()
-		self.logs["chest"..i.."-a"]=va self.logs["chest"..i.."-b"]=vb
-	end
-end
 
-function TELL:CheckLoaderDirection(i,a,b) if(not a or not a.valid or not b or not b.valid)then return end
-	local lv=gwarptorio.Research["factory-logistics"] or 0
-	if(a.loader_type ~= self.dir[i][1])then -- A has rotated
-		self.dir[i][1]=a.loader_type
-		self.dir[i][2]=(a.loader_type=="input" and "output" or "input")
-		b.loader_type=self.dir[i][2]
-		self:SwapLoaderChests(i,a,b)
-	elseif(b.loader_type ~= self.dir[i][2])then -- B has rotated
-		self.dir[i][2]=b.loader_type
-		self.dir[i][1]=(b.loader_type=="input" and "output" or "input")
-		a.loader_type=self.dir[i][1]
-		self:SwapLoaderChests(i,a,b)
-	end
-end
 
-function TELL:SpawnPointA(n,f,pos) local e=warptorio.SpawnEntity(f,n,pos.x,pos.y) self:SetPointA(e) return e end
-function TELL:SpawnPointB(n,f,pos) local e=warptorio.SpawnEntity(f,n,pos.x,pos.y) self:SetPointB(e) return e end
+function TELL:SpawnPointA(n,f,pos,nd) local e=warptorio.SpawnEntity(f,n,pos.x,pos.y) if(not nd)then e.minable=false e.destructible=false end self:SetPointA(e) return e end
+function TELL:SpawnPointB(n,f,pos,nd) local e=warptorio.SpawnEntity(f,n,pos.x,pos.y) if(not nd)then e.minable=false e.destructible=false end self:SetPointB(e) return e end
 function TELL:SetPointA(e) self.PointA=e if(self.PointAEnergy)then self.PointA.energy=self.PointAEnergy self.PointAEnergy=nil end end
 function TELL:SetPointB(e) self.PointB=e if(self.PointBEnergy)then self.PointB.energy=self.PointBEnergy self.PointBEnergy=nil end end
 function TELL:DoCheckLoader(i)
@@ -234,19 +205,54 @@ end
 ]]
 
 
+function TELL:SwapLoaderChests(i,a,b)
+	local lv=gwarptorio.Research["factory-logistics"] or 0
+	if(lv>=4)then -- buffer chests
+		local ea=self.logs["chest"..i.."-a"] local eax=(a.loader_type=="input" and "logistic-chest-requester" or "logistic-chest-active-provider")
+		local eb=self.logs["chest"..i.."-b"] local ebx=(a.loader_type=="output" and "logistic-chest-requester" or "logistic-chest-active-provider")
+		local va=warptorio.SpawnEntity(ea.surface,eax,ea.position.x,ea.position.y) va.minable=false va.destructible=false
+		local vb=warptorio.SpawnEntity(eb.surface,ebx,eb.position.x,eb.position.y) vb.minable=false vb.destructible=false 
+		warptorio.CopyChestEntity(ea,va) warptorio.CopyChestEntity(eb,vb)
+		local cb if(a.loader_type=="input")then cb=va.get_or_create_control_behavior() else cb=vb.get_or_create_control_behavior() end
+		cb.circuit_mode_of_operation=defines.control_behavior.logistic_container.circuit_mode_of_operation.set_requests
+			
+		ea.destroy() eb.destroy()
+		self.logs["chest"..i.."-a"]=va self.logs["chest"..i.."-b"]=vb
+	end
+end
+
 function TELL:ConnectCircuit()
 	local vv=self.PointA.connect_neighbour({target_entity=self.PointB,wire=defines.wire_type.red})
 	local vv=self.PointA.connect_neighbour({target_entity=self.PointB,wire=defines.wire_type.green})
 end
 
+function TELL:CheckLoaderDirection(i,a,b) if(not a or not a.valid or not b or not b.valid)then return end
+	local lv=gwarptorio.Research["factory-logistics"] or 0
+	if(a.loader_type ~= self.dir[i][1])then -- A has rotated
+		self.dir[i][1]=a.loader_type
+		self.dir[i][2]=(a.loader_type=="input" and "output" or "input")
+		b.loader_type=self.dir[i][2]
+		self:SwapLoaderChests(i,a,b)
+	elseif(b.loader_type ~= self.dir[i][2])then -- B has rotated
+		self.dir[i][2]=b.loader_type
+		self.dir[i][1]=(b.loader_type=="input" and "output" or "input")
+		a.loader_type=self.dir[i][1]
+		self:SwapLoaderChests(i,a,b)
+	end
+end
+
 function TELL:MakeLoaderPair(f,chest,belt,p,i,u) local ix=(i*2)-1
-	local v=self.logs["loader"..ix.."-"..u] if(not v or not v.valid)then v=warptorio.SpawnEntity(f,belt,p.x-1-i,p.y-1,defines.direction.south) self.logs["loader"..ix.."-"..u]=v v.loader_type=self.dir[ix][1] end
-	local v=self.logs["loader"..ix+1 .."-"..u] if(not v or not v.valid)then v=warptorio.SpawnEntity(f,belt,p.x+1+i,p.y-1,defines.direction.south) self.logs["loader"..ix+1 .."-"..u]=v v.loader_type=self.dir[ix+1][2] end
-	local v=self.logs["chest"..ix.."-"..u] if(not v or not v.valid)then v=warptorio.SpawnEntity(f,chest,p.x-1-i,p.y+1) self.logs["chest"..ix.."-"..u]=v
+	local v=self.logs["loader"..ix.."-"..u] if(not v or not v.valid)then v=warptorio.SpawnEntity(f,belt,p.x-1-i,p.y-1,defines.direction.south) v.minable=false v.destructible=false
+		self.logs["loader"..ix.."-"..u]=v v.loader_type=self.dir[ix][(u=="a" and 1 or 2)] end
+
+	local v=self.logs["loader"..ix+1 .."-"..u] if(not v or not v.valid)then v=warptorio.SpawnEntity(f,belt,p.x+1+i,p.y-1,defines.direction.south) v.minable=false v.destructible=false
+		self.logs["loader"..ix+1 .."-"..u]=v v.loader_type=self.dir[ix+1][(u=="a" and 1 or 2)] end
+
+	local v=self.logs["chest"..ix.."-"..u] if(not v or not v.valid)then v=warptorio.SpawnEntity(f,chest,p.x-1-i,p.y+1) self.logs["chest"..ix.."-"..u]=v v.minable=false v.destructible=false 
 		local inv=self.logcont["chest"..ix .."-"..u] if(inv)then local cv=v.get_inventory(defines.inventory.chest) for x,y in pairs(inv)do cv.insert({name=x,count=y}) end end
 		self.logcont["chest"..ix .."-"..u]=nil
 	end
-	local v=self.logs["chest"..ix+1 .."-"..u] if(not v or not v.valid)then v=warptorio.SpawnEntity(f,chest,p.x+1+i,p.y+1) self.logs["chest"..ix+1 .."-"..u]=v
+	local v=self.logs["chest"..ix+1 .."-"..u] if(not v or not v.valid)then v=warptorio.SpawnEntity(f,chest,p.x+1+i,p.y+1) self.logs["chest"..ix+1 .."-"..u]=v v.minable=false v.destructible=false 
 		local inv=self.logcont["chest"..ix+1 .."-"..u] if(inv)then local cv=v.get_inventory(defines.inventory.chest) for x,y in pairs(inv)do cv.insert({name=x,count=y}) end end
 		self.logcont["chest"..ix+1 .."-"..u]=nil
 	end
@@ -261,14 +267,14 @@ function TELL:SpawnLogisticsPoint(u,a,chest,belt,pipe,dl,lv)
 		if(dl>=3)then self:MakeLoaderPair(f,chest,belt,p,4,u) end
 
 		local px=dl
-		local v=self.logs["pipe1-"..u] if(not v or not v.valid)then self.logs["pipe1-"..u]=warptorio.SpawnEntity(f,pipe,p.x-3-px,p.y+1,defines.direction.west) end
-		local v=self.logs["pipe2-"..u] if(not v or not v.valid)then self.logs["pipe2-"..u]=warptorio.SpawnEntity(f,pipe,p.x+3+px,p.y+1,defines.direction.east) end
+		local v=self.logs["pipe1-"..u] if(not v or not v.valid)then v=warptorio.SpawnEntity(f,pipe,p.x-3-px,p.y+1,defines.direction.west) self.logs["pipe1-"..u]=v v.minable=false v.destructible=false end
+		local v=self.logs["pipe2-"..u] if(not v or not v.valid)then v=warptorio.SpawnEntity(f,pipe,p.x+3+px,p.y+1,defines.direction.east) self.logs["pipe2-"..u]=v v.minable=false v.destructible=false end
 		if(lv>=2)then
-			local v=self.logs["pipe3-"..u] if(not v or not v.valid)then self.logs["pipe3-"..u]=warptorio.SpawnEntity(f,pipe,p.x-3-px,p.y,defines.direction.west) end
-			local v=self.logs["pipe4-"..u] if(not v or not v.valid)then self.logs["pipe4-"..u]=warptorio.SpawnEntity(f,pipe,p.x+3+px,p.y,defines.direction.east) end
+			local v=self.logs["pipe3-"..u] if(not v or not v.valid)then v=warptorio.SpawnEntity(f,pipe,p.x-3-px,p.y,defines.direction.west) self.logs["pipe3-"..u]=v v.minable=false v.destructible=false end
+			local v=self.logs["pipe4-"..u] if(not v or not v.valid)then v=warptorio.SpawnEntity(f,pipe,p.x+3+px,p.y,defines.direction.east) self.logs["pipe4-"..u]=v v.minable=false v.destructible=false end
 		end if(lv>=4)then
-			local v=self.logs["pipe5-"..u] if(not v or not v.valid)then self.logs["pipe5-"..u]=warptorio.SpawnEntity(f,pipe,p.x-3-px,p.y-1,defines.direction.west) end
-			local v=self.logs["pipe6-"..u] if(not v or not v.valid)then self.logs["pipe6-"..u]=warptorio.SpawnEntity(f,pipe,p.x+3+px,p.y-1,defines.direction.east) end
+			local v=self.logs["pipe5-"..u] if(not v or not v.valid)then v=warptorio.SpawnEntity(f,pipe,p.x-3-px,p.y-1,defines.direction.west) self.logs["pipe5-"..u]=v v.minable=false v.destructible=false end
+			local v=self.logs["pipe6-"..u] if(not v or not v.valid)then v=warptorio.SpawnEntity(f,pipe,p.x+3+px,p.y-1,defines.direction.east) self.logs["pipe6-"..u]=v v.minable=false v.destructible=false end
 		end
 		warptorio.playsound("warp_in",f)
 	end
@@ -302,6 +308,10 @@ function TELL:SpawnLogistics() if(not self.logs)then self.logs={} end
 	else
 		self:SpawnLogisticsPoint("b",self.PointB,chest,belt,pipe,dl,lv)
 	end end
+	local lv=gwarptorio.Research["factory-logistics"] or 0
+	if(lv>=4)then -- buffer chests
+		for i=1,8,1 do local a,b=self.logs["loader"..i.."-a"],self.logs["loader"..i.."-b"] if(a and b and a.valid and b.valid)then self:SwapLoaderChests(i,a,b) end end
+	end
 	for k,v in pairs(self.logs)do if(v and v.valid)then v.minable=false v.destructible=false end end
 end
 
@@ -320,7 +330,7 @@ function tpcls.offworld()
 
 	local makeB="warptorio-teleporter-gate-"..lv
 	if(x:ValidPointB())then if(x.PointB.name~=makeB)then bpos=x.PointB.position x:DestroyPointB() elseif(x.PointB.surface.name~=f.name)then x:DestroyPointB() x:DestroyLogisticsB() end end
-	if(not x.PointB)then bpos=f.find_non_colliding_position("warptorio-teleporter-gate-"..lv,bpos,0,1,1) local e=x:SpawnPointB("warptorio-teleporter-gate-"..lv,f,{x=bpos.x,y=bpos.y}) end
+	if(not x:ValidPointB())then bpos=f.find_non_colliding_position("warptorio-teleporter-gate-"..lv,bpos,0,1,1) local e=x:SpawnPointB("warptorio-teleporter-gate-"..lv,f,{x=bpos.x,y=bpos.y},true) end
 
 	if(lgv>=0)then x:SpawnLogistics() end
 	warptorio.playsound("warp_in",f.name)
@@ -589,7 +599,8 @@ function warptorio.TickTeleporters(e) for k,v in pairs(gwarptorio.Teleporters)do
 end end end
 
 -- Teleporter mined/destroyed/rebuilt
-function warptorio.OnBuiltEntity(event) local e=event.created_entity if(warptorio.IsTeleporterGate(e))then local t=gwarptorio.Teleporters["offworld"] t:SetPointB(e) t:Warpin() end
+function warptorio.OnBuiltEntity(event) local e=event.created_entity if(warptorio.IsTeleporterGate(e))then local t=gwarptorio.Teleporters["offworld"]
+	if(t:ValidPointB())then e.destroy() game.print("Unable to spawn more than 1 Planet Teleporter Gate at a time") else t:SetPointB(e) t:Warpin() end end
 end script.on_event(defines.events.on_built_entity, warptorio.OnBuiltEntity)
 
 function warptorio.OnPlayerMinedEntity(event) local e=event.entity if(warptorio.IsTeleporterGate(e))then local t=gwarptorio.Teleporters["offworld"] t:DestroyLogisticsB() end
@@ -1107,7 +1118,6 @@ end)
 function warptorio.InitPlayer(e)
 	local i=e.player_index
 	local p=game.players[i]
-	game.print("playerindex " .. i)
 	warptorio.BuildGui(p)
 	--if(i==1)then warptorio.PostPlayerInit() end
 	warptorio.safeteleport(p.character,{0,-5},gwarptorio.Floors.main:GetSurface())
