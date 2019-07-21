@@ -284,7 +284,7 @@ function TELL:SpawnLogistics() if(not self.logs)then self.logs={} end
 	elseif(lv==3)then chest,belt="steel-chest","express-loader"
 	elseif(lv>=4)then chest,belt="logistic-chest-buffer","express-loader" end
 
-	local dl = ((self.name=="b1" or self.name=="b2") and (gwarptorio.Research["dualloader"] or 3) or (gwarptorio.Research["triloader"] or 1))
+	local dl = ((self.name=="b1" or self.name=="b2") and (gwarptorio.Research["dualloader"] or 0) or (gwarptorio.Research["triloader"] or 0))
 	self:SpawnLogisticsPoint("a",self.PointA,chest,belt,pipe,dl,lv)
 
 	local f=gwarptorio.Floors.main:GetSurface()
