@@ -14,13 +14,6 @@ local function printx(m) for k,v in pairs(game.players)do v.print(m) end end
 local function isvalid(v) return (v and v.valid) end
 function table.HasValue(t,a) for k,v in pairs(t)do if(v==a)then return true end end return false end
 
-local Vector2={} Vector2.__index=Vector2 setmetatable(Vector2,Vector2)
-function Vector2.__call(x,y) x=x or 0 y=y or 0 local t={} setmetatable(t,Vector2) t.x=x t.y=y t[1]=t.x t[2]=t.y return t end
-function Vector2.__add(a,b) local t={} setmetatable(t,Vector2) t.x=a.x+b.x t.y=a.y+b.y t[1]=t.x t[2]=t.y return t end
-function Vector2.__mul(a,b) local t={} setmetatable(t,Vector2) t.x=a.x*b.x t.y=a.y*b.y t[1]=t.x t[2]=t.y return t end
-function Vector2:AddAngle(r,d) local t={} setmetatable(t,Vector2) t.x=self.x+math.sin(r)*d t.y=self.y+math.cos(r)*d t[1]=t.x t[2]=t.y return t end
-function Vector2:Length() return math.sqrt(self.x^2+self.y^2) end
-
 
 warptorio=warptorio or {}
 
@@ -34,9 +27,6 @@ end
 function warptorio.FlipDirection(v) return (v+4)%8 end
 
 require("control_planets")
--- --------
--- Logistics & Teleporters
-
 
 
 -- ----
@@ -140,6 +130,10 @@ function warptorio.BuildRailCorner(cn) local c=warptorio.corn[cn]
 end
 
 function warptorio.BuildRails() warptorio.BuildRailCorner("nw") warptorio.BuildRailCorner("sw") warptorio.BuildRailCorner("ne") warptorio.BuildRailCorner("se") end --for k,v in pairs(railCorn)do warptorio.BuildRailCorner(k) end end
+
+
+-- --------
+-- Logistics & Teleporters
 
 
 
@@ -1118,17 +1112,16 @@ function warptorio.InitPlayer(e)
 	warptorio.safeteleport(p.character,{0,-5},gwarptorio.Floors.main:GetSurface())
 end script.on_event(defines.events.on_player_created,warptorio.InitPlayer)
 
-
+--[[
 function warptorio.OnPlayerRemoved(ev) local i=ev.player_index
 end script.on_event(defines.events.on_player_removed,warptorio.OnPlayerRemoved)
 function warptorio.OnPlayerPreRemoved(ev) local i=ev.player_index
 end script.on_event(defines.events.on_pre_player_removed,warptorio.OnPlayerPreRemoved)
-
-
 function warptorio.OnPlayerLeft(ev) local i=ev.player_index
 end script.on_event(defines.events.on_player_left_game,warptorio.OnPlayerLeft)
 function warptorio.OnPlayerPreLeft(ev) local i=ev.player_index
 end script.on_event(defines.events.on_pre_player_left_game,warptorio.OnPlayerPreLeft)
+]]
 
 function warptorio.OnPlayerJoined(ev)
 	local i=ev.player_index local p=game.players[i]
