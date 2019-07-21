@@ -13,7 +13,7 @@ local function istable(x) return type(x)=="table" end
 local function printx(m) for k,v in pairs(game.players)do v.print(m) end end
 local function isvalid(v) return (v and v.valid) end
 function table.HasValue(t,a) for k,v in pairs(t)do if(v==a)then return true end end return false end
-
+function table.insertExclusive(t,a) if(not table.HasValue(t,a))then return table.insert(t,a) end return false end
 
 warptorio=warptorio or {}
 
@@ -285,11 +285,12 @@ function TELL:SpawnLogistics() if(not self.logs)then self.logs={} end
 	elseif(lv>=4)then chest,belt="logistic-chest-buffer","express-loader" end
 
 	local dl = ((self.name=="b1" or self.name=="b2") and (gwarptorio.Research["dualloader"] or 0) or (gwarptorio.Research["triloader"] or 0))
-	self:SpawnLogisticsPoint("a",self.PointA,chest,belt,pipe,dl,lv)
+	local a=self.PointA
+	if(a and a.valid)then self:SpawnLogisticsPoint("a",self.PointA,chest,belt,pipe,dl,lv) end
 
 	local f=gwarptorio.Floors.main:GetSurface()
 	local b=self.PointB
-	if(self.name=="offworld")then -- check for collisions
+	if(b and b.valid)then if(self.name=="offworld")then -- check for collisions
 		if(b.surface.name == f.name)then
 			local bp=b.position local bb={bp.x-5,bp.y-1} local bbox={bb,{bb[1]+9,bb[2]+3}}
 			if(f.count_entities_filtered{area=bbox} > 1)then game.print("Unable to place teleporter logistics, something is in the way!")
@@ -300,7 +301,7 @@ function TELL:SpawnLogistics() if(not self.logs)then self.logs={} end
 		end
 	else
 		self:SpawnLogisticsPoint("b",self.PointB,chest,belt,pipe,dl,lv)
-	end
+	end end
 	for k,v in pairs(self.logs)do if(v and v.valid)then v.minable=false v.destructible=false end end
 end
 
@@ -676,11 +677,11 @@ function warptorio.InitEntities()
 	local b2=gwarptorio.Floors.b2
 end
 
-warptorio.BadCloneTypes={"offshore-pump","resource","warptorio-underground-1"}
+warptorio.BadCloneTypes={"offshore-pump","resource"}
 
 local clone={} warptorio.OnEntCloned=clone
 clone["warptorio-reactor"] = function(event)
-	if gwarptorio.warpenergy then event.destination.insert{name="warptorio-reactor-fuel-cell",count=1} end
+	--if gwarptorio.warpenergy then event.destination.insert{name="warptorio-reactor-fuel-cell",count=1} end
 	gwarptorio.warp_reactor = event.destination
 end
 
@@ -691,7 +692,7 @@ function warptorio.OnEntityCloned(ev) local d=ev.destination local type,name=d.t
 		if(e==v.PointA)then v.PointA=d v:ConnectCircuit() return
 		elseif(e==v.PointB)then v.PointB=d v:ConnectCircuit() return
 		elseif(v.logs)then for a,x in pairs(v.logs)do
-			if(ev.source==x)then v.logs[a]=d return end
+			if(e==x)then v.logs[a]=d return end
 		end end
 	elseif(v.logs)then for a,x in pairs(v.logs)do if(ev.source==x)then v.logs[a]=d return end end
 	end end
@@ -1292,8 +1293,11 @@ function warptorio.Warpout()
 	local bbox=m.area
 
 	local tpply={}
-	c.clone_area{source_area=bbox, destination_area=bbox, destination_surface=f, destination_force=game.forces.player, expand_map=false, clone_tiles=true, clone_entities=true,
-		clone_decoratives=false, clear_destination=true}
+	local cx=warptorio.corn
+	local etbl=c.find_entities_filtered{type="character",invert=true,area=m.area}
+	for k,v in pairs(f.find_entities_filtered{type="character",invert=true,area=m.area})do v.destroy() end
+	--[[ c.clone_area{source_area=bbox, destination_area=bbox, destination_surface=f, destination_force=game.forces.player, expand_map=false, clone_tiles=true, clone_entities=true,
+		clone_decoratives=false, clear_destination=true}]]
 
 	-- teleport players to new surface
 	for k,v in pairs(game.players)do
@@ -1305,18 +1309,18 @@ function warptorio.Warpout()
 		end
 	end
 
-	local cx=warptorio.corn
 	for k,v in pairs({"nw","ne","sw","se"})do local ug=gwarptorio.Research["turret-"..v] or -1 if(ug>=0)then
 		local etc=f.find_entities_filtered{position={cx[v].x+0.5,cx[v].y+0.5},radius=(11+(ug*6))/2} for a,e in pairs(etc)do e.destroy() end
 
 		local etp=c.find_entities_filtered{type="character",position={cx[v].x+0.5,cx[v].y+0.5},radius=(11+(ug*6))/2}
 		for a,e in pairs(etp)do if(e.player and e.player.character~=nil)then table.insert(tpply,{e.player,{e.position.x,e.position.y}}) end end
-			--e.player.teleport(f.find_non_colliding_position("character",{e.position.x,e.position.y},0,1,1),f) end end
 
 		local et=c.find_entities_filtered{type="character",invert=true,position={cx[v].x+0.5,cx[v].y+0.5},radius=(11+(ug*6))/2}
-		c.clone_entities{entities=et,destination_offset={0,0},destination_surface=f,destination_force=game.forces.player}
+		for k,v in pairs(et)do table.insertExclusive(etbl,v) end
 	end end
 
+
+	c.clone_entities{entities=etbl,destination_offset={0,0},destination_surface=f,destination_force=game.forces.player}
 
 	for k,v in pairs(tpply)do
 		v[1].teleport(f.find_non_colliding_position("character",{v[2][1],v[2][2]},0,1,1),f)
