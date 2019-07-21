@@ -19,7 +19,7 @@ local function ExtendDataCopy(a,b,x,ri,tx) local t=MakeDataCopy(a,b,x) if(tx)the
 -- --------
 -- Warp Tiles
 
-local t=ExtendDataCopy("tile","tutorial-grid",{name="warp-tile",tint={r=0.6,g=0.6,b=0.7,a=1},decorative_removal_probability=1,walking_speed_modifier=1.6})
+local t=ExtendDataCopy("tile","tutorial-grid",{name="warp-tile",tint={r=0.6,g=0.6,b=0.7,a=1},decorative_removal_probability=1,walking_speed_modifier=1.6,map_color={r=0.2,g=0.1,b=0.25,a=1}})
 
 -- ----
 -- Logistics
@@ -34,9 +34,50 @@ local t=ExtendDataCopy("pipe-to-ground","pipe-to-ground",{name="warptorio-logist
 
 -- Fuel
 data:extend{{type="fuel-category", name="warp"}}
-ExtendDataCopy("item","uranium-fuel-cell",{name="warptorio-reactor-fuel-cell",fuel_category="warp",burnt_result="uranium-fuel-cell",fuel_value="4GJ",stack_size=50,
-	icon_size=32,icons={ {icon="__base__/graphics/icons/uranium-fuel-cell.png",tint={r=1,g=0,b=0.1,a=0.8}}, }, })
-ExtendDataCopy("recipe","uranium-fuel-cell",{name="warptorio-reactor-fuel-cell",enabled=false,result="warptorio-reactor-fuel-cell"})
+
+ExtendDataCopy("item","uranium-fuel-cell",{name="warptorio-warponium-fuel-cell",fuel_category="warp",burnt_result="uranium-fuel-cell",fuel_value="16GJ",stack_size=50,
+	icon=false,icon_size=32,icons={ {icon="__base__/graphics/icons/uranium-fuel-cell.png",tint={r=1,g=0.2,b=1,a=0.8}}, }, })
+
+ExtendDataCopy("recipe","uranium-fuel-cell",{name="warptorio-warponium-fuel-cell",enabled=false,result="warptorio-warponium-fuel-cell",result_count=1},false,
+	{ingredients={{"uranium-fuel-cell",4}},
+	icon=false,icon_size=32,icons={ {icon="__base__/graphics/icons/uranium-fuel-cell.png",tint={r=1,g=0.2,b=1,a=0.8}}, },
+})
+
+ExtendDataCopy("item","nuclear-fuel",{name="warptorio-warponium-fuel",fuel_category="chemical",
+	fuel_acceleration_multiplier=5,fuel_value="4GJ",stack_size=1,fuel_top_speed_multiplier=1.25,
+	icon=false,icon_size=32,icons={ {icon="__base__/graphics/icons/nuclear-fuel.png",tint={r=1,g=0.2,b=1,a=0.8}}, },
+})
+
+ExtendDataCopy("recipe","nuclear-fuel",{name="warptorio-warponium-fuel",enabled=false,result="warptorio-warponium-fuel",result_count=1},false,
+	{ingredients={{"warptorio-warponium-fuel-cell",1},{"nuclear-fuel",1}},
+	icon=false,icon_size=32,icons={ {icon="__base__/graphics/icons/nuclear-fuel.png",tint={r=1,g=0.2,b=1,a=0.8}}, },
+})
+
+-- ----
+-- Warp Bomb
+--[[
+ExtendDataCopy("ammo","atomic-bomb",{name="warptorio-warponium-bomb",
+	ammo_type={
+		action={
+			action_delivery={
+				projectile="warptorio-warponium-rocket",source_effects={entity_name="explosion-hit",type="create-entity"}, starting_speed=0.05,type="projectile"
+			},
+			type="direct",
+		},
+		category="rocket",
+		cooldown_modifier=3,
+		range_modifier=5,
+		target_type="position",
+	},
+	stack_size=20,
+	icon=false,icon_size=32,icons={ {icon="__base__/graphics/icons/atomic-bomb.png",tint={r=1,g=0.2,b=1,a=0.8}}, },
+})
+
+ExtendDataCopy("recipe","atomic-bomb",{name="warptorio-warponium-bomb",enabled=true,result="warptorio-warponium-bomb"},false,
+	{ingredients={{"atomic-bomb",1},{"warptorio-warponium-fuel-cell",1},{"warptorio-warponium-fuel",1}},
+	icon=false,icons={ {icon="__base__/graphics/icons/atomic-bomb.png",tint={r=1,g=0.2,b=1,a=0.8}}, },
+})]]
+
 
 -- The Reactor Itself
 local t=ExtendDataCopy("reactor","nuclear-reactor",{name="warptorio-reactor",max_health=5000,neighbour_bonus=12,consumption="20MW",
@@ -236,12 +277,25 @@ ExtendTech(t,{name="warptorio-reactor-4",unit={count=50,time=5}, prerequisites={
 ExtendTech(t,{name="warptorio-reactor-5",unit={count=50,time=5}, prerequisites={"warptorio-reactor-4"}}, {red=1,green=1,black=1,blue=1,purple=1})
 ExtendTech(t,{name="warptorio-reactor-6",unit={count=100,time=90}, prerequisites={"warptorio-reactor-5"}}, {red=4,black=1,purple=1}) -- reactor module
 ExtendTech(t,{name="warptorio-reactor-7",unit={count=1000,time=30}, effects={{recipe="warptorio-heatpipe",type="unlock-recipe"}}, prerequisites={"nuclear-power","warptorio-reactor-6"}}, {red=1,green=1,black=1,blue=1,yellow=1})
-ExtendTech(t,{name="warptorio-reactor-8",unit={count=1000,time=30}, prerequisites={"warptorio-reactor-7"}}, {red=1,green=1,black=1,blue=1,purple=1,yellow=1,white=1}) -- steering
+ExtendTech(t,{name="warptorio-reactor-8",unit={count=1000,time=30}, prerequisites={"warptorio-reactor-7","warptorio-charting","warptorio-kovarex"}}, {red=1,green=1,black=1,blue=1,purple=1,yellow=1,white=1}) -- steering
 
 t.upgrade=false
-ExtendTech(t,{name="warptorio-charting",unit={count=300,time=30}, prerequisites={"warptorio-reactor-6"}}, {red=1,green=1,black=1,blue=1,purple=1,yellow=1}) -- charting
+
+t.icons={ {icon="__base__/graphics/technology/electric-energy-acumulators.png",tint={r=0.2,g=0.2,b=1,a=0.8}} }
 ExtendTech(t,{name="warptorio-stabilizer",unit={count=300,time=30}, prerequisites={"warptorio-reactor-6"}}, {red=1,green=1,black=1,blue=1,purple=1,yellow=1}) -- stabilizer
+
+t.icons={ {icon="__base__/graphics/technology/engine.png",tint={r=0.2,g=0.2,b=1,a=0.8}} }
 ExtendTech(t,{name="warptorio-accelerator",unit={count=300,time=30}, prerequisites={"warptorio-reactor-6"}}, {red=1,green=1,black=1,blue=1,purple=1,yellow=1}) -- accelerator
+
+t.icons={ {icon="__base__/graphics/technology/radar.png",tint={r=0.2,g=0.2,b=1,a=0.8}} }
+ExtendTech(t,{name="warptorio-charting",unit={count=300,time=30}, prerequisites={"warptorio-reactor-6"}}, {red=1,green=1,black=1,blue=1,purple=1,yellow=1}) -- charting
+
+-- ----
+-- Warponium Fuel
+
+local t={type="technology",upgrade=true,icon_size=128,icons={ {icon="__base__/graphics/technology/kovarex-enrichment-process.png",tint={r=0.2,g=0.2,b=1,a=0.8}} },
+	effects={{recipe="warptorio-warponium-fuel",type="unlock-recipe"},{recipe="warptorio-warponium-fuel-cell",type="unlock-recipe"}}, }
+ExtendTech(t,{name="warptorio-kovarex",unit={count=300,time=30}, prerequisites={"warptorio-reactor-7","kovarex-enrichment-process"}}, {red=1,green=1,black=1,blue=1,purple=1,yellow=1}) -- Kovarex
 
 -- ----
 -- Warp Energy Pipe
@@ -263,7 +317,7 @@ local t=ExtendDataCopy("heat-pipe","heat-pipe",{name="warptorio-heatpipe",connec
 })]]
 
 local pipe_icon={ {icon="__base__/graphics/icons/heat-pipe.png",tint={r=0.2,g=0.2,b=1,a=0.8},hr_version={tint={r=0.2,g=0.2,b=1,a=0.8}} } }
-local t=ExtendDataCopy("recipe","heat-pipe",{name="warptorio-heatpipe",result="warptorio-heatpipe",ingredients={{"processing-unit",200},{"heat-pipe",50}}, enabled=true,energy_required=30, })
+local t=ExtendDataCopy("recipe","heat-pipe",{name="warptorio-heatpipe",result="warptorio-heatpipe",ingredients={{"processing-unit",200},{"heat-pipe",50}}, enabled=false,energy_required=30, })
 local t=ExtendDataCopy("item","heat-pipe",{name="warptorio-heatpipe",place_result="warptorio-heatpipe",
 	icon_size=32,icons=pipe_icon,
 })

@@ -140,6 +140,18 @@ planet.stone={ zone=15, rng=5, name="A Stone Planet", desc="A Stone Planet Descr
 -- --------
 -- Biter Planets
 
+planet.polluted={ zone=15,rng=5,name="A Polluted Planet", desc="A heavy aroma of grease and machinery suddenly wafts over the platform and you wonder if you have been here before.",
+	warp_multiply=1.5,
+	gen={
+		autoplace_controls={["enemy-base"]={frequency=2,size=2}},
+	},
+	spawn=function(f)
+		f.daytime=0.5
+		f.freeze_daytime=0
+		for x=-5,5,1 do for y=-5,5,1 do f.pollute({x*2,y*2},1000) end end
+	end,
+}
+
 planet.midnight={ zone=20,rng=5,name="A Planet Called Midnight", desc="Your hands disappear before your eyes as you are shrouded in darkness. This place seems dangerous.",
 	warp_multiply=2,
 	gen={
