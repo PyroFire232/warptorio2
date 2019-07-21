@@ -66,6 +66,14 @@ planet.water={ zone=7, rng=5, name="An Ocean Planet", desc="There is water all a
 	spawn=function(f) end,
 }
 
+planet.rich={ zone=60, rng=2, name="A Rich Planet", desc="A Rich Planet Description",
+	gen={
+		autoplace_controls={["iron-ore"]={frequency=4,size=2},
+			["copper-ore"]={frequency=4,size=2},["coal"]={frequency=4,size=2},["crude-oil"]={frequency=4,size=2},["uranium-ore"]={frequency=4,size=2},["stone"]={frequency=4,size=2},
+		},
+	},
+	spawn=function(f) end,
+}
 
 -- --------
 -- Resource Specific Planets

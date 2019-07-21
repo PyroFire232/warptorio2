@@ -14,7 +14,7 @@ data:extend(
         name = "warptorio_warp_polution_factor",
         setting_type = "runtime-global",
         default_value = 1.01,
-        minimum_value = 1,
+        minimum_value = 1.01,
         maximum_value = 2,
         order = "e",
     },

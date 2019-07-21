@@ -1008,7 +1008,7 @@ function warptorio.BuildGui(player)
 	local gui=player.gui
 	if(not gui.valid)then player.print("invalid gui error!") return end
 
-	local f=gui.warptorio_frame if(f==nil)then f=gui.left.add{name="warptorio_frame",type="flow",direction="vertical"} end
+	local f=gui.left.warptorio_frame if(f==nil)then f=gui.left.add{name="warptorio_frame",type="flow",direction="vertical"} end
 	local fa=f.warptorio_line1 if(fa==nil)then fa=f.add{name="warptorio_line1",type="flow",direction="horizontal"} end
 	local fb=f.warptorio_line2 if(fb==nil)then fb=f.add{name="warptorio_line2",type="flow",direction="horizontal"} end
 
@@ -1120,7 +1120,7 @@ end)
 function warptorio.InitPlayer(e)
 	local i=e.player_index
 	local p=game.players[i]
-	game.print(i)
+	game.print("playerindex " .. i)
 	warptorio.BuildGui(p)
 	--if(i==1)then warptorio.PostPlayerInit() end
 	warptorio.safeteleport(p.character,{0,-5},gwarptorio.Floors.main:GetSurface())
@@ -1369,7 +1369,7 @@ function warptorio.safeteleport(e,x,f)
 	if(e.type=="character")then for k,v in pairs(game.players)do if(v.character==e)then v.teleport(f.find_non_colliding_position("character",x,12,1,true),f) end end end end
 
 function warptorio.PrintToCharacter(c,msg,x) for k,v in pairs(game.players)do if(v.character==c)then v.print(msg) end end end
-function warptorio.getlabelcontrol(ply,x) local gx=ply.gui.warptorio_frame if(gx)then local g for i=1,2,1 do g=gx["warptorio_line"..i][x] if(g)then return g end end end end
+function warptorio.getlabelcontrol(ply,x) local gx=ply.gui.left.warptorio_frame if(gx)then local g for i=1,2,1 do g=gx["warptorio_line"..i][x] if(g)then return g end end end end
 function warptorio.updatelabel(lbl,txt) for k,v in pairs(game.players)do local g=warptorio.getlabelcontrol(v,lbl) if(g and g.valid)then g.caption=txt end end end
 function warptorio.isinbbox(pos,pos1,pos2) return not ( (pos.x<pos1.x or pos.y<pos1.y) or (pos.x>pos2.x or pos.y>pos2.y) ) end
 function warptorio.playsound(pth,f,x) for k,v in pairs(game.connected_players)do if(v.surface.name==f)then v.play_sound{path=pth,position=x} end end end
