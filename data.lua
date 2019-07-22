@@ -409,7 +409,7 @@ end
 
 ExtendTech(t,{name="warptorio-bridgesize-1",unit={count=1000,time=40},prerequisites={"warptorio-factory-0","warptorio-turret-nw-0","warptorio-turret-ne-0","warptorio-turret-se-0","warptorio-turret-sw-0"},
 		unit={count=200,time=40}},{red=1,green=1,black=1,blue=1})
-ExtendTech(t,{name="warptorio-bridgesize-2",unit={count=1000,time=40},prerequisites={"warptorio-bridgesize-1"},
+ExtendTech(t,{name="warptorio-bridgesize-2",unit={count=1000,time=40},prerequisites={"warptorio-bridgesize-1","warptorio-turret-nw-1","warptorio-turret-ne-1","warptorio-turret-se-1","warptorio-turret-sw-1"},
 		unit={count=400,time=40}},{red=1,green=1,black=1,blue=1,purple=1})
 
 -- ----

@@ -28,7 +28,7 @@ planet.average={ zone=1, rng=15, name="An Average Planet", desc="The usual critt
 -- Other Planets
 
 planet.jungle={ zone=9, rng=3, name="A Jungle Planet", desc="A Jungle Planet Description",
-	gen={autoplace_controls={["trees"]={frequency=2,size=1}}}
+	gen={autoplace_controls={["trees"]={frequency=2,size=2}}}
 }
 
 planet.barren={ zone=3, rng=4, name="A Barren Planet", desc="This world looks deserted and we appear to be safe. .. For now.",
@@ -57,7 +57,7 @@ planet.barren={ zone=3, rng=4, name="A Barren Planet", desc="This world looks de
 	end,
 }
 
-planet.water={ zone=7, rng=5, name="An Ocean Planet", desc="There is water all around and seems to go on forever. The nearby fish that greet you fills you with determination.",
+planet.water={ zone=7, rng=4, name="An Ocean Planet", desc="There is water all around and seems to go on forever. The nearby fish that greet you fills you with determination.",
 	warp_multiply=0.25,
 	gen={ starting_area="none",water=999999,default_enable_all_autoplace_controls=false,autoplace_settings={
 		tile={treat_missing_as_default=false,settings={["water"]={frequency=5,size=5},["deepwater"]={frequency=5,size=5}}},
@@ -67,8 +67,9 @@ planet.water={ zone=7, rng=5, name="An Ocean Planet", desc="There is water all a
 }
 
 planet.rich={ zone=60, rng=2, name="A Rich Planet", desc="A Rich Planet Description",
+	warp_multiply=1.5,
 	gen={
-		autoplace_controls={["iron-ore"]={frequency=4,size=2},
+		autoplace_controls={["iron-ore"]={frequency=4,size=2},["enemy-base"]={frequency=1.25,size=1.25},
 			["copper-ore"]={frequency=4,size=2},["coal"]={frequency=4,size=2},["crude-oil"]={frequency=4,size=2},["uranium-ore"]={frequency=4,size=2},["stone"]={frequency=4,size=2},
 		},
 	},
@@ -78,11 +79,13 @@ planet.rich={ zone=60, rng=2, name="A Rich Planet", desc="A Rich Planet Descript
 -- --------
 -- Resource Specific Planets
 
+local czRes={size=0.25,frequency=0.25,richness=0.35}
+local czIron={size=0.3,frequency=0.25,richness=0.35}
 planet.copper={ zone=8, rng=5, name="A Copper Planet", desc="The warp reactor surges with power and you feel static in the air. You are filled with determination.",
 	warp_multiply=0.5,
 	gen={
 		autoplace_controls={["copper-ore"]={frequency=4,size=2},
-			["iron-ore"]={size=0},["coal"]={size=0},["crude-oil"]={size=0},["uranium-ore"]={size=0},["stone"]={size=0},
+			["iron-ore"]=czRes,["coal"]=czRes,["crude-oil"]=czRes,["uranium-ore"]=czRes,["stone"]=czRes,
 		},
 	},
 	spawn=function(f) for k,v in pairs(f.find_entities_filtered{type="resource"})do if(v.name~="copper-ore")then v.destroy() game.print("iron") end end end
@@ -92,7 +95,7 @@ planet.copper={ zone=8, rng=5, name="A Copper Planet", desc="The warp reactor su
 planet.iron={ zone=5, rng=5, name="An Iron Planet", desc="You land with a loud metal clang. The sparkle in the ground fills you with determination.",
 	gen={
 		autoplace_controls={["iron-ore"]={frequency=4,size=2},
-			["copper-ore"]={size=0},["coal"]={size=0},["crude-oil"]={size=0},["uranium-ore"]={size=0},["stone"]={size=0},
+			["copper-ore"]=czRes,["coal"]=czRes,["crude-oil"]=czRes,["uranium-ore"]=czRes,["stone"]=czRes,
 		},
 	},
 	spawn=function(f) for k,v in pairs(f.find_entities_filtered{type="resource"})do if(v.name~="iron-ore")then v.destroy() game.print("iron") end end end,
@@ -101,7 +104,7 @@ planet.iron={ zone=5, rng=5, name="An Iron Planet", desc="You land with a loud m
 planet.coal={ zone=7, rng=5, name="A Coal Planet", desc="A Coal Planet Description",
 	gen={
 		autoplace_controls={["coal"]={frequency=7,size=2},
-			["iron-ore"]={size=0},["copper-ore"]={size=0},["crude-oil"]={size=0},["uranium-ore"]={size=0},["stone"]={size=0}
+			["iron-ore"]=czRes,["copper-ore"]=czRes,["crude-oil"]=czRes,["uranium-ore"]=czRes,["stone"]=czRes
 		},
 	},
 	spawn=function(f) for k,v in pairs(f.find_entities_filtered{type="resource"})do if(v.name~="coal")then v.destroy() end end end,
@@ -109,8 +112,8 @@ planet.coal={ zone=7, rng=5, name="A Coal Planet", desc="A Coal Planet Descripti
 
 planet.uranium={ zone=15, rng=5, name="A Uranium Planet", desc="The warmth of this worlds green glow fills you with determination, but you probably shouldn't stay too long",
 	gen={
-		autoplace_controls={["uranium-ore"]={frequency=4,size=2},
-			["iron-ore"]={size=0},["copper-ore"]={size=0},["coal"]={size=0},["crude-oil"]={size=0},["stone"]={size=0},
+		autoplace_controls={["uranium-ore"]={frequency=4,size=2},["enemy-base"]={frequency=1.5,size=1.5},
+			["iron-ore"]=czRes,["copper-ore"]=czRes,["coal"]=czRes,["crude-oil"]=czRes,["stone"]=czRes,
 		},
 	},
 	spawn=function(f)
@@ -122,7 +125,7 @@ planet.uranium={ zone=15, rng=5, name="A Uranium Planet", desc="The warmth of th
 planet.oil={ zone=10, rng=5, name="An Oil Planet", desc="An Oil Planet Description",
 	gen={
 		autoplace_controls={["crude-oil"]={frequency=5,size=2},
-			["iron-ore"]={size=0},["copper-ore"]={size=0},["coal"]={size=0},["stone"]={size=0},["uranium-ore"]={size=0}
+			["iron-ore"]=czRes,["copper-ore"]=czRes,["coal"]=cRes,["stone"]=czRes,["uranium-ore"]=czRes
 		},
 	},
 	spawn=function(f)
@@ -135,7 +138,7 @@ planet.oil={ zone=10, rng=5, name="An Oil Planet", desc="An Oil Planet Descripti
 planet.stone={ zone=15, rng=5, name="A Stone Planet", desc="A Stone Planet Description",
 	gen={
 		autoplace_controls={["stone"]={frequency=8,size=2},
-			["iron-ore"]={size=0},["copper-ore"]={size=0},["coal"]={size=0},["crude-oil"]={size=0},["uranium-ore"]={size=0},["crude-oil"]={size=0},
+			["iron-ore"]=czRes,["copper-ore"]=czRes,["coal"]=czRes,["crude-oil"]=czRes,["uranium-ore"]=czRes,["crude-oil"]=czRes,
 		},
 	},
 	spawn=function(f)
@@ -151,12 +154,12 @@ planet.stone={ zone=15, rng=5, name="A Stone Planet", desc="A Stone Planet Descr
 planet.polluted={ zone=15,rng=5,name="A Polluted Planet", desc="A heavy aroma of grease and machinery suddenly wafts over the platform and you wonder if you have been here before.",
 	warp_multiply=1.5,
 	gen={
-		autoplace_controls={["enemy-base"]={frequency=2,size=2}},
+		autoplace_controls={["enemy-base"]={frequency=1.5,size=1.5}},
 	},
 	spawn=function(f)
-		f.daytime=0.5
-		f.freeze_daytime=0
-		for x=-5,5,1 do for y=-5,5,1 do f.pollute({x*2,y*2},1000) end end
+		--f.daytime=0.5
+		--f.freeze_daytime=0
+		for x=-5,5,1 do for y=-5,5,1 do f.pollute({x*32,y*32},2000) end end
 	end,
 }
 

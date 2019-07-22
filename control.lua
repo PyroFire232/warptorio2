@@ -286,7 +286,8 @@ function TELL:SpawnLogistics() if(not self.logs)then self.logs={} end
 	elseif(lv==3)then chest,belt="steel-chest","express-loader"
 	elseif(lv>=4)then chest,belt="logistic-chest-buffer","express-loader" end
 
-	local dl = ((self.name=="b1" or self.name=="b2") and (gwarptorio.Research["dualloader"] or 0) or (gwarptorio.Research["triloader"] or 0))
+	local dl=0 if(self.name=="b1" or self.name=="b2")then dl=gwarptorio.Research["dualloader"] or 0 else dl=gwarptorio.Research["triloader"] or 0 end
+
 	local a=self.PointA
 	if(a and a.valid)then self:SpawnLogisticsPoint("a",self.PointA,chest,belt,pipe,dl,lv) end
 
@@ -334,7 +335,7 @@ function tpcls.offworld()
 end
 function tpcls.b1(lv)
 	local lv=gwarptorio.Research["factory-energy"] or 0 local lgv=gwarptorio.Research["factory-logistics"] or 0
-	local x=gwarptorio.Teleporters["b1"] if(not x)then x=new(TELL,"b1`") end
+	local x=gwarptorio.Teleporters["b1"] if(not x)then x=new(TELL,"b1") end
 	local m=gwarptorio.Floors.main local f=m:GetSurface()
 	local mb=gwarptorio.Floors.b1 local fb=mb:GetSurface()
 	local makeA,makeB="warptorio-underground-"..lv,"warptorio-underground-"..lv
@@ -402,10 +403,10 @@ warptorio.corn.nw={x=-52,y=-52}
 warptorio.corn.ne={x=50,y=-52}
 warptorio.corn.sw={x=-52,y=50}
 warptorio.corn.se={x=50,y=50}
-warptorio.corn.north=-51.5
+warptorio.corn.north=-52
 warptorio.corn.south=50
 warptorio.corn.east=50
-warptorio.corn.west=-52
+warptorio.corn.west=-51.5
 
 function tpcls.nw() local c=warptorio.corn.nw warptorio.SpawnTurretTeleporter("nw",c.x,c.y) gwarptorio.Turrets.nw=n warptorio.BuildPlatform() warptorio.BuildB1() end
 function tpcls.sw() local c=warptorio.corn.sw warptorio.SpawnTurretTeleporter("sw",c.x,c.y) gwarptorio.Turrets.sw=n warptorio.BuildPlatform() warptorio.BuildB1()end
@@ -472,7 +473,7 @@ end
 
 function warptorio.BuildB1() local m=gwarptorio.Floors.b1 local f=m:GetSurface() local z=m.z
 
-	local t={} for k,v in pairs({"nw","ne","sw","se"}) do
+	local t={} for k,v in pairs({"nw","ne","sw","se"}) do -- 0,1,2,3
 		t.nw=(gwarptorio.Research["turret-nw"]) or -1
 		t.ne=(gwarptorio.Research["turret-ne"]) or -1
 		t.sw=(gwarptorio.Research["turret-sw"]) or -1
@@ -484,31 +485,34 @@ function warptorio.BuildB1() local m=gwarptorio.Floors.b1 local f=m:GetSurface()
 	local lright=(t.ne>=0 or t.se>=0)
 
 	local c=warptorio.corn
+	local rsz=gwarptorio.Research.bridgesize or 0
+	local cz=6+(rsz)*4
+	local cpz=59+(rsz)*2
+	local crz=10+rsz*2
 
-	local cz=12+(gwarptorio.Research.bridgesize or 0)*2
-	local cpz=59
-
+	-- Paths
 	if(ltop)then
-		warptorio.LaySquare("warp-tile",f,-1,c.north/2,cz,cpz)
-		if(t.nw>=0)then warptorio.LaySquare("warp-tile",f,c.west/2,c.north,cpz,cz) end
-		if(t.ne>=0)then warptorio.LaySquare("warp-tile",f,c.east/2,c.north,cpz,cz) end
+		warptorio.LaySquare("warp-tile",f,-1,c.north/2,crz,cpz)
+		if(t.nw>=0)then warptorio.LaySquare("warp-tile",f,(c.west/2),c.north,cpz,cz) end
+		if(t.ne>=0)then warptorio.LaySquare("warp-tile",f,(c.east/2)-1,c.north,cpz,cz) end
 	end
 	if(lbot)then
-		warptorio.LaySquare("warp-tile",f,-1,c.south/2,10,cpz)
-		if(t.sw>=0)then warptorio.LaySquare("warp-tile",f,c.west/2,c.south,cpz,cz) end
-		if(t.se>=0)then warptorio.LaySquare("warp-tile",f,c.east/2,c.south,cpz,cz) end
+		warptorio.LaySquare("warp-tile",f,-1,math.floor(c.south/2)-1,crz,cpz)
+		if(t.sw>=0)then warptorio.LaySquare("warp-tile",f,(c.west/2),c.south,cpz,cz) end
+		if(t.se>=0)then warptorio.LaySquare("warp-tile",f,(c.east/2)-1,c.south,cpz,cz) end
 	end
 	if(lleft)then
-		warptorio.LaySquare("warp-tile",f,c.west/2,-1,cpz+1,10)
-		if(t.nw>=0)then warptorio.LaySquare("warp-tile",f,c.west,c.north/2,cz,cpz) end
-		if(t.sw>=0)then warptorio.LaySquare("warp-tile",f,c.west,c.south/2,cz,cpz) end
+		warptorio.LaySquare("warp-tile",f,math.floor(c.west/2)+1,-1,cpz+1,crz)
+		if(t.nw>=0)then warptorio.LaySquare("warp-tile",f,c.west,(c.north/2),cz,cpz) end
+		if(t.sw>=0)then warptorio.LaySquare("warp-tile",f,c.west,(c.south/2),cz,cpz) end
 	end
 	if(lright)then
-		warptorio.LaySquare("warp-tile",f,c.east/2,-1,cpz,10)
-		if(t.ne>=0)then warptorio.LaySquare("warp-tile",f,c.east,c.north/2,cz,cpz) end
-		if(t.se>=0)then warptorio.LaySquare("warp-tile",f,c.east,c.south/2,cz,cpz) end
+		warptorio.LaySquare("warp-tile",f,math.floor(c.east/2)-2,-1,cpz,crz)
+		if(t.ne>=0)then warptorio.LaySquare("warp-tile",f,c.east,(c.north/2),cz,cpz) end
+		if(t.se>=0)then warptorio.LaySquare("warp-tile",f,c.east,(c.south/2),cz,cpz) end
 	end
 
+	-- Turrets
 	if(t.nw>=0)then local z=10+t.nw*6 t.nwz=z local zx=math.floor(z/2) warptorio.LaySquare("warp-tile",f,c.nw.x,c.nw.y,z,z) warptorio.LayFloor("hazard-concrete-left",f,c.nw.x-4,c.nw.y-1,9,3) end
 	if(t.ne>=0)then local z=10+t.ne*6 t.nez=z local zx=math.floor(z/2) warptorio.LaySquare("warp-tile",f,c.ne.x,c.ne.y,z,z) warptorio.LayFloor("hazard-concrete-left",f,c.ne.x-4,c.ne.y-1,9,3) end
 	if(t.sw>=0)then local z=10+t.sw*6 t.swz=z local zx=math.floor(z/2) warptorio.LaySquare("warp-tile",f,c.sw.x,c.sw.y,z,z) warptorio.LayFloor("hazard-concrete-left",f,c.sw.x-4,c.sw.y-1,9,3) end
@@ -559,11 +563,11 @@ function warptorio.BuildB2() local m=gwarptorio.Floors.b2 local f,z=m:GetSurface
 		local zvx=64 local zvy=96 local zxm=32
 		if(gwarptorio.boiler_w or true)then warptorio.LaySquare("warp-tile",f,-z-zxm-6,-1,zvx,zvy) warptorio.LaySquare("warp-tile",f,-z-5,-9,7,7) warptorio.LaySquare("warp-tile",f,-z-5,9,7,7)
 			end
-		if(gwarptorio.boiler_e or true)then warptorio.LaySquare("warp-tile",f,z+zxm+6,-2,zvx,zvy) warptorio.LaySquare("warp-tile",f,z+3,-9,7,7) warptorio.LaySquare("warp-tile",f,z+3,9,7,7)
+		if(gwarptorio.boiler_e or true)then warptorio.LaySquare("warp-tile",f,z+zxm+6,-1,zvx,zvy) warptorio.LaySquare("warp-tile",f,z+3,-9,7,7) warptorio.LaySquare("warp-tile",f,z+3,9,7,7)
 			end
-		if(gwarptorio.boiler_n or true)then warptorio.LaySquare("warp-tile",f,-2,-z-zxm-6,zvy,zvx) warptorio.LaySquare("warp-tile",f,-9,-z-4,7,7) warptorio.LaySquare("warp-tile",f,9,-z-4,7,7)
+		if(gwarptorio.boiler_n or true)then warptorio.LaySquare("warp-tile",f,-1,-z-zxm-6,zvy,zvx) warptorio.LaySquare("warp-tile",f,-9,-z-4,7,7) warptorio.LaySquare("warp-tile",f,9,-z-4,7,7)
 			end
-		if(gwarptorio.boiler_s or true)then warptorio.LaySquare("warp-tile",f,-2,z+zxm+6,zvy,zvx) warptorio.LaySquare("warp-tile",f,-9,z+3,7,7) warptorio.LaySquare("warp-tile",f,9,z+3,7,7)
+		if(gwarptorio.boiler_s or true)then warptorio.LaySquare("warp-tile",f,-1,z+zxm+6,zvy,zvx) warptorio.LaySquare("warp-tile",f,-9,z+3,7,7) warptorio.LaySquare("warp-tile",f,9,z+3,7,7)
 			end
 	end
 	
@@ -783,7 +787,18 @@ function warptorio.TickTimers(e)
 	end
 end
 
+function warptorio.TickChargeTimer(e)
+	if(gwarptorio.warp_charging<1 and gwarptorio.warp_charge_time>30)then -- passive cooldown
+		local r=60-(gwarptorio.Research["reactor"] or 0)*3
+		if(e%(r*5)==0)then
+			gwarptorio.warp_charge_time=math.max(gwarptorio.warp_charge_time-1,30)
+			warptorio.updatelabel("warptorio_time_left","    Charge Time : " .. util.formattime(gwarptorio.warp_charge_time*60))
+		end
+	end
+end
+
 function warptorio.Tick(ev) local e=ev.tick
+	warptorio.TickChargeTimer(e)
 	if(e%5==0)then
 		warptorio.TickLogistics(e)
 		if(e%30==0)then
@@ -1254,7 +1269,7 @@ function warptorio.Warpout()
 
 	-- charge time
 	local c=warptorio.CountEntities()
-	gwarptorio.warp_charge_time=math.min((10+c/settings.global['warptorio_warp_charge_factor'].value + gwarptorio.warpzone*0.5),60*30)
+	gwarptorio.warp_charge_time=math.min( 10+c/settings.global['warptorio_warp_charge_factor'].value + gwarptorio.warpzone*0.5 + (360*( math.min(gwarptorio.warpzone,20) /20)) ,60*30)
 	gwarptorio.warp_time_left = 60*gwarptorio.warp_charge_time
 	gwarptorio.warp_lastwarp = game.tick
 
