@@ -31,46 +31,73 @@ require("control_planets")
 -- Rail Logistics
 
 local TRAIL={} TRAIL.__index=TRAIL warptorio.TelerailMeta=TRAIL
-function TRAIL.__init(self,n) self.name=n self.chests={} self.rails={} self.loaders={} gwarptorio.Rails[n]=self end
+function TRAIL.__init(self,n) self.name=n self.chests={} self.rails={} self.loaders={} gwarptorio.Rails[n]=self self.dir="output" end
 function TRAIL:MakeRails() local f=gwarptorio.Floors.main:GetSurface() local c=warptorio.railCorn[self.name]
-	local r=self.rails[1] if(not isvalid(r))then r=warptorio.SpawnEntity(f,"straight-rail",c.x,c.y,defines.direction.south) self.rails[1]=r end
-	local r=self.rails[2] if(not isvalid(r))then r=warptorio.SpawnEntity(f,"straight-rail",c.x,c.y,defines.direction.east) self.rails[2]=r end
+	local r=self.rails[1] if(not isvalid(r))then r=warptorio.SpawnEntity(f,"straight-rail",c.x,c.y,defines.direction.south) self.rails[1]=r r.minable=false r.destructible=false end
+	local r=self.rails[2] if(not isvalid(r))then r=warptorio.SpawnEntity(f,"straight-rail",c.x,c.y,defines.direction.east) self.rails[2]=r r.minable=false r.destructible=false end
 end
+
+--local t=r.get_inventory(defines.inventory.chest).get_contents() 
 function TRAIL:MakeChests(chest) local f=gwarptorio.Floors.b1:GetSurface() local c=warptorio.railCorn[self.name]
-	local r=self.chests[1] if(isvalid(r) and r.name~=chest)then local t=r.get_inventory(defines.inventory.chest).get_contents() r.destroy() r=nil end
-	if(not isvalid(r))then r=warptorio.SpawnEntity(f,chest,c.x,c.y) self.chests[1]=r end
-	local r=self.chests[2] if(isvalid(r) and r.name~=chest)then local t=r.get_inventory(defines.inventory.chest).get_contents() r.destroy() r=nil end
-	if(not isvalid(r))then r=warptorio.SpawnEntity(f,chest,c.x-1,c.y) self.chests[2]=r end
-	local r=self.chests[3] if(isvalid(r) and r.name~=chest)then local t=r.get_inventory(defines.inventory.chest).get_contents() r.destroy() r=nil end
-	if(not isvalid(r))then r=warptorio.SpawnEntity(f,chest,c.x,c.y-1) self.chests[3]=r end
-	local r=self.chests[4] if(isvalid(r) and r.name~=chest)then local t=r.get_inventory(defines.inventory.chest).get_contents() r.destroy() r=nil end
-	if(not isvalid(r))then r=warptorio.SpawnEntity(f,chest,c.x-1,c.y-1) self.chests[4]=r end
+	local rd=(self.dir=="input")
+	local r,rx=self.chests[1]
+	if(isvalid(r) and r.name~=chest)then rx=r r=nil end
+	if(not isvalid(r))then r=warptorio.SpawnEntity(f,chest,c.x,c.y) self.chests[1]=r r.minable=false r.destructible=false
+		if(rd)then local cb=r.get_or_create_control_behavior() cb.circuit_mode_of_operation=defines.control_behavior.logistic_container.circuit_mode_of_operation.set_requests end
+	end
+	if(rx)then warptorio.CopyChestEntity(rx,r) rx.destroy() end
+
+	local r,rx=self.chests[2]
+	if(isvalid(r) and r.name~=chest)then rx=r r=nil end
+	if(not isvalid(r))then r=warptorio.SpawnEntity(f,chest,c.x-1,c.y) self.chests[2]=r r.minable=false r.destructible=false
+		if(rd)then local cb=r.get_or_create_control_behavior() cb.circuit_mode_of_operation=defines.control_behavior.logistic_container.circuit_mode_of_operation.set_requests end
+	end
+	if(rx)then warptorio.CopyChestEntity(rx,r) rx.destroy() end
+
+	local r,rx=self.chests[3]
+	if(isvalid(r) and r.name~=chest)then rx=r r=nil end
+	if(not isvalid(r))then r=warptorio.SpawnEntity(f,chest,c.x,c.y-1) self.chests[3]=r r.minable=false r.destructible=false
+		if(rd)then local cb=r.get_or_create_control_behavior() cb.circuit_mode_of_operation=defines.control_behavior.logistic_container.circuit_mode_of_operation.set_requests end
+	end
+	if(rx)then warptorio.CopyChestEntity(rx,r) rx.destroy() end
+
+	local r,rx=self.chests[4]
+	if(isvalid(r) and r.name~=chest)then rx=r r=nil end
+	if(not isvalid(r))then r=warptorio.SpawnEntity(f,chest,c.x-1,c.y-1) self.chests[4]=r r.minable=false r.destructible=false
+		if(rd)then local cb=r.get_or_create_control_behavior() cb.circuit_mode_of_operation=defines.control_behavior.logistic_container.circuit_mode_of_operation.set_requests end
+	end
+	if(rx)then warptorio.CopyChestEntity(rx,r) rx.destroy() end
+
 end
+
+function TRAIL:DoCheckLoader(i) local r=self.loaders[i] if(r.loader_type~=self.dir)then self.dir=r.loader_type self:DoMakes() return end end
+function TRAIL:CheckLoaders() for i=1,4,1 do self:DoCheckLoader(i) end end
+
 TRAIL.SpawnLoader={}
 TRAIL.SpawnLoader.nw=function(self,belt) local f=gwarptorio.Floors.b1:GetSurface() local c=warptorio.railCorn[self.name]
-	local r=self.loaders[1] if(isvalid(r) and r.name~=belt)then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x+2,c.y,defines.direction.east,"output") self.loaders[1]=r end
-	local r=self.loaders[2] if(isvalid(r) and r.name~=belt)then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x+2,c.y-1,defines.direction.east,"output") self.loaders[2]=r end
-	local r=self.loaders[3] if(isvalid(r) and r.name~=belt)then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x,c.y+2,defines.direction.south,"output") self.loaders[3]=r end
-	local r=self.loaders[4] if(isvalid(r) and r.name~=belt)then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x-1,c.y+2,defines.direction.south,"output") self.loaders[4]=r end
+	local r=self.loaders[1] if(isvalid(r) and (r.name~=belt or r.loader_type~=self.dir))then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x+2,c.y,defines.direction.east,"output") r.loader_type=self.dir self.loaders[1]=r end
+	local r=self.loaders[2] if(isvalid(r) and (r.name~=belt or r.loader_type~=self.dir))then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x+2,c.y-1,defines.direction.east,"output") r.loader_type=self.dir self.loaders[2]=r end
+	local r=self.loaders[3] if(isvalid(r) and (r.name~=belt or r.loader_type~=self.dir))then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x,c.y+2,defines.direction.south,"output") r.loader_type=self.dir self.loaders[3]=r end
+	local r=self.loaders[4] if(isvalid(r) and (r.name~=belt or r.loader_type~=self.dir))then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x-1,c.y+2,defines.direction.south,"output") r.loader_type=self.dir self.loaders[4]=r end
 end
 TRAIL.SpawnLoader.sw=function(self,belt) local f=gwarptorio.Floors.b1:GetSurface() local c=warptorio.railCorn[self.name]
-	local r=self.loaders[1] if(isvalid(r) and r.name~=belt)then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x+2,c.y,defines.direction.east,"output") self.loaders[1]=r end
-	local r=self.loaders[2] if(isvalid(r) and r.name~=belt)then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x+2,c.y-1,defines.direction.east,"output") self.loaders[2]=r end
-	local r=self.loaders[3] if(isvalid(r) and r.name~=belt)then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x,c.y-2,defines.direction.north,"output") self.loaders[3]=r end
-	local r=self.loaders[4] if(isvalid(r) and r.name~=belt)then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x-1,c.y-2,defines.direction.north,"output") self.loaders[4]=r end
+	local r=self.loaders[1] if(isvalid(r) and (r.name~=belt or r.loader_type~=self.dir))then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x+2,c.y,defines.direction.east,"output") r.loader_type=self.dir self.loaders[1]=r end
+	local r=self.loaders[2] if(isvalid(r) and (r.name~=belt or r.loader_type~=self.dir))then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x+2,c.y-1,defines.direction.east,"output") r.loader_type=self.dir self.loaders[2]=r end
+	local r=self.loaders[3] if(isvalid(r) and (r.name~=belt or r.loader_type~=self.dir))then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x,c.y-2,defines.direction.north,"output") r.loader_type=self.dir self.loaders[3]=r end
+	local r=self.loaders[4] if(isvalid(r) and (r.name~=belt or r.loader_type~=self.dir))then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x-1,c.y-2,defines.direction.north,"output") r.loader_type=self.dir self.loaders[4]=r end
 end
 
 TRAIL.SpawnLoader.ne=function(self,belt) local f=gwarptorio.Floors.b1:GetSurface() local c=warptorio.railCorn[self.name]
-	local r=self.loaders[1] if(isvalid(r) and r.name~=belt)then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x-2,c.y,defines.direction.west,"output") self.loaders[1]=r end
-	local r=self.loaders[2] if(isvalid(r) and r.name~=belt)then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x-2,c.y-1,defines.direction.west,"output") self.loaders[2]=r end
-	local r=self.loaders[3] if(isvalid(r) and r.name~=belt)then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x,c.y+2,defines.direction.south,"output") self.loaders[3]=r end
-	local r=self.loaders[4] if(isvalid(r) and r.name~=belt)then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x-1,c.y+2,defines.direction.south,"output") self.loaders[4]=r end
+	local r=self.loaders[1] if(isvalid(r) and (r.name~=belt or r.loader_type~=self.dir))then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x-2,c.y,defines.direction.west,"output") r.loader_type=self.dir self.loaders[1]=r end
+	local r=self.loaders[2] if(isvalid(r) and (r.name~=belt or r.loader_type~=self.dir))then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x-2,c.y-1,defines.direction.west,"output") r.loader_type=self.dir self.loaders[2]=r end
+	local r=self.loaders[3] if(isvalid(r) and (r.name~=belt or r.loader_type~=self.dir))then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x,c.y+2,defines.direction.south,"output") r.loader_type=self.dir self.loaders[3]=r end
+	local r=self.loaders[4] if(isvalid(r) and (r.name~=belt or r.loader_type~=self.dir))then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x-1,c.y+2,defines.direction.south,"output") r.loader_type=self.dir self.loaders[4]=r end
 end
 TRAIL.SpawnLoader.se=function(self,belt) local f=gwarptorio.Floors.b1:GetSurface() local c=warptorio.railCorn[self.name]
-	local r=self.loaders[1] if(isvalid(r) and r.name~=belt)then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x-2,c.y,defines.direction.west,"output") self.loaders[1]=r end
-	local r=self.loaders[2] if(isvalid(r) and r.name~=belt)then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x-2,c.y-1,defines.direction.west,"output") self.loaders[2]=r end
-	local r=self.loaders[3] if(isvalid(r) and r.name~=belt)then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x,c.y-2,defines.direction.north,"output") self.loaders[3]=r end
-	local r=self.loaders[4] if(isvalid(r) and r.name~=belt)then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x-1,c.y-2,defines.direction.north,"output") self.loaders[4]=r end
+	local r=self.loaders[1] if(isvalid(r) and (r.name~=belt or r.loader_type~=self.dir))then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x-2,c.y,defines.direction.west,"output") r.loader_type=self.dir self.loaders[1]=r end
+	local r=self.loaders[2] if(isvalid(r) and (r.name~=belt or r.loader_type~=self.dir))then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x-2,c.y-1,defines.direction.west,"output") r.loader_type=self.dir self.loaders[2]=r end
+	local r=self.loaders[3] if(isvalid(r) and (r.name~=belt or r.loader_type~=self.dir))then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x,c.y-2,defines.direction.north,"output") r.loader_type=self.dir self.loaders[3]=r end
+	local r=self.loaders[4] if(isvalid(r) and (r.name~=belt or r.loader_type~=self.dir))then r.destroy() r=nil end if(not isvalid(r))then r=warptorio.SpawnEntity(f,belt,c.x-1,c.y-2,defines.direction.north,"output") r.loader_type=self.dir self.loaders[4]=r end
 end
 function TRAIL:MakeLoaders(belt) self.SpawnLoader[self.name](self,belt) end
 
@@ -85,27 +112,36 @@ function TRAIL:SplitItem(u,n)
 	return cx
 end
 
-function TRAIL:BalanceLogistics()
-	local c=warptorio.railCorn[self.name]
-	local f=gwarptorio.Floors.main:GetSurface() if(not f.valid)then return end
-	local e=f.find_entities_filtered{name="cargo-wagon",area={{c.x-1,c.y-1},{c.x,c.y}} }
+function TRAIL:LoadLogistics(e)
+	local inv={} for k,v in pairs(self.chests)do inv[k]=v.get_inventory(defines.inventory.chest) end
+	local ct={} for k,v in pairs(inv)do for a,b in pairs(v.get_inventory(defines.inventory.chest))do ct[k]=(ct[k] or 0)+v end v.clear() end
+	for _,r in pairs(e)do
+		local tr=r.get_inventory(defines.inventory.cargo_wagon)
+		for k,v in pairs(ct)do ct[k]=v-(tr.insert{name=k,count=v}) end
+	end
+	local ci for a,b in pairs(ct)do local g=b ci=#inv for k,v in pairs(inv)do local gci=math.ceil(g/ci) if(gci>0)then local w=v.insert{name=a,count=math.ceil(g/ci)} ci=ci-1 g=g-w end end end
+end
+function TRAIL:UnloadLogistics(e)
 	for _,r in pairs(e)do
 		local inv=r.get_inventory(defines.inventory.cargo_wagon)
 		for k,v in pairs(inv.get_contents())do
 			local ct=self:SplitItem(k,v) if(ct>0)then inv.remove({name=k,count=ct}) end
 		end
 	end
+end
 
-	self:BalanceChests()
+function TRAIL:BalanceLogistics()
+	local c=warptorio.railCorn[self.name]
+	local f=gwarptorio.Floors.main:GetSurface() if(not f.valid)then return end
+	local e=f.find_entities_filtered{name="cargo-wagon",area={{c.x-1,c.y-1},{c.x,c.y}} }
+	if(table.Count(e)>0)then if(self.dir=="output")then self:UnloadLogistics(e) self:BalanceChests() else self:LoadLogistics(e) end
+	else self:BalanceChests() end
 end
 
 function TRAIL:BalanceChests()
-	local inv={}
-	for k,v in pairs(self.chests)do inv[k]=v.get_inventory(defines.inventory.chest) end
-	local ct={}
-	for k,v in pairs(inv)do for a,b in pairs(v.get_contents())do ct[a]=(ct[a] or 0)+b end v.clear() end
-	local ci
-	for a,b in pairs(ct)do local g=b ci=#inv for k,v in pairs(inv)do local gci=math.ceil(g/ci) if(gci>0)then local w=v.insert{name=a,count=math.ceil(g/ci)} ci=ci-1 g=g-w end end end
+	local inv={} for k,v in pairs(self.chests)do inv[k]=v.get_inventory(defines.inventory.chest) end
+	local ct={} for k,v in pairs(inv)do for a,b in pairs(v.get_contents())do ct[a]=(ct[a] or 0)+b end v.clear() end
+	local ci for a,b in pairs(ct)do local g=b ci=#inv for k,v in pairs(inv)do local gci=math.ceil(g/ci) if(gci>0)then local w=v.insert{name=a,count=math.ceil(g/ci)} ci=ci-1 g=g-w end end end
 end
 
 function TRAIL:DoMakes()
@@ -114,7 +150,7 @@ function TRAIL:DoMakes()
 	if(lv==1)then chest,belt="wooden-chest","loader"
 	elseif(lv==2)then chest,belt="iron-chest","fast-loader"
 	elseif(lv==3)then chest,belt="steel-chest","express-loader"
-	elseif(lv>=4)then chest,belt="logistic-chest-active-provider","express-loader" end
+	elseif(lv>=4)then chest,belt=(self.dir=="output" and "logistic-chest-active-provider" or "logistic-chest-requester"),"express-loader" end
 	self:MakeRails()
 	self:MakeChests(chest)
 	self:MakeLoaders(belt)
@@ -797,11 +833,14 @@ function warptorio.TickChargeTimer(e)
 	end
 end
 
+function warptorio.TickLoaders(e) for k,v in pairs(gwarptorio.Rails)do v:CheckLoaders() end end
+
 function warptorio.Tick(ev) local e=ev.tick
 	warptorio.TickChargeTimer(e)
 	if(e%5==0)then
 		warptorio.TickLogistics(e)
 		if(e%30==0)then
+			warptorio.TickLoaders(e)
 			warptorio.TickTeleporters(e)
 			if(e%60==0)then
 				warptorio.TickTimers(e)
@@ -1260,7 +1299,6 @@ function warptorio.BuildNewPlanet()
 	return f,w
 end
 
-
 function warptorio.Warpout()
 	gwarptorio.warp_charge = 0
 	gwarptorio.warp_charging=0
@@ -1269,7 +1307,7 @@ function warptorio.Warpout()
 
 	-- charge time
 	local c=warptorio.CountEntities()
-	gwarptorio.warp_charge_time=math.min( 10+c/settings.global['warptorio_warp_charge_factor'].value + gwarptorio.warpzone*0.5 + (360*( math.min(gwarptorio.warpzone,20) /20)) ,60*30)
+	gwarptorio.warp_charge_time=math.min( 10+c/settings.global['warptorio_warp_charge_factor'].value + gwarptorio.warpzone*0.5 + (360*( math.min(gwarptorio.warpzone,70) /70)) ,60*30)
 	gwarptorio.warp_time_left = 60*gwarptorio.warp_charge_time
 	gwarptorio.warp_lastwarp = game.tick
 
