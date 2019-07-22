@@ -359,7 +359,7 @@ function tpcls.offworld()
 	local bpos={-1,8}
 	local makeA="warptorio-teleporter-"..lv
 	if(x:ValidPointA() and x.PointA.name~=makeA)then x:DestroyPointA() end
-	if(not x.PointA or not x.PointA.valid)then warptorio.cleanbbox(f,-4,5,8,3) local e=x:SpawnPointA("warptorio-teleporter-"..lv,f,{x=-1,y=5}) e.minable=false e.destructible=false end
+	if(not x.PointA or not x.PointA.valid)then warptorio.cleanbbox(f,-4,4,8,3) local e=x:SpawnPointA("warptorio-teleporter-"..lv,f,{x=-1,y=5}) e.minable=false e.destructible=false end
 
 	local makeB="warptorio-teleporter-gate-"..lv
 	if(x:ValidPointB())then if(x.PointB.name~=makeB)then bpos=x.PointB.position x:DestroyPointB() elseif(x.PointB.surface.name~=f.name)then x:DestroyPointB() x:DestroyLogisticsB() end end
@@ -377,8 +377,8 @@ function tpcls.b1(lv)
 	local makeA,makeB="warptorio-underground-"..lv,"warptorio-underground-"..lv
 	if(x:ValidPointA())then if(x.PointA.surface~=f)then x:DestroyPointA() self:DestroyLogisticsA() elseif(x.PointA~=makeA)then x:DestroyPointA() end end
 	if(x:ValidPointB())then if(x.PointB.surface~=fb)then x:DestroyPointB() self:DestroyLogisticsB() elseif(x.PointB~=makeB)then x:DestroyPointB() end end
-	if(not x.PointA or not x.PointA.valid)then warptorio.cleanbbox(f,-7,-7,13,3) local e=x:SpawnPointA(makeA,f,{x=-1,y=-7}) e.minable=false end
-	if(not x.PointB or not x.PointB.valid)then warptorio.cleanbbox(fb,-7,-7,13,3) local e=x:SpawnPointB(makeB,fb,{x=-1,y=-7}) e.minable=false e.destructible=false end
+	if(not x.PointA or not x.PointA.valid)then warptorio.cleanbbox(f,-7,-7-1,13,3) local e=x:SpawnPointA(makeA,f,{x=-1,y=-7}) e.minable=false end
+	if(not x.PointB or not x.PointB.valid)then warptorio.cleanbbox(fb,-7,-7-1,13,3) local e=x:SpawnPointB(makeB,fb,{x=-1,y=-7}) e.minable=false e.destructible=false end
 
 	x:ConnectCircuit()
 
@@ -395,8 +395,8 @@ function tpcls.b2(lv) lv=lv or 0
 	local makeA,makeB="warptorio-underground-"..lv,"warptorio-underground-"..lv
 	if(x:ValidPointA())then if(x.PointA.surface~=f)then x:DestroyPointA() self:DestroyLogisticsA() elseif(x.PointA~=makeA)then x:DestroyPointA() end end
 	if(x:ValidPointB())then if(x.PointB.surface~=fb)then x:DestroyPointB() self:DestroyLogisticsB() elseif(x.PointB~=makeB)then x:DestroyPointB() end end
-	if(not x:ValidPointA())then warptorio.cleanbbox(f,-7,5,13,3) local e=x:SpawnPointA(makeA,f,{x=-1,y=5}) e.minable=false end
-	if(not x:ValidPointB())then warptorio.cleanbbox(fb,-7,5,13,3) local e=x:SpawnPointB(makeB,fb,{x=-1,y=5}) e.minable=false e.destructible=false end
+	if(not x:ValidPointA())then warptorio.cleanbbox(f,-7,4,13,3) local e=x:SpawnPointA(makeA,f,{x=-1,y=5}) e.minable=false end
+	if(not x:ValidPointB())then warptorio.cleanbbox(fb,-7,4,13,3) local e=x:SpawnPointB(makeB,fb,{x=-1,y=5}) e.minable=false e.destructible=false end
 	if(lgv>0)then x:SpawnLogistics() end
 
 	x:ConnectCircuit()
@@ -608,7 +608,7 @@ function warptorio.BuildB2() local m=gwarptorio.Floors.b2 local f,z=m:GetSurface
 	end
 	
 	warptorio.LayFloor("hazard-concrete-left",f,-7,4,13,3)
-	warptorio.LayFloor("hazard-concrete-left",f,-3,-3,5,5)
+	--warptorio.LayFloor("hazard-concrete-left",f,-3,-3,5,5)
 	warptorio.playsound("warp_in",f.name)
 end
 
@@ -743,14 +743,15 @@ end script.on_event(defines.events.on_entity_cloned, warptorio.OnEntityCloned)
 -- further setup
 
 function warptorio.OnLoad()
-	--if(not global.warptorio)then global.warptorio={} end gwarptorio=(gwarptorio or global.warptorio)
+	if(not global.warptorio or not gwarptorio)then return end
 	gwarptorio=global.warptorio
 	for k,v in pairs(gwarptorio.Floors)do setmetatable(v,warptorio.FloorMeta) end
 	for k,v in pairs(gwarptorio.Teleporters)do setmetatable(v,warptorio.TeleporterMeta) end
 	for k,v in pairs(gwarptorio.Rails)do setmetatable(v,warptorio.TelerailMeta) end
 end script.on_load(warptorio.OnLoad)
 
-
+function warptorio.OnConfigChanged(ev)
+end script.on_configuration_changed(warptorio.OnConfigChanged)
 
 
 function warptorio.TickWarpEnergy(e)
@@ -809,7 +810,7 @@ function warptorio.TickTimers(e)
 
 	local rta=(gwarptorio.Research.reactor or 0)
 	if(not gwarptorio.warp_reactor)then
-		gwarptorio.warp_auto_end=60*gwarptorio.warp_auto_time - (e-gwarptorio.warp_charge_start_tick)
+		gwarptorio.warp_auto_end=60*gwarptorio.warp_auto_time - (e-gwarptorio.warp_last)
 		warptorio.updatelabel("warptorio_autowarp","    Auto-Warp In : " .. util.formattime(gwarptorio.warp_auto_end))
 		if(gwarptorio.warp_auto_end<=0)then
 			warptorio.Warpout()
@@ -1105,13 +1106,13 @@ function warptorio.IncrementAbility(c,m) c=c or 2.5 m=m or 5
 	local n=gwarptorio.ability_uses+1
 	gwarptorio.ability_uses=n
 	gwarptorio.ability_next= 1--game.tick+60*60*(m+(n)*c)
-	warptorio.updatelabel("warptorio_ability_uses","   Uses : " .. n)
-	warptorio.updatelabel("warptorio_ability_next","   Cooldown : " .. util.formattime(math.max(gwarptorio.ability_next-game.tick,0)) )
+	warptorio.updatelabel("warptorio_ability_uses","    Uses : " .. n)
+	warptorio.updatelabel("warptorio_ability_next","    Cooldown : " .. util.formattime(math.max(gwarptorio.ability_next-game.tick,0)) )
 end
 
 function warptorio.TryStabilizer() if(game.tick<(gwarptorio.ability_next or 0) or not gwarptorio.warp_reactor)then return end warptorio.IncrementAbility(2.5,5)
 	game.forces["enemy"].evolution_factor=0	
-	gwarptorio.pollution_amount = 1
+	gwarptorio.pollution_amount = 1.5
 	local f=gwarptorio.Floors.main:GetSurface()
 	f.clear_pollution()
 	f.set_multi_command{command={type=defines.command.flee, from=gwarptorio.warp_reactor}, unit_count=1000, unit_search_distance=500}
@@ -1207,7 +1208,7 @@ local FLOOR={} FLOOR.__index=FLOOR warptorio.FloorMeta=FLOOR
 function FLOOR.__init(self,n,z) global.warptorio.Floors[n]=self self.f,self.n=f,n self.ents={} self:SetSize(z) end
 function FLOOR:SetSize(z) self.z,self.x,self.y,self.w,self.h=z,-z/2,-z/2,z,z self:CalcSizebox() end
 function FLOOR:CalcSizebox() self.pos={self.x,self.y} self.size={self.w,self.h}
-	self.bbox={self.x+self.w,self.y+self.h} self.area={self.pos,self.bbox} self.sizebox={self.pos,self.size} end
+	self.bbox={self.x+self.w-1,self.y+self.h-1} self.area={self.pos,self.bbox} self.sizebox={self.pos,self.size} end
 function FLOOR:GetPos() return self.pos end
 function FLOOR:GetSize() return self.size end
 function FLOOR:GetBBox() return self.bbox end
@@ -1252,7 +1253,6 @@ function warptorio.InitFloors() -- init_floors(f)
 	local m=new(FLOOR,"b2",17)
 	local f=m:BuildSurface("warpfloor-b2")
 	warptorio.BuildB2()
-
 end
 
 
@@ -1309,7 +1309,7 @@ function warptorio.Warpout()
 	local c=warptorio.CountEntities()
 	gwarptorio.warp_charge_time=math.min( 10+c/settings.global['warptorio_warp_charge_factor'].value + gwarptorio.warpzone*0.5 + (360*( math.min(gwarptorio.warpzone,70) /70)) ,60*30)
 	gwarptorio.warp_time_left = 60*gwarptorio.warp_charge_time
-	gwarptorio.warp_lastwarp = game.tick
+	gwarptorio.warp_last=game.tick
 
 	local rta=(gwarptorio.Research.reactor or 0)
 	if(not gwarptorio.warp_reactor)then
@@ -1401,7 +1401,7 @@ function warptorio.Warpout()
 	-- stuff to reset
 	gwarptorio.surf_to_leave_angry_biters_counter = 0
 	game.forces["enemy"].evolution_factor=0
-	gwarptorio.pollution_amount=1
+	gwarptorio.pollution_amount=1.5
 	gwarptorio.warp_stabilizer_accumulator_discharge_count = 0
 
 	-- warp sound
@@ -1462,11 +1462,11 @@ end
 
 
 
-function warptorio.Initialize() if(not global.warptorio)then global.warptorio={} gwarptorio=global.warptorio else gwarptorio=global.warptorio return end
+function warptorio.Initialize()
+	if(not global.warptorio)then global.warptorio={} gwarptorio=global.warptorio else gwarptorio=global.warptorio return end
 	gwarptorio.warpzone=0
 
 	gwarptorio.surf_to_leave_angry_biters_counter = 0
-	gwarptorio.pollution_amount = 1
 
 	gwarptorio.warp_charge_time= 10 --in seconds
 	gwarptorio.warp_charge_start_tick = 0
@@ -1475,11 +1475,12 @@ function warptorio.Initialize() if(not global.warptorio)then global.warptorio={}
 	gwarptorio.warp_reactor = nil
 	gwarptorio.warp_auto_time = 60*30
 	gwarptorio.warp_auto_end = 60*60*30
+	gwarptorio.warp_last=game.tick
 
-	gwarptorio.time_spent_start_tick = 0
+	gwarptorio.time_spent_start_tick = game.tick
 	gwarptorio.time_passed = 0
 
-	gwarptorio.pollution_amount = settings.global['warptorio_warp_polution_factor'].value
+	gwarptorio.pollution_amount = 1+settings.global['warptorio_warp_polution_factor'].value
 	gwarptorio.biter_expand_cooldown = 1000 * 60
 	gwarptorio.charge_factor = settings.global['warptorio_warp_charge_factor'].value
 
