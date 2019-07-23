@@ -428,7 +428,7 @@ function warptorio.SpawnTurretTeleporter(c,xp,yp)
 	if(not x:ValidPointA())then warptorio.cleanbbox(f,xp+vx,yp,vw,3) local e=x:SpawnPointA(makeA,f,{x=xp,y=yp}) e.minable=false end
 	if(not x:ValidPointB())then warptorio.cleanbbox(fb,xp+vx,yp,vw,3) local e=x:SpawnPointB(makeB,fb,{x=xp,y=yp}) e.minable=false e.destructible=false end
 
-	if(lgv>0)then x:SpawnLogistics() end
+	if(lgv)then x:SpawnLogistics() end
 
 	x:ConnectCircuit()
 	warptorio.playsound("warp_in",f.name)
@@ -502,7 +502,7 @@ function warptorio.BuildPlatform() local m=gwarptorio.Floors.main local f=m:GetS
 	end
 
 	lgv=(true)
-	local vx = -2-(lgv and 2 or 0)-lgx
+	local vx = -1-(lgv and 2 or 0)-lgx
 	local vw = 3+(lgv and 4 or 0)+lgx*2
 	local c=warptorio.corn
 	if(lvc.nw>=0)then
@@ -587,7 +587,7 @@ function warptorio.BuildB1() local m=gwarptorio.Floors.b1 local f=m:GetSurface()
 	local lgx=math.min((gwarptorio.Research["triloader"] or 0)+(lgv and 1 or 0),1)
 	local lgy=math.min((gwarptorio.Research["dualloader"] or 0)+(lgv and 1 or 0),3)
 	lgv=(lvfs) or lvs>0
-	local vx = -2-(lgv and 2 or 0)-lgx
+	local vx = -1-(lgv and 2 or 0)-lgx
 	local vw = 3+(lgv and 4 or 0)+lgx*2
 
 	-- Turrets
@@ -675,9 +675,10 @@ end
 function warptorio.InitTeleporters(event) end --for k,v in pairs(warptorio.TeleCls)do if(not gwarptorio.Teleporters[k])then gwarptorio.Teleporters[k]=v() end end end
 
 
+warptorio.teleDir={[0]={0,-1},[1]={1,-1},[2]={1,0},[3]={1,1},[4]={0,1},[5]={-1,1},[6]={-1,0},[7]={-1,-1}}
 function warptorio.TickTeleporters(e) for k,v in pairs(gwarptorio.Teleporters)do if(v.PointA and v.PointB and v.PointA.valid and v.PointB.valid)then
 	for i,e in pairs({v.PointA,v.PointB})do
-		local o=(i==1 and v.PointB or v.PointA) local x=e.position local p=e.surface.find_entities_filtered{area={{x.x-1.09,x.y-1.09},{x.x+1.09,x.y+1.09}},type="character"}
+		local o=(i==1 and v.PointB or v.PointA) local x=e.position local p=e.surface.find_entities_filtered{area={{x.x-1.2,x.y-1.2},{x.x+1.2,x.y+1.2}},type="character"}
 		for a,b in pairs(p)do
 			local inv=b.get_main_inventory().get_item_count()
 			if(e.energy and v.cost and false)then
@@ -688,17 +689,25 @@ function warptorio.TickTeleporters(e) for k,v in pairs(gwarptorio.Teleporters)do
 			else
 				warptorio.playsound("teleport",e.surface.name,e.position) warptorio.playsound("teleport",o.surface.name,o.position)
 			end
-			warptorio.safeteleport(b,o.position,o.surface)
+			local w=b.walking_state
+			local ox=o.position
+			if(not w.walking)then local cp=b.position local xd,yd=(x.x-cp.x),(x.y-cp.y) warptorio.safeteleport(b,{x=ox.x+xd*1.25,y=ox.y+yd*1.25},o.surface)
+			else local td=warptorio.teleDir[w.direction] warptorio.safeteleport(b,{x=ox.x+td[1]*2,y=ox.y+td[2]*2},o.surface) end
 		end
 	end
 end end end
 
 -- Teleporter mined/destroyed/rebuilt
 function warptorio.OnBuiltEntity(event) local e=event.created_entity if(warptorio.IsTeleporterGate(e))then
-	if(e.surface.name==gwarptorio.Floors.b1:GetSurface().name)then game.print("The Teleporter only functions on the Planet") return end
 	local t=gwarptorio.Teleporters["offworld"]
-	if(t:ValidPointB())then e.destroy() game.print("Unable to spawn more than 1 Planet Teleporter Gate at a time") else t:SetPointB(e) t:Warpin() end end
-end script.on_event(defines.events.on_built_entity, warptorio.OnBuiltEntity)
+
+	if(t:ValidPointB())then e.destroy() game.print("Unable to spawn more than 1 Planet Teleporter Gate at a time") else
+		t:SetPointB(e)
+		if(e.surface.name==gwarptorio.Floors.b1:GetSurface().name)then game.print("The Teleporter only functions on the Planet") return end
+		if(e.surface.name==gwarptorio.Floors.b2:GetSurface().name)then game.print("The Teleporter only functions on the Planet") return end
+		t:Warpin()
+	end
+end end script.on_event(defines.events.on_built_entity, warptorio.OnBuiltEntity)
 
 function warptorio.OnPlayerMinedEntity(event) local e=event.entity if(warptorio.IsTeleporterGate(e))then local t=gwarptorio.Teleporters["offworld"] t:DestroyLogisticsB() end
 end script.on_event(defines.events.on_player_mined_entity,warptorio.OnPlayerMinedEntity)
@@ -897,11 +906,12 @@ function warptorio.TickLoaders(e) for k,v in pairs(gwarptorio.Rails)do v:CheckLo
 
 function warptorio.Tick(ev) local e=ev.tick
 	warptorio.TickChargeTimer(e)
+	warptorio.TickTeleporters(e)
 	if(e%5==0)then
 		warptorio.TickLogistics(e)
 		if(e%30==0)then
 			warptorio.TickLoaders(e)
-			warptorio.TickTeleporters(e)
+
 			if(e%60==0)then
 				warptorio.TickTimers(e)
 				if(e%120==0)then
@@ -1305,7 +1315,7 @@ function warptorio.InitFloors() -- init_floors(f)
 	m:SetSize(m.OuterSize)
 
 	warptorio.BuildPlatform(z)
-	warptorio.cleanbbox(f,math.floor(-z/2),math.floor(-z/2),z,z)
+	warptorio.cleanbbox(f,math.floor(-z/2),math.floor(-z/2),z-1,z-1)
 
 	local m=new(FLOOR,"b1",17)
 	local f=m:BuildSurface("warpfloor-b1")

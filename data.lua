@@ -1,6 +1,7 @@
 --require("technology/warp-technology")
 require("sound/sound")
 require("data_warptorio-heatpipe")
+--require("data_warptorio-warpport")
 
 local function istable(t) return type(t)=="table" end
 
@@ -106,7 +107,7 @@ local t={
 	max_health=500,
 	energy_source={type="electric",usage_priority="tertiary",buffer_capacity="2MJ",input_flow_limit="200kW",output_flow_limit="200kW"},
 
-	collision_box={{-1.01,-1.01}, {1.01,1.01}}, selection_box={{-1.5,-1.5}, {1.5,1.5}},
+	collision_box={{-1.01/0.9,-1.01/0.9}, {1.01/0.9,1.01/0.9}}, selection_box={{-1.5/0.9,-1.5/0.9}, {1.5/0.9,1.5/0.9}},
 	charge_cooldown=30, charge_light={intensity=0.3,size=7,color={r=1.0,g=1.0,b=1.0}},
 	discharge_cooldown=60, discharge_light={intensity=0.7,size=7,color={r=1.0,g=1.0,b=1.0}},
 	circuit_wire_connection_point=circuit_connector_definitions["accumulator"].points,
@@ -122,20 +123,20 @@ local t={
 
 	picture={ layers={
 		[1]={	filename="__base__/graphics/entity/lab/lab.png", tint={r=0.6,g=0.6,b=1,a=0.6},
-			width=98, height=87, frame_count=33, animation_speed=1/3, line_length=11, shift=util.by_pixel(0,1.5),
-			hr_version={ filename="__base__/graphics/entity/lab/hr-lab.png", scale=0.5, tint={r=0.6,g=0.6,b=1,a=0.6},
+			width=98, height=87, frame_count=33, animation_speed=1/3, line_length=11, shift=util.by_pixel(0,1.5), scale=0.9,
+			hr_version={ filename="__base__/graphics/entity/lab/hr-lab.png", scale=0.45, tint={r=0.6,g=0.6,b=1,a=0.6},
 				width=194, height=174, frame_count=33,animation_speed=1/3, line_length=11, shift=util.by_pixel(0, 1.5),
 			},
 		},
-		[2]={	filename="__base__/graphics/entity/lab/lab-shadow.png", draw_as_shadow=true, scale=0.5,
+		[2]={	filename="__base__/graphics/entity/lab/lab-shadow.png", draw_as_shadow=true, scale=0.9,
 			width=122, height=68, frame_count=1, line_length=1, repeat_count=33, animation_speed=1/3, shift=util.by_pixel(13,11),
-			hr_version ={filename="__base__/graphics/entity/lab/hr-lab-shadow.png", draw_as_shadow=true, scale=0.5,
+			hr_version ={filename="__base__/graphics/entity/lab/hr-lab-shadow.png", draw_as_shadow=true, scale=0.45,
 				width=242, height=136, frame_count=1, line_length=1, repeat_count=33, animation_speed=1/3, shift=util.by_pixel(13, 11),
 			},
 		},	
-		[3]={	filename="__base__/graphics/entity/lab/lab-integration.png",
+		[3]={	filename="__base__/graphics/entity/lab/lab-integration.png", scale=0.9,
 			width=122, height=81, frame_count=1, line_length=1, repeat_count=33, animation_speed=1/3, shift=util.by_pixel(0, 15.5),
-			hr_version={ filename="__base__/graphics/entity/lab/hr-lab-integration.png", scale=0.5,
+			hr_version={ filename="__base__/graphics/entity/lab/hr-lab-integration.png", scale=0.45,
 				width=242, height=162, frame_count=1, line_length=1, repeat_count=33, animation_speed=1/3, shift=util.by_pixel(0, 15.5),
 			},
 		},
@@ -170,17 +171,17 @@ local t=ExtendDataCopy("accumulator","warptorio-teleporter-gate-0",{name="warpto
 
 local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{name="warptorio-underground-0",energy_source={buffer_capacity="2MJ",input_flow_limit="5MW",output_flow_limit="5MW"},},true,{
 	picture={layers={
-		[1]={ tint={r=0.8,g=0.8,b=1,a=1},
-			filename="__base__/graphics/entity/electric-furnace/electric-furnace-base.png", priority="high", width=129, height=100, frame_count=1, shift={0.421875, 0},
+		[1]={ tint={r=0.8,g=0.8,b=1,a=1}, scale=0.9,
+			filename="__base__/graphics/entity/electric-furnace/electric-furnace-base.png", priority="high", width=129, height=100, frame_count=1, shift={0.421875/2, 0},
 			hr_version={ filename="__base__/graphics/entity/electric-furnace/hr-electric-furnace.png", tint={r=0.8,g=0.8,b=1,a=1},
-				scale=0.5, priority="high", width=239, height=219, frame_count=1, shift=util.by_pixel(0.75, 5.75), 
+				scale=0.45, priority="high", width=239, height=219, frame_count=1, shift=util.by_pixel(0.75, 5.75), 
 			},
 		},
 		[2]={
-			filename="__base__/graphics/entity/electric-furnace/electric-furnace-shadow.png", draw_as_shadow=true,
+			filename="__base__/graphics/entity/electric-furnace/electric-furnace-shadow.png", draw_as_shadow=true, scale=0.9,
 			priority="high", width=129, height=100, frame_count=1, shift={0.421875,0},
 			hr_version={	filename="__base__/graphics/entity/electric-furnace/hr-electric-furnace-shadow.png",
-				priority="high", width=227, height=171, frame_count=1, draw_as_shadow=true, shift=util.by_pixel(11.25, 7.75), scale=0.5,
+				priority="high", width=227, height=171, frame_count=1, draw_as_shadow=true, shift=util.by_pixel(11.25, 7.75), scale=0.45,
 			},
 		},
 	}},
