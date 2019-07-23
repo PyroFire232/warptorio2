@@ -465,11 +465,11 @@ ExtendTech(t,{name="warptorio-logistics-2", unit={count=150,time=20}, prerequisi
 ExtendTech(t,{name="warptorio-logistics-3", unit={count=150,time=20}, prerequisites={"logistics-3","warptorio-logistics-2"}}, {red=2,green=2,blue=1} )
 ExtendTech(t,{name="warptorio-logistics-4", unit={count=150,time=20}, prerequisites={"logistic-system","warptorio-logistics-3"}}, {red=2,green=2,blue=1,yellow=1} )
 
-ExtendTech(t,{name="warptorio-dualloader-1", unit={count=1000,time=20}, prerequisites={"logistics"}}, {red=1} )
-ExtendTech(t,{name="warptorio-dualloader-2", unit={count=1000,time=20}, prerequisites={"logistics-2","warptorio-dualloader-1"}}, {red=2,green=1} )
+ExtendTech(t,{name="warptorio-dualloader-1", unit={count=1000,time=10}, prerequisites={"warptorio-logistics-1"}}, {red=1} )
+ExtendTech(t,{name="warptorio-dualloader-2", unit={count=1000,time=15}, prerequisites={"logistics-2","warptorio-dualloader-1"}}, {red=2,green=1} )
 ExtendTech(t,{name="warptorio-dualloader-3", unit={count=1000,time=20}, prerequisites={"logistics-3","warptorio-dualloader-2","production-science-pack"}}, {red=3,green=2,blue=1,purple=1} )
 t.upgrade=false
-ExtendTech(t,{name="warptorio-triloader", unit={count=2000,time=20}, prerequisites={"warptorio-dualloader-3","military-science-pack","utility-science-pack"}}, {red=1,green=1,purple=1,blue=1,black=1,yellow=1} )
+ExtendTech(t,{name="warptorio-triloader", unit={count=10000,time=10}, prerequisites={"warptorio-logistics-1"}}, {red=1} )
 
 -- ----
 -- Energy Upgrades
