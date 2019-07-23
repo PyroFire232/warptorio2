@@ -79,13 +79,15 @@ planet.rich={ zone=60, rng=2, name="A Rich Planet", desc="A Rich Planet Descript
 -- --------
 -- Resource Specific Planets
 
-local czRes={size=0.25,frequency=0.25,richness=0.35}
-local czIron={size=0.3,frequency=0.25,richness=0.35}
+local czRes={size=0.275,frequency=0.25,richness=0.25}
+local czCoal={size=0.3,frequency=0.3,richness=0.35}
+local czIron={size=0.275,frequency=0.25,richness=0.3}
+local czCopper={size=0.25,frequency=0.25,richness=0.275}
 planet.copper={ zone=8, rng=5, name="A Copper Planet", desc="The warp reactor surges with power and you feel static in the air. You are filled with determination.",
 	warp_multiply=0.5,
 	gen={
 		autoplace_controls={["copper-ore"]={frequency=4,size=2},
-			["iron-ore"]=czRes,["coal"]=czRes,["crude-oil"]=czRes,["uranium-ore"]=czRes,["stone"]=czRes,
+			["iron-ore"]=czIron,["coal"]=czCoal,["crude-oil"]=czRes,["uranium-ore"]=czRes,["stone"]=czRes,
 		},
 	},
 	spawn=function(f) for k,v in pairs(f.find_entities_filtered{type="resource"})do if(v.name~="copper-ore")then v.destroy() game.print("iron") end end end
@@ -95,7 +97,7 @@ planet.copper={ zone=8, rng=5, name="A Copper Planet", desc="The warp reactor su
 planet.iron={ zone=5, rng=5, name="An Iron Planet", desc="You land with a loud metal clang. The sparkle in the ground fills you with determination.",
 	gen={
 		autoplace_controls={["iron-ore"]={frequency=4,size=2},
-			["copper-ore"]=czRes,["coal"]=czRes,["crude-oil"]=czRes,["uranium-ore"]=czRes,["stone"]=czRes,
+			["copper-ore"]=czCopper,["coal"]=czCoal,["crude-oil"]=czRes,["uranium-ore"]=czRes,["stone"]=czRes,
 		},
 	},
 	spawn=function(f) for k,v in pairs(f.find_entities_filtered{type="resource"})do if(v.name~="iron-ore")then v.destroy() game.print("iron") end end end,
@@ -104,7 +106,7 @@ planet.iron={ zone=5, rng=5, name="An Iron Planet", desc="You land with a loud m
 planet.coal={ zone=7, rng=5, name="A Coal Planet", desc="A Coal Planet Description",
 	gen={
 		autoplace_controls={["coal"]={frequency=7,size=2},
-			["iron-ore"]=czRes,["copper-ore"]=czRes,["crude-oil"]=czRes,["uranium-ore"]=czRes,["stone"]=czRes
+			["iron-ore"]=czIron,["copper-ore"]=czCopper,["crude-oil"]=czRes,["uranium-ore"]=czRes,["stone"]=czRes
 		},
 	},
 	spawn=function(f) for k,v in pairs(f.find_entities_filtered{type="resource"})do if(v.name~="coal")then v.destroy() end end end,
@@ -113,7 +115,7 @@ planet.coal={ zone=7, rng=5, name="A Coal Planet", desc="A Coal Planet Descripti
 planet.uranium={ zone=15, rng=5, name="A Uranium Planet", desc="The warmth of this worlds green glow fills you with determination, but you probably shouldn't stay too long",
 	gen={
 		autoplace_controls={["uranium-ore"]={frequency=4,size=2},["enemy-base"]={frequency=1.5,size=1.5},
-			["iron-ore"]=czRes,["copper-ore"]=czRes,["coal"]=czRes,["crude-oil"]=czRes,["stone"]=czRes,
+			["iron-ore"]=czIron,["copper-ore"]=czCopper,["coal"]=czCoal,["crude-oil"]=czRes,["stone"]=czRes,
 		},
 	},
 	spawn=function(f)
@@ -125,7 +127,7 @@ planet.uranium={ zone=15, rng=5, name="A Uranium Planet", desc="The warmth of th
 planet.oil={ zone=10, rng=5, name="An Oil Planet", desc="An Oil Planet Description",
 	gen={
 		autoplace_controls={["crude-oil"]={frequency=5,size=2},
-			["iron-ore"]=czRes,["copper-ore"]=czRes,["coal"]=cRes,["stone"]=czRes,["uranium-ore"]=czRes
+			["iron-ore"]=czIron,["copper-ore"]=czCopper,["coal"]=cRes,["stone"]=czRes,["uranium-ore"]=czRes
 		},
 	},
 	spawn=function(f)
@@ -138,7 +140,7 @@ planet.oil={ zone=10, rng=5, name="An Oil Planet", desc="An Oil Planet Descripti
 planet.stone={ zone=15, rng=5, name="A Stone Planet", desc="A Stone Planet Description",
 	gen={
 		autoplace_controls={["stone"]={frequency=8,size=2},
-			["iron-ore"]=czRes,["copper-ore"]=czRes,["coal"]=czRes,["crude-oil"]=czRes,["uranium-ore"]=czRes,["crude-oil"]=czRes,
+			["iron-ore"]=czIron,["copper-ore"]=czCopper,["coal"]=czCoal,["crude-oil"]=czRes,["uranium-ore"]=czRes,["crude-oil"]=czRes,
 		},
 	},
 	spawn=function(f)

@@ -1389,6 +1389,10 @@ function warptorio.Warpout()
 		warptorio.updatelabel("warptorio_autowarp","    Auto-Warp In : " .. util.formattime(gwarptorio.warp_auto_time*60))
 	end
 
+	local m=gwarptorio.Floors.main
+	local c=m:GetSurface()
+	local bbox=m.area
+	if(not c or not c.valid)then return end -- bad warp
 
 	-- abilities
 	if(gwarptorio.accelerator or gwarptorio.radar or gwarptorio.stabilizer)then
@@ -1414,9 +1418,6 @@ function warptorio.Warpout()
 	local tp=gwarptorio.Teleporters.offworld
 	if(tp and tp:ValidPointB())then tp:DestroyPointB() tp:DestroyLogisticsB() end
 
-	local m=gwarptorio.Floors.main
-	local c=m:GetSurface()
-	local bbox=m.area
 
 	local tpply={}
 	local cx=warptorio.corn
