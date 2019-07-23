@@ -81,5 +81,8 @@ for k,v in pairs(global.warptorio.Teleporters)do v:DestroyPointA() v:DestroyPoin
 
 end
 
+local gwarptorio=global.warptorio
+if(not gwarptorio.warp_last)then gwarptorio.warp_last=game.tick end
+
 
 game.print("Finished: Warptorio Migration 0.2.2_0")
