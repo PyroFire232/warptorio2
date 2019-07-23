@@ -218,7 +218,7 @@ function TELL:DestroyLogisticsB() if(self.logs)then for k,v in pairs(self.Logist
 	e.destroy()
 end self.logs[v.."-b"]=nil end end end end
 function TELL:DestroyLogistics() self:DestroyLogisticsA() self:DestroyLogisticsB() end
-function TELL:UpgradeLogistics() if(self.logs)then self:DestroyLogistics() end self:SpawnLogistics() end
+function TELL:UpgradeLogistics() if(self.logs)then self:DestroyLogistics() end self:Warpin() end -- self:SpawnLogistics()
 function TELL:UpgradeEnergy() self:Warpin() end
 
 --[[
@@ -423,10 +423,10 @@ function warptorio.SpawnTurretTeleporter(c,xp,yp)
 	if(x:ValidPointB())then if(x.PointB.surface~=fb)then x:DestroyPointB() self:DestroyLogisticsB() elseif(x.PointB~=makeB)then x:DestroyPointB() end end
 	local lgv=(gwarptorio.Research["factory-logistics"] or 0)>0
 	local lgx=gwarptorio.Research["triloader"] or 0
-	local vx = -2-(lgv and 2 or 0)-lgx
+	local vx = -1-(lgv and 2 or 0)-lgx
 	local vw = 3+(lgv and 4 or 0)+lgx*2
-	if(not x:ValidPointA())then warptorio.cleanbbox(f,xp+vx,yp,vw,3) local e=x:SpawnPointA(makeA,f,{x=xp,y=yp}) e.minable=false end
-	if(not x:ValidPointB())then warptorio.cleanbbox(fb,xp+vx,yp,vw,3) local e=x:SpawnPointB(makeB,fb,{x=xp,y=yp}) e.minable=false e.destructible=false end
+	if(not x:ValidPointA())then warptorio.cleanbbox(f,xp+vx,yp-1,vw,3) local e=x:SpawnPointA(makeA,f,{x=xp,y=yp}) e.minable=false end
+	if(not x:ValidPointB())then warptorio.cleanbbox(fb,xp+vx,yp-1,vw,3) local e=x:SpawnPointB(makeB,fb,{x=xp,y=yp}) e.minable=false e.destructible=false end
 
 	if(lgv)then x:SpawnLogistics() end
 
