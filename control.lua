@@ -462,7 +462,7 @@ function tpcls.se() local c=warptorio.corn.se warptorio.SpawnTurretTeleporter("s
 
 function warptorio.BuildPlatform() local m=gwarptorio.Floors.main local f=m:GetSurface() local z=m.z
 	local lv=(gwarptorio.Research["platform-size"] or 0)
-	for k,v in pairs(f.find_entities_filtered{type="character",invert=true,area={{-z/2,-z/2},{z/2,z/2}}})do
+	for k,v in pairs(f.find_entities_filtered{type="character",invert=true,area={{math.floor(-z/2),math.floor(-z/2)},{(z/2)-1,(z/2)-1}}})do
 		if(not v.last_user and v.name:sub(1,9)~="warptorio")then v.destroy() end
 	end
 	warptorio.LayFloor("warp-tile",f,math.floor(-z/2),math.floor(-z/2),z,z,true) -- main platform
@@ -667,7 +667,7 @@ function warptorio.BuildB2() local m=gwarptorio.Floors.b2 local f,z=m:GetSurface
 	end
 	
 	warptorio.LayFloor("hazard-concrete-left",f,vx,4,vw,3) -- entrance
-	--warptorio.LayFloor("hazard-concrete-left",f,-3,-3,5,5) -- old center
+	warptorio.LayFloor("hazard-concrete-left",f,-2,-2,3,3) -- old center
 	warptorio.playsound("warp_in",f.name)
 end
 
@@ -964,6 +964,12 @@ upcs["factory-beacon"]=function(lv,f) local m=gwarptorio.Floors.b1 local inv={}
 	warptorio.playsound("warp_in",m:GetSurface().name)
 end
 
+upcs["boiler-station"]=function(lv,f) local m=gwarptorio.Floors.b2
+	if(m.station and m.station.valid)then return end
+	warptorio.cleanbbox(m:GetSurface(),-2,-2,1,1) m.station=warptorio.SpawnEntity(m:GetSurface(),"warptorio-warpstation",-1,-1) m.station.minable=false m.station.destructible=false
+	warptorio.playsound("warp_in",m:GetSurface().name)
+end
+
 upcs["reactor"]=function(lv) local m=gwarptorio.Floors.main warptorio.playsound("warp_in",m:GetSurface().name)
 	if(lv>=6 and not gwarptorio.warp_reactor)then
 		local f=m:GetSurface()
@@ -1021,6 +1027,8 @@ ups["warptorio-boiler-4"] = {"boiler-size",function() return 48 end}
 ups["warptorio-boiler-5"] = {"boiler-size",function() return 56 end}
 ups["warptorio-boiler-6"] = {"boiler-size",function() return 64 end}
 ups["warptorio-boiler-7"] = {"boiler-size",function() return 72 end}
+
+ups["warptorio-boiler-station"] = {"boiler-station"}
 
 ups["warptorio-reactor-1"] = {"reactor"}
 ups["warptorio-reactor-2"] = {"reactor"}
@@ -1314,8 +1322,8 @@ function warptorio.InitFloors() -- init_floors(f)
 	local z=m.OuterSize
 	m:SetSize(m.OuterSize)
 
-	warptorio.BuildPlatform(z)
-	warptorio.cleanbbox(f,math.floor(-z/2),math.floor(-z/2),z-1,z-1)
+	warptorio.BuildPlatform()
+	--warptorio.cleanbbox(f,math.floor(-z/2),math.floor(-z/2),z-1,z-1)
 
 	local m=new(FLOOR,"b1",17)
 	local f=m:BuildSurface("warpfloor-b1")
@@ -1597,3 +1605,13 @@ function warptorio.Initialize()
 end script.on_init(warptorio.Initialize)
 
 
+
+
+local cheatItems={["roboport"]=10,["construction-robot"]=50,["logistic-chest-passive-provider"]=50,["logistic-chest-requester"]=50,["red-wire"]=100,["pipe"]=200,
+["iron-plate"]=400,["copper-plate"]=300,["wood"]=300,["electronic-circuit"]=400,["stone"]=100,["steel-plate"]=200,["pipe-to-ground"]=50,
+["transport-belt"]=400,
+}
+
+function warptorio.cheat() for i,p in pairs(game.players)do for k,v in pairs(cheatItems)do p.get_main_inventory().insert{name=k,count=v} end end end
+remote.add_interface("warptorio",{cheat=warptorio.cheat})
+--remote.call("warptorio","cheat")
