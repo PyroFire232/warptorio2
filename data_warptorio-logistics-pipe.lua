@@ -33,7 +33,7 @@ data:extend{
         "player-creation"
       },
       fluid_box = {
-        base_area = 50,
+        base_area = 5,
         pipe_connections = {
           {
             position = {

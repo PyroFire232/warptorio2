@@ -8,7 +8,7 @@ local mod_gui = require("mod-gui")
 local function new(x,a,b,c,d,e,f,g) local t,v=setmetatable({},x),rawget(x,"__init") if(v)then v(t,a,b,c,d,e,f,g) end return t end
 function table.Count(t) local c=0 for k,v in pairs(t)do c=c+1 end return c end
 function table.First(t) for k,v in pairs(t)do return k,v end end
-function table.Random(t) local c,i=table.Count(t),1 if(c==0)then return end local rng=math.random(1,c) for k,v in pairs(t)do if(i==rng)then return v end i=i+1 end end
+function table.Random(t) local c,i=table.Count(t),1 if(c==0)then return end local rng=math.random(1,c) for k,v in pairs(t)do if(i==rng)then return v,k end i=i+1 end end
 local function istable(x) return type(x)=="table" end
 local function printx(m) for k,v in pairs(game.players)do v.print(m) end end
 local function isvalid(v) return (v and v.valid) end
@@ -760,9 +760,13 @@ function warptorio.BalanceLogistics(a,b,bal) if(not a or not b or not a.valid or
 end
 
 function warptorio.TickLogistics(e)
-	local points={}
-	for k,v in pairs(gwarptorio.Teleporters)do v:BalanceLogistics() if(v:ValidPointA())then table.insert(points,v.PointA) end if(v:ValidPointB())then table.insert(points,v.PointB) end end
+	for k,v in pairs(gwarptorio.Teleporters)do v:BalanceLogistics() end
 	for k,v in pairs(gwarptorio.Rails)do v:BalanceLogistics() end
+end
+
+function warptorio.TickEnergy(e)
+	local points={}
+	for k,v in pairs(gwarptorio.Teleporters)do if(v:ValidPointA())then table.insert(points,v.PointA) end if(v:ValidPointB())then table.insert(points,v.PointB) end end
 	local pnum=#points
 	local eg=0
 	local ec=0
@@ -907,6 +911,7 @@ function warptorio.TickLoaders(e) for k,v in pairs(gwarptorio.Rails)do v:CheckLo
 function warptorio.Tick(ev) local e=ev.tick
 	warptorio.TickChargeTimer(e)
 	warptorio.TickTeleporters(e)
+	warptorio.TickEnergy(e)
 	if(e%5==0)then
 		warptorio.TickLogistics(e)
 		if(e%30==0)then
@@ -970,7 +975,44 @@ upcs["boiler-station"]=function(lv,f) local m=gwarptorio.Floors.b2
 	warptorio.playsound("warp_in",m:GetSurface().name)
 end
 
+local lvMsg={
+	{"You've awoken with slight headache, and the only thing you feel sure of is that you need to rebuild your experiment and return home.",
+	"You cobble together some wires, switches and dials and attach it to the platform.",
+	"Although you are unsure if you managed to achieve anything, you at least Feel a bit more in control."},
+
+	{"The memories of what happened begin to return to you. You were working on an experimental reactor that could distort and displace time and space.",
+	"You are able to recall the early stages of your experiment and are able to replicate it with the crude resources on this planet you've landed on.",
+	"The progress you feel you've made fills you with determination."},
+
+	{"Ah yes, the experiment went bad! The Warp Reactor tore open a rift in the warpspace fabric around it casting you and the reactor into an alternate relative dimension in space.",
+	"You hastily assemble the warp reactor control panel from memory, but then stop when you realize you need the reactor core before they can function.",
+	"You feel like you know what you need to do now, if only you had the resources to do it."},
+
+	{"Before the accident, you recall feeling excited about the endless applications of mastering the control of warpspace and became careless.",
+	"You have finished building the reactor warpdis and rift core, but you are not going to make the same mistakes twice.",
+	"Holding the pulsating warpdis in your hands fills you with determination.",},
+
+	{"You think you know why your experiment went wrong, the warpdis must be unstable unless maintained by perfectly reversing the polarity inversely squared to the rift core's inter-subdimensional artron energy matrix.",
+	"You ready the warpdis to rip the perfected materials you need directly out of warpspace.",
+	"It's a risky strategy, but you believe this is your only chance to escape these savage alien infested worlds and get back to civilization.",},
+
+	{"A loud clash of energy ripples over your warp platform as the reactor shifts into existence, and you know this technology will uplift your civilization beyond their imagination.",
+	"You decide to continue your experiments with the warp reactor while you keep warping in search of home, if only you knew how to steer this boat.",
+	"The Warp Reactor finally now in place fills you with determination."},
+
+	{"You have developed a way to build a miniaturized warpdis connected to your reactors rift core, allowing the transfer of heat energy through warpspace",
+	"You believe this may be further refined into a way to rip chemical artron energy fuel cells out of warpspace through a perfect quasi-misalignment of the warpdis polarity.",
+	"This newfound flexible control over warpspace and time fills you with determination."},
+
+	{"You have almost lost track of how many worlds you have visited while adrift between dimensions, but you have discovered a way to measure the dimensional relativity of the artron energy matrix emitted by the reactors rift core.",
+	"As a result, you are able to chart a map of where you have been, and what might lay ahead. But be wary, the Warp Reactor may not always agree with you, just like the day that started this all.",
+	"Your homeworld in your sights fills you with determination, and you marvel at the fruits you will receive from of your finished warpspace experiments."},
+}
+
 upcs["reactor"]=function(lv) local m=gwarptorio.Floors.main warptorio.playsound("warp_in",m:GetSurface().name)
+	if(lvMsg[lv])then
+		for k,v in ipairs(lvMsg[lv])do game.print(v) end
+	end
 	if(lv>=6 and not gwarptorio.warp_reactor)then
 		local f=m:GetSurface()
 		warptorio.cleanbbox(f,-3,-3,5,5)
@@ -1414,6 +1456,7 @@ function warptorio.Warpout()
 
 	-- create next surface
 	local f,w=warptorio.BuildNewPlanet()
+	gwarptorio.planet=w
 
 	-- Add planet warp multiplier
 	if(w.warp_multiply)then gwarptorio.warp_charge_time=gwarptorio.warp_charge_time*w.warp_multiply gwarptorio.warp_time_left=gwarptorio.warp_time_left*w.warp_multiply end
@@ -1439,9 +1482,9 @@ function warptorio.Warpout()
 		local p,b=m:GetPos(),m:GetBBox()
 		if(v.character~=nil and v.surface.name==c.name and warptorio.isinbbox(v.character.position,{x=p[1],y=p[2]},{x=b[1]-1,y=b[2]}))then
 			table.insert(tpply,{v,{v.position.x,v.position.y}})
-		elseif(v.character~=nil and v.surface.name==gwarptorio.Floors.b1:GetSurface().name or v.surface.name==gwarptorio.Floors.b2:GetSurface().name)then
-			table.insert(tpply,{v,{0,0}})
-		end
+		end --elseif(v.character~=nil and v.surface.name==gwarptorio.Floors.b1:GetSurface().name or v.surface.name==gwarptorio.Floors.b2:GetSurface().name)then
+			--table.insert(tpply,{v,{0,0}})
+		--end
 	end
 
 	for k,v in pairs({"nw","ne","sw","se"})do local ug=gwarptorio.Research["turret-"..v] or -1 if(ug>=0)then
@@ -1476,7 +1519,7 @@ function warptorio.Warpout()
 	warptorio.LayFloorVec("out-of-map",c,m:GetPos(),m:GetSize())
 
 	-- delete abandoned surfaces
-	for k,v in pairs(game.surfaces)do if(#(v.find_entities_filtered{type="character"})<1)then local n=v.name if(n:sub(1,9)=="warpsurf_")then game.delete_surface(v) end end end
+	for k,v in pairs(game.surfaces)do if(#(v.find_entities_filtered{type="character"})<1 and v.name~=f.name)then local n=v.name if(n:sub(1,9)=="warpsurf_")then game.delete_surface(v) end end end
 
 	-- stuff to reset
 	gwarptorio.surf_to_leave_angry_biters_counter = 0
@@ -1607,11 +1650,95 @@ end script.on_init(warptorio.Initialize)
 
 
 
-local cheatItems={["roboport"]=10,["construction-robot"]=50,["logistic-chest-passive-provider"]=50,["logistic-chest-requester"]=50,["red-wire"]=100,["pipe"]=200,
-["iron-plate"]=400,["copper-plate"]=300,["wood"]=300,["electronic-circuit"]=400,["stone"]=100,["steel-plate"]=200,["pipe-to-ground"]=50,
+local lootItems={
+["roboport"]=10,
+["construction-robot"]=10,
+["logistic-chest-passive-provider"]=10,
+["logistic-chest-requester"]=10,
+["wooden-chest"]=20,
+["iron-chest"]=20,
+["steel-chest"]=20,
+["storage-tank"]=10,
+
+["red-wire"]=100,
+["green-wire"]=100,
+["pipe"]=200,
+["pipe-to-ground"]=50,
+
+["iron-plate"]=400,
+["iron-gear-wheel"]=300,
+
+["copper-plate"]=300,
+["steel-plate"]=200,
+
+["wood"]=100,
+["stone"]=100,
+
+["electronic-circuit"]=200,
+["advanced-circuit"]=200,
+["processing-unit"]=100,
+["big-electric-pole"]=25,
+["medium-electric-pole"]=25,
+["small-electric-pole"]=25,
+["substation"]=15,
+
 ["transport-belt"]=400,
+["fast-transport-belt"]=300,
+["express-transport-belt"]=200,
+["landfill"]=100,
+
+["express-underground-belt"]=15,
+["fast-underground-belt"]=20,
+["underground-belt"]=25,
+
+["steam-engine"]=10,
+["heat-exchanger"]=10,
+["nuclear-reactor"]=10,
+["accumulator"]=10,
+["heat-pipe"]=25,
+["steam-turbine"]=10,
+["nuclear-reactor"]=1,
+["chemical-plant"]=10,
+["assembling-machine-1"]=15,
+["assembling-machine-2"]=15,
+["assembling-machine-3"]=15,
+["inserter"]=50,
+["fast-inserter"]=25,
+["stack-inserter"]=25,
+["warptorio-atomic-bomb"]=1,
+["atomic-bomb"]=2,
+["warptorio-warponium-fuel-cell"]=2,
+["warptorio-warponium-fuel"]=1,
 }
 
-function warptorio.cheat() for i,p in pairs(game.players)do for k,v in pairs(cheatItems)do p.get_main_inventory().insert{name=k,count=v} end end end
-remote.add_interface("warptorio",{cheat=warptorio.cheat})
+
+function warptorio.cheat() for i,p in pairs(game.players)do for k,v in pairs(lootItems)do p.get_main_inventory().insert{name=k,count=v} end end end
+function warptorio.cmdwarp() warptorio.Warpout() end
+remote.add_interface("warptorio",{cheat=warptorio.cheat,warp=warptorio.cmdwarp})
 --remote.call("warptorio","cheat")
+
+
+function warptorio.OnChunkGenerated(ev) local a=ev.area local f=ev.surface
+	if(f.name=="nauvis" or f.name~=(gwarptorio.Floors.main:GetSurface().name))then return end
+	-- spawn chest with goodies
+	if(math.random(1,200)>1)then return end
+	local x=math.random(a.left_top.x,a.right_bottom.x)
+	local y=math.random(a.left_top.y,a.right_bottom.y)
+	local dist=math.sqrt(math.abs(x^2)+math.abs(y^2))
+	if(dist < 256)then return end
+
+	local lt={} for k,v in pairs(lootItems)do local r=game.forces.player.recipes[k] if(not r or (r and r.enabled==true))then lt[k]=v end end
+	if(table.Count(lt)<1)then return end
+	local e=f.create_entity{name="warptorio-lootchest",position={x,y},force=game.forces.player}
+	if(not e or not e.valid)then game.print("Invalid Chest") return end
+	--game.print("Made Chest x: " .. x .. " y: " .. y)
+	local inv=e.get_inventory(defines.inventory.chest)
+	for i=1,math.random(1,3),1 do
+		local u,k=table.Random(lt)
+		local dv=math.min(dist/1700,1)
+		local fc=math.random(20,100)/100
+		local cx=math.max(math.ceil(u*dv*fc),1)
+		--game.print("Insert Random Item: " .. tostring(k) .. " c: " .. cx .. " u: " .. tostring(u) .. " dv: " .. dv .. " fc: " .. fc)
+		inv.insert{name=k,count=cx}
+	end
+end script.on_event(defines.events.on_chunk_generated,warptorio.OnChunkGenerated)

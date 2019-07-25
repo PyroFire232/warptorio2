@@ -4,6 +4,7 @@ require("data_warptorio-heatpipe")
 require("data_warptorio-warpport")
 require("data_warptorio-logistics-pipe")
 require("data_warptorio-warpstation")
+require("data_warpnuke")
 
 local function istable(t) return type(t)=="table" end
 
@@ -24,6 +25,18 @@ local function ExtendDataCopy(a,b,x,ri,tx) local t=MakeDataCopy(a,b,x) if(tx)the
 
 local t=ExtendDataCopy("tile","tutorial-grid",{name="warp-tile",tint={r=0.6,g=0.6,b=0.7,a=1},decorative_removal_probability=1,walking_speed_modifier=1.6,map_color={r=0.2,g=0.1,b=0.25,a=1}})
 
+
+
+-- --------
+-- Loot Chest
+
+local rtint={r=0.4,g=0.4,b=1,a=1}
+local t=ExtendDataCopy("container","wooden-chest",{name="warptorio-lootchest",
+	icon=false,icons={{icon="__base__/graphics/icons/wooden-chest.png",tint=rtint}},
+	picture={layers={ [1]={tint=rtint,hr_version={tint=rtint}}, }},
+},true,{minable={mining_time=0.1}})
+
+
 -- ----
 -- Logistics
 
@@ -32,7 +45,7 @@ local rtint={r=0.5,g=0.5,b=1,a=1}
 local rtintpic={tint=rtint,hr_version={tint=rtint}}
 local rctint={r=0.39,g=0,b=0,a=1}
 local rtintcov={layers={ [1]={tint=rctint,hr_version={tint=rctint}} }}
-local t=ExtendDataCopy("pipe-to-ground","pipe-to-ground",{name="warptorio-logistics-pipe",fluid_box={base_area=50,pipe_connections={[2]={max_underground_distance=1}}},
+local t=ExtendDataCopy("pipe-to-ground","pipe-to-ground",{name="warptorio-logistics-pipe",fluid_box={base_area=5,pipe_connections={[2]={max_underground_distance=-1}}},
 	pictures={ left=rtintpic, right=rtintpic,up=rtintpic,down=rtintpic },
 	pipe_covers={ east={layers={ [1]={tint=rctint,hr_version={tint=rctint}} }}, north=rtintcov, south=rtintcov, west=rtintcov,}
 },true)
@@ -61,31 +74,6 @@ ExtendDataCopy("recipe","nuclear-fuel",{name="warptorio-warponium-fuel",enabled=
 	{ingredients={{"warptorio-warponium-fuel-cell",1},{"nuclear-fuel",1}},
 	icon=false,icon_size=32,icons={ {icon="__base__/graphics/icons/nuclear-fuel.png",tint={r=1,g=0.2,b=1,a=0.8}}, },
 })
-
--- ----
--- Warp Bomb
---[[
-ExtendDataCopy("ammo","atomic-bomb",{name="warptorio-warponium-bomb",
-	ammo_type={
-		action={
-			action_delivery={
-				projectile="warptorio-warponium-rocket",source_effects={entity_name="explosion-hit",type="create-entity"}, starting_speed=0.05,type="projectile"
-			},
-			type="direct",
-		},
-		category="rocket",
-		cooldown_modifier=3,
-		range_modifier=5,
-		target_type="position",
-	},
-	stack_size=20,
-	icon=false,icon_size=32,icons={ {icon="__base__/graphics/icons/atomic-bomb.png",tint={r=1,g=0.2,b=1,a=0.8}}, },
-})
-
-ExtendDataCopy("recipe","atomic-bomb",{name="warptorio-warponium-bomb",enabled=true,result="warptorio-warponium-bomb"},false,
-	{ingredients={{"atomic-bomb",1},{"warptorio-warponium-fuel-cell",1},{"warptorio-warponium-fuel",1}},
-	icon=false,icons={ {icon="__base__/graphics/icons/atomic-bomb.png",tint={r=1,g=0.2,b=1,a=0.8}}, },
-})]]
 
 
 -- The Reactor Itself
@@ -266,7 +254,7 @@ recipe_item_entity_extend(entity)
 ]]
 
 
--- --------
+-- -------------------------------------------------------------------------
 -- Technologies
 
 local techPacks={red="automation-science-pack",green="logistic-science-pack",blue="chemical-science-pack",black="military-science-pack",
@@ -279,10 +267,20 @@ local function ExtendTech(t,d,s) local x=table.merge(t,d) if(s)then x.unit.ingre
 -- ----
 -- Warp Roboport
 
-local t={type="technology",upgrade=true,icon_size=128,icons={
+local t={type="technology",upgrade=true,icon_size=128,effects={{recipe="warptorio-warpport",type="unlock-recipe"}},icons={
 	{icon="__base__/graphics/entity/roboport/roboport-base.png",tint={r=0.3,g=0.3,b=1,a=1},scale=0.75,priority="low"},
 }, }
 ExtendTech(t,{name="warptorio-warpport",unit={count=1000,time=5}, prerequisites={"warptorio-logistics-4","warptorio-reactor-8","space-science-pack"}}, {red=1,green=1,black=1,blue=1,purple=1,yellow=1,white=1})
+
+
+-- ----
+-- Warp Nuke
+
+local t={type="technology",upgrade=true,icon_size=128,icons={
+	{icon="__base__/graphics/technology/atomic-bomb.png",tint={r=0.3,g=0.3,b=1,a=1},priority="low"},
+}, }
+ExtendTech(t,{name="warptorio-warpnuke",unit={count=1000,time=5},effects={{recipe="warptorio-atomic-bomb",type="unlock-recipe"}},
+	prerequisites={"atomic-bomb","warptorio-reactor-8","space-science-pack"}}, {red=1,green=1,black=1,blue=1,purple=1,yellow=1,white=1})
 
 
 -- ----
@@ -712,4 +710,4 @@ data:extend{{type="equipment-grid",name="warptorio-warparmor-grid",equipment_cat
 local t=ExtendDataCopy("armor","power-armor-mk2",{name="warptorio-armor",equipment_grid="warptorio-warparmor-grid",
 	icon_size=32,icons={{icon="__base__/graphics/icons/power-armor-mk2.png",tint={r=0.3,g=0.3,b=1,a=1},}},inventory_size_bonus=100},false)
 
-local t=ExtendDataCopy("recipe","power-armor-mk2",{name="warptorio-armor",enabled=false,ingredients={{"power-armor-mk2",5}},result="warptorio-armor"})
+local t=ExtendDataCopy("recipe","power-armor-mk2",{name="warptorio-armor",enabled=false,ingredients={{"power-armor-mk2",5},{"power-armor",5},{"modular-armor",5},{"heavy-armor",5},{"light-armor",5}},result="warptorio-armor"})
