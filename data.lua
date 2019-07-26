@@ -351,7 +351,7 @@ ExtendTech(t,{name="warptorio-reactor-7",unit={count=1000,time=30}, effects={{re
 
 local t={type="technology",upgrade=true,icon_size=128,icons={
 	{icon="__base__/graphics/technology/nuclear-power.png",tint={r=0.3,g=0.3,b=1,a=1},priority="low"},
-	{icon="__warptorio__/graphics/technology/earth.png",tint={r=0.8,g=0.8,b=1,a=1},scale=0.5,shift={32,32},priority="high"}
+	{icon="__warptorio2__/graphics/technology/earth.png",tint={r=0.8,g=0.8,b=1,a=1},scale=0.5,shift={32,32},priority="high"}
 }, }
 ExtendTech(t,{name="warptorio-reactor-8",unit={count=1000,time=30}, prerequisites={"warptorio-reactor-7","warptorio-charting","warptorio-kovarex","rocket-control-unit"}}, {red=1,green=1,black=1,blue=1,purple=1,yellow=1}) -- steering
 
@@ -468,7 +468,7 @@ ExtendTech(t,{name="warptorio-toolbelt-4",unit={count=180,time=30},prerequisites
 ExtendTech(t,{name="warptorio-toolbelt-5",unit={count=200,time=30},prerequisites={"warptorio-toolbelt-4","utility-science-pack"}}, {red=4,green=3,blue=2,purple=2,yellow=1} )
 
 local t={type="technology",upgrade=true,icons={
-	{icon="__warptorio__/graphics/technology/earth.png",tint={r=0.7,g=0.7,b=1,a=1},shift={0,0},scale=0.375,priority="medium",icon_size=128},
+	{icon="__warptorio2__/graphics/technology/earth.png",tint={r=0.7,g=0.7,b=1,a=1},shift={0,0},scale=0.375,priority="medium",icon_size=128},
 	{icon="__base__/graphics/icons/steel-axe.png",tint={r=0.3,g=0.3,b=1,a=1},priority="low",icon_size=32},
 	},
 	effects={ {type="character-reach-distance",modifier=1} },
