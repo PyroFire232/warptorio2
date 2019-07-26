@@ -1757,7 +1757,7 @@ remote.add_interface("warptorio",{cheat=warptorio.cheat,warp=warptorio.cmdwarp,r
 function warptorio.OnChunkGenerated(ev) local a=ev.area local f=ev.surface
 	if(f.name=="nauvis" or f.name~=(gwarptorio.Floors.main:GetSurface().name))then return end
 	-- spawn chest with goodies
-	if(math.random(1,200)>1)then return end
+	if(math.random(1,175)>1)then return end
 	local x=math.random(a.left_top.x,a.right_bottom.x)
 	local y=math.random(a.left_top.y,a.right_bottom.y)
 	local dist=math.sqrt(math.abs(x^2)+math.abs(y^2))
@@ -1769,7 +1769,7 @@ function warptorio.OnChunkGenerated(ev) local a=ev.area local f=ev.surface
 	if(not e or not e.valid)then game.print("Invalid Chest") return end
 	--game.print("Made Chest x: " .. x .. " y: " .. y)
 	local inv=e.get_inventory(defines.inventory.chest)
-	for i=1,math.random(1,3),1 do
+	for i=1,math.random(1,5),1 do
 		local u,k=table.Random(lt)
 		local dv=math.min(dist/1700,1)
 		local fc=math.random(20,100)/100
