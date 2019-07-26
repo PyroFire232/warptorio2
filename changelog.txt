@@ -1,4 +1,11 @@
-
+v0.2.3
+- Mic Drop
 
 v0.2.2
-- Branch split from warptorio_0.2.1. Credit to Nonoce https://mods.factorio.com/mod/warptorio
+- Major Branch split from warptorio_0.2.1. Credit to Nonoce https://mods.factorio.com/mod/warptorio
+- Updated everything
+- Fixed everything
+- Finished everything
+- Polished everything
+- Added a whole bunch of new stuff
+- Made sure that new stuff worked properly as ideally as possible.
