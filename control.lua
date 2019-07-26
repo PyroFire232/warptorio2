@@ -201,7 +201,7 @@ function TELL:Warpout() local f=gwarptorio.Floors.main:GetSurface().name
 	if(self:ValidPointA() and self.PointA.surface.name==f)then self:DestroyPointA() self:DestroyLogisticsA() end
 	if(self:ValidPointB() and self.PointB.surface.name==f)then self:DestroyPointB() self:DestroyLogisticsB() end
 end
-function TELL:Warpin() warptorio.TeleCls[self.name]() end
+function TELL:Warpin(upgr,logs) warptorio.TeleCls[self.name](upgr,logs) end
 function TELL:ValidPointA() return (self.PointA and self.PointA.valid) end
 function TELL:ValidPointB() return (self.PointB and self.PointB.valid) end
 function TELL:ValidPoints() return (self:ValidPointA() and self:ValidPointB()) end
@@ -218,8 +218,8 @@ function TELL:DestroyLogisticsB() if(self.logs)then for k,v in pairs(self.Logist
 	e.destroy()
 end self.logs[v.."-b"]=nil end end end end
 function TELL:DestroyLogistics() self:DestroyLogisticsA() self:DestroyLogisticsB() end
-function TELL:UpgradeLogistics() if(self.logs)then self:DestroyLogistics() end self:Warpin() end -- self:SpawnLogistics()
-function TELL:UpgradeEnergy() self:Warpin() end
+function TELL:UpgradeLogistics() if(self.logs)then self:DestroyLogistics() end self:Warpin(false,true) end -- self:SpawnLogistics()
+function TELL:UpgradeEnergy() self:Warpin(true) end
 
 --[[
 a.temperature
@@ -331,8 +331,8 @@ function TELL:SpawnLogistics() if(not self.logs)then self.logs={} end
 	local b=self.PointB
 	if(b and b.valid)then if(self.name=="offworld")then -- check for collisions
 		if(b.surface.name == f.name)then
-			local bp=b.position local bb={bp.x-5,bp.y-1} local bbox={bb,{bb[1]+9,bb[2]+3}}
-			if(f.count_entities_filtered{area=bbox} > 1)then game.print("Unable to place teleporter logistics, something is in the way!")
+			local bp=b.position local bb={bp.x-5,bp.y-1} local bbox={bb,{bb[1]+9,bb[2]+2}}
+			if(f.count_entities_filtered{area=bbox,collision_mask={"object-layer"}} > 1)then game.print("Unable to place teleporter logistics, something is in the way!")
 			else self:SpawnLogisticsPoint("b",self.PointB,chest,belt,pipe,dl,lv)
 			end
 		else
@@ -349,7 +349,7 @@ function TELL:SpawnLogistics() if(not self.logs)then self.logs={} end
 end
 
 local tpcls={} warptorio.TeleCls=tpcls
-function tpcls.offworld()
+function tpcls.offworld(upgr,logs)
 	local lv=gwarptorio.Research["teleporter-energy"] or 0
 	local lgv=(gwarptorio.Research["factory-logistics"] or 0)>0
 	local lgx=gwarptorio.Research["triloader"] or 0
@@ -359,18 +359,19 @@ function tpcls.offworld()
 	local f=m:GetSurface()
 	local bpos={-1,8}
 	local makeA="warptorio-teleporter-"..lv
-	if(x:ValidPointA() and x.PointA.name~=makeA)then x:DestroyPointA() end
-	if(not x.PointA or not x.PointA.valid)then warptorio.cleanbbox(f,-2-lgx-(lgv and 2 or 0),4,3+(lgv and 4 or 0)+lgx*2,3) local e=x:SpawnPointA("warptorio-teleporter-"..lv,f,{x=-1,y=5}) e.minable=false e.destructible=false end
+	local ades=false
+	if(x:ValidPointA() and x.PointA.name~=makeA)then x:DestroyPointA() ades=true end
+	if(not x.PointA or not x.PointA.valid)then if(not upgr and not ades)then warptorio.cleanbbox(f,-2-lgx-(lgv and 2 or 0),4,3+(lgv and 4 or 0)+lgx*2,3) end local e=x:SpawnPointA("warptorio-teleporter-"..lv,f,{x=-1,y=5}) e.minable=false e.destructible=false end
 
 	local makeB="warptorio-teleporter-gate-"..lv
 	if(x:ValidPointB())then if(x.PointB.name~=makeB)then bpos=x.PointB.position x:DestroyPointB() elseif(x.PointB.surface.name~=f.name)then x:DestroyPointB() x:DestroyLogisticsB() end end
 	if(not x:ValidPointB())then bpos=f.find_non_colliding_position("warptorio-teleporter-gate-"..lv,bpos,0,1,1) local e=x:SpawnPointB("warptorio-teleporter-gate-"..lv,f,{x=bpos.x,y=bpos.y},true) end
 
-	if(lgv)then x:SpawnLogistics() end
+	if(lgv and not upgr)then x:SpawnLogistics() end
 	warptorio.playsound("warp_in",f.name)
 	return x
 end
-function tpcls.b1(lv)
+function tpcls.b1(upgr,logs)
 	local lv=gwarptorio.Research["factory-energy"] or 0
 	local x=gwarptorio.Teleporters["b1"] if(not x)then x=new(TELL,"b1") end
 	local m=gwarptorio.Floors.main local f=m:GetSurface()
@@ -380,18 +381,25 @@ function tpcls.b1(lv)
 	local vx = -2-(lgv and 2 or 0)-lgx
 	local vw = 3+(lgv and 4 or 0)+lgx*2
 	local makeA,makeB="warptorio-underground-"..lv,"warptorio-underground-"..lv
-	if(x:ValidPointA())then if(x.PointA.surface~=f)then x:DestroyPointA() self:DestroyLogisticsA() elseif(x.PointA~=makeA)then x:DestroyPointA() end end
-	if(x:ValidPointB())then if(x.PointB.surface~=fb)then x:DestroyPointB() self:DestroyLogisticsB() elseif(x.PointB~=makeB)then x:DestroyPointB() end end
-	if(not x.PointA or not x.PointA.valid)then warptorio.cleanbbox(f,vx,-8,vw,3) local e=x:SpawnPointA(makeA,f,{x=-1,y=-7}) e.minable=false end --- 7,-8  13,3
-	if(not x.PointB or not x.PointB.valid)then warptorio.cleanbbox(fb,vx,-8,vw,3) local e=x:SpawnPointB(makeB,fb,{x=-1,y=-7}) e.minable=false e.destructible=false end
+	local ades=false local bdes=false
+	if(x:ValidPointA() and (logs or x.PointA.surface~=f))then x:DestroyPointA() x:DestroyLogisticsA() elseif(x:ValidPointA() and x.PointA~=makeA)then x:DestroyPointA() ades=true end
+	if(x:ValidPointB() and (logs or x.PointB.surface~=fb))then x:DestroyPointB() x:DestroyLogisticsB() elseif(x:ValidPointB() and x.PointB~=makeB)then x:DestroyPointB() bdes=true end
+	if(not x.PointA or not x.PointA.valid)then
+		if(not ades)then warptorio.cleanbbox(f,vx,-8,vw,3) end
+		local e=x:SpawnPointA(makeA,f,{x=-1,y=-7}) e.minable=false e.destructible=false
+	end --- 7,-8  13,3
+	if(not x.PointB or not x.PointB.valid)then
+		if(not bdes)then warptorio.cleanbbox(fb,vx,-8,vw,3) end
+		local e=x:SpawnPointB(makeB,fb,{x=-1,y=-7}) e.minable=false e.destructible=false
+	end
 
-	x:ConnectCircuit()
+	--x:ConnectCircuit()
 
-	if(lgv)then x:SpawnLogistics() end
+	if(lgv and not upgr)then x:SpawnLogistics() end
 	warptorio.playsound("warp_in",f.name)
 	return x
 end
-function tpcls.b2(lv) lv=lv or 0
+function tpcls.b2(upgr,logs)
 	local lv=gwarptorio.Research["factory-energy"] or 0
 	local x=gwarptorio.Teleporters["b2"] if(not x)then x=new(TELL,"b2") end
 	local m=gwarptorio.Floors.b1 local f=m:GetSurface()
@@ -399,13 +407,14 @@ function tpcls.b2(lv) lv=lv or 0
 	local lgv=(gwarptorio.Research["factory-logistics"] or 0)>0
 	local lgx=gwarptorio.Research["dualloader"] or 0
 	local makeA,makeB="warptorio-underground-"..lv,"warptorio-underground-"..lv
-	if(x:ValidPointA())then if(x.PointA.surface~=f)then x:DestroyPointA() self:DestroyLogisticsA() elseif(x.PointA~=makeA)then x:DestroyPointA() end end
-	if(x:ValidPointB())then if(x.PointB.surface~=fb)then x:DestroyPointB() self:DestroyLogisticsB() elseif(x.PointB~=makeB)then x:DestroyPointB() end end
+	local ades=false local bdes=false
+	if(x:ValidPointA() and (logs or x.PointA.surface~=f))then x:DestroyPointA() x:DestroyLogisticsA() elseif(x:ValidPointA() and x.PointA~=makeA)then x:DestroyPointA() ades=true end
+	if(x:ValidPointB() and (logs or x.PointA.surface~=f))then x:DestroyPointB() x:DestroyLogisticsB() elseif(x:ValidPointB() and x.PointB~=makeB)then x:DestroyPointB() bdes=true end
 	local vx = -2-(lgv and 2 or 0)-lgx
 	local vw = 3+(lgv and 4 or 0)+lgx*2
-	if(not x:ValidPointA())then warptorio.cleanbbox(f,vx,4,vw,3) local e=x:SpawnPointA(makeA,f,{x=-1,y=5}) e.minable=false end
-	if(not x:ValidPointB())then warptorio.cleanbbox(fb,vx,4,vw,3) local e=x:SpawnPointB(makeB,fb,{x=-1,y=5}) e.minable=false e.destructible=false end
-	if(lgv)then x:SpawnLogistics() end
+	if(not x:ValidPointA())then if(not (upgr) and not ades)then warptorio.cleanbbox(f,vx,4,vw,3) end local e=x:SpawnPointA(makeA,f,{x=-1,y=5}) e.minable=false end
+	if(not x:ValidPointB())then if(not (upgr) and not bdes)then warptorio.cleanbbox(fb,vx,4,vw,3) end local e=x:SpawnPointB(makeB,fb,{x=-1,y=5}) e.minable=false e.destructible=false end
+	if(lgv and not upgr)then x:SpawnLogistics() end
 
 	x:ConnectCircuit()
 	warptorio.playsound("warp_in",f.name)
@@ -413,22 +422,24 @@ function tpcls.b2(lv) lv=lv or 0
 end
 
 
-function warptorio.SpawnTurretTeleporter(c,xp,yp)
+function warptorio.SpawnTurretTeleporter(c,xp,yp,upgr,logs)
 	local lv=gwarptorio.Research["turret-"..c] or 0
 	local x=gwarptorio.Teleporters[c] if(not x)then x=new(TELL,c) end
 	local m=gwarptorio.Floors.main local f=m:GetSurface()
 	local mb=gwarptorio.Floors.b1 local fb=mb:GetSurface()
 	local makeA,makeB="warptorio-underground-"..lv,"warptorio-underground-"..lv
-	if(x:ValidPointA())then if(x.PointA.surface~=f)then x:DestroyPointA() self:DestroyLogisticsA() elseif(x.PointA~=makeA)then x:DestroyPointA() end end
-	if(x:ValidPointB())then if(x.PointB.surface~=fb)then x:DestroyPointB() self:DestroyLogisticsB() elseif(x.PointB~=makeB)then x:DestroyPointB() end end
+
+	local ades=false local bdes=false
+	if(x:ValidPointA() and (logs or x.PointA.surface~=f))then x:DestroyPointA() x:DestroyLogisticsA() elseif(x:ValidPointA() and x.PointA~=makeA)then x:DestroyPointA() ades=true end
+	if(x:ValidPointB() and (logs or x.PointB.surface~=fb))then x:DestroyPointB() x:DestroyLogisticsB() elseif(x:ValidPointB() and x.PointB~=makeB)then x:DestroyPointB() bdes=true end
 	local lgv=(gwarptorio.Research["factory-logistics"] or 0)>0
 	local lgx=gwarptorio.Research["triloader"] or 0
 	local vx = -1-(lgv and 2 or 0)-lgx
 	local vw = 3+(lgv and 4 or 0)+lgx*2
-	if(not x:ValidPointA())then warptorio.cleanbbox(f,xp+vx,yp-1,vw,3) local e=x:SpawnPointA(makeA,f,{x=xp,y=yp}) e.minable=false end
-	if(not x:ValidPointB())then warptorio.cleanbbox(fb,xp+vx,yp-1,vw,3) local e=x:SpawnPointB(makeB,fb,{x=xp,y=yp}) e.minable=false e.destructible=false end
+	if(not x:ValidPointA())then if(not (upgr) and not ades)then warptorio.cleanbbox(f,xp+vx,yp-1,vw,3) end local e=x:SpawnPointA(makeA,f,{x=xp,y=yp}) e.minable=false end
+	if(not x:ValidPointB())then if(not (upgr) and not bdes)then warptorio.cleanbbox(fb,xp+vx,yp-1,vw,3) end local e=x:SpawnPointB(makeB,fb,{x=xp,y=yp}) e.minable=false e.destructible=false end
 
-	if(lgv)then x:SpawnLogistics() end
+	if(lgv and not upgr)then x:SpawnLogistics() end
 
 	x:ConnectCircuit()
 	warptorio.playsound("warp_in",f.name)
@@ -454,10 +465,10 @@ warptorio.corn.south=50
 warptorio.corn.east=50
 warptorio.corn.west=-51.5
 
-function tpcls.nw() local c=warptorio.corn.nw warptorio.SpawnTurretTeleporter("nw",c.x,c.y) gwarptorio.Turrets.nw=n warptorio.BuildPlatform() warptorio.BuildB1() end
-function tpcls.sw() local c=warptorio.corn.sw warptorio.SpawnTurretTeleporter("sw",c.x,c.y) gwarptorio.Turrets.sw=n warptorio.BuildPlatform() warptorio.BuildB1()end
-function tpcls.ne() local c=warptorio.corn.ne warptorio.SpawnTurretTeleporter("ne",c.x,c.y) gwarptorio.Turrets.ne=n warptorio.BuildPlatform() warptorio.BuildB1()end
-function tpcls.se() local c=warptorio.corn.se warptorio.SpawnTurretTeleporter("se",c.x,c.y) gwarptorio.Turrets.sw=n warptorio.BuildPlatform() warptorio.BuildB1()end
+function tpcls.nw(upgr,logs) local c=warptorio.corn.nw warptorio.SpawnTurretTeleporter("nw",c.x,c.y,upgr,logs) gwarptorio.Turrets.nw=n warptorio.BuildPlatform() warptorio.BuildB1() end
+function tpcls.sw(upgr,logs) local c=warptorio.corn.sw warptorio.SpawnTurretTeleporter("sw",c.x,c.y,upgr,logs) gwarptorio.Turrets.sw=n warptorio.BuildPlatform() warptorio.BuildB1() end
+function tpcls.ne(upgr,logs) local c=warptorio.corn.ne warptorio.SpawnTurretTeleporter("ne",c.x,c.y,upgr,logs) gwarptorio.Turrets.ne=n warptorio.BuildPlatform() warptorio.BuildB1() end
+function tpcls.se(upgr,logs) local c=warptorio.corn.se warptorio.SpawnTurretTeleporter("se",c.x,c.y,upgr,logs) gwarptorio.Turrets.sw=n warptorio.BuildPlatform() warptorio.BuildB1() end
 
 
 function warptorio.BuildPlatform() local m=gwarptorio.Floors.main local f=m:GetSurface() local z=m.z
@@ -1225,7 +1236,7 @@ end
 function warptorio.IncrementAbility(c,m) c=c or 2.5 m=m or 5
 	local n=gwarptorio.ability_uses+1
 	gwarptorio.ability_uses=n
-	gwarptorio.ability_next= 1--game.tick+60*60*(m+(n)*c)
+	gwarptorio.ability_next= game.tick+60*60*(m+(n)*c)
 	warptorio.updatelabel("warptorio_ability_uses","    Uses : " .. n)
 	warptorio.updatelabel("warptorio_ability_next","    Cooldown : " .. util.formattime(math.max(gwarptorio.ability_next-game.tick,0)) )
 end
@@ -1447,7 +1458,7 @@ function warptorio.Warpout()
 	-- abilities
 	if(gwarptorio.accelerator or gwarptorio.radar or gwarptorio.stabilizer)then
 		gwarptorio.ability_uses=0
-		gwarptorio.ability_next= 1--game.tick+60*60*5
+		gwarptorio.ability_next= game.tick+60*60*5
 		gwarptorio.radar_uses=0
 		warptorio.updatelabel("warptorio_radar","Radar (0)")
 		warptorio.updatelabel("warptorio_ability_uses","    Uses : " .. gwarptorio.ability_uses)
