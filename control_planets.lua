@@ -15,7 +15,7 @@ planet.average={ zone=1, rng=15, name="An Average Planet", desc="The usual critt
 	fgen=function(t,b)
 		local z,x=table.deepcopy(resourceTypes),{} for i=1,math.random(1,2),1 do local u=math.random(1,#z) x[i]=z[u] table.remove(z,u) end
 		for k,v in pairs(x)do t.autoplace_controls[v]={size=0} end
-		if(b or true)then local s=x[1] if(x[2])then s=s .. " and " .. x[2] .. " do" else s=s.. " does" end s=s.." not spawn on this planet"
+		if(b)then local s=x[1] if(x[2])then s=s .. " and " .. x[2] .. " do" else s=s.. " does" end s=s.." not spawn on this planet"
 			game.print(s) end
 	end,
 	spawn=function(f,b)
@@ -90,7 +90,7 @@ planet.copper={ zone=8, rng=5, name="A Copper Planet", desc="The warp reactor su
 			["iron-ore"]=czIron,["coal"]=czCoal,["crude-oil"]=czRes,["uranium-ore"]=czRes,["stone"]=czRes,
 		},
 	},
-	spawn=function(f) for k,v in pairs(f.find_entities_filtered{type="resource"})do if(v.name~="copper-ore")then v.destroy() game.print("iron") end end end
+	spawn=function(f) for k,v in pairs(f.find_entities_filtered{type="resource"})do if(v.name~="copper-ore")then v.destroy() end end end
 }
 
 
@@ -100,7 +100,7 @@ planet.iron={ zone=5, rng=5, name="An Iron Planet", desc="You land with a loud m
 			["copper-ore"]=czCopper,["coal"]=czCoal,["crude-oil"]=czRes,["uranium-ore"]=czRes,["stone"]=czRes,
 		},
 	},
-	spawn=function(f) for k,v in pairs(f.find_entities_filtered{type="resource"})do if(v.name~="iron-ore")then v.destroy() game.print("iron") end end end,
+	spawn=function(f) for k,v in pairs(f.find_entities_filtered{type="resource"})do if(v.name~="iron-ore")then v.destroy() end end end,
 }
 
 planet.coal={ zone=7, rng=5, name="A Coal Planet", desc="A Coal Planet Description",
@@ -131,7 +131,7 @@ planet.oil={ zone=10, rng=5, name="An Oil Planet", desc="An Oil Planet Descripti
 		},
 	},
 	spawn=function(f)
-		for k,v in pairs(f.find_entities_filtered{type="resource"})do if(v.name~="stone")then v.destroy() end end
+		for k,v in pairs(f.find_entities_filtered{type="resource"})do if(v.name~="crude-oil")then v.destroy() end end
 
 	end,
 }
