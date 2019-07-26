@@ -70,8 +70,9 @@ function TRAIL:MakeChests(chest) local f=gwarptorio.Floors.b1:GetSurface() local
 
 end
 
-function TRAIL:DoCheckLoader(i) local r=self.loaders[i] if(r and r.loader_type~=self.dir)then self.dir=r.loader_type self:DoMakes() return end end
+function TRAIL:DoCheckLoader(i) local r=self.loaders[i] if(r and r.loader_type~=self.dir)then self.dir=r.loader_type self:DoMakes(true) return end end
 function TRAIL:CheckLoaders() for i=1,4,1 do self:DoCheckLoader(i) end end
+
 
 warptorio.railLoader={nw={{2,0},{0,2}},sw={{2,0},{0,-2}},ne={{-2,0},{0,2}},se={{-2,0},{0,-2}}}
 
@@ -116,7 +117,7 @@ end
 
 function TRAIL:LoadLogistics(e)
 	local inv={} for k,v in pairs(self.chests)do inv[k]=v.get_inventory(defines.inventory.chest) end
-	local ct={} for k,v in pairs(inv)do for a,b in pairs(v.get_inventory(defines.inventory.chest))do ct[k]=(ct[k] or 0)+v end v.clear() end
+	local ct={} for k,v in pairs(inv)do for a,b in pairs(v.get_contents())do ct[a]=(ct[a] or 0)+b end v.clear() end
 	for _,r in pairs(e)do
 		local tr=r.get_inventory(defines.inventory.cargo_wagon)
 		for k,v in pairs(ct)do ct[k]=v-(tr.insert{name=k,count=v}) end
@@ -146,21 +147,17 @@ function TRAIL:BalanceChests()
 	local ci for a,b in pairs(ct)do local g=b ci=#inv for k,v in pairs(inv)do local gci=math.ceil(g/ci) if(gci>0)then local w=v.insert{name=a,count=math.ceil(g/ci)} ci=ci-1 g=g-w end end end
 end
 
-function TRAIL:DoMakes()
+function TRAIL:DoMakes(udir)
 	local lv=gwarptorio.Research["factory-logistics"] or 0
 	local chest,belt local pipe="warptorio-logistics-pipe"
 	if(lv<=1)then chest,belt="wooden-chest","loader"
 	elseif(lv==2)then chest,belt="iron-chest","fast-loader"
 	elseif(lv==3)then chest,belt="steel-chest","express-loader"
 	elseif(lv>=4)then chest,belt=(self.dir=="output" and "logistic-chest-active-provider" or "logistic-chest-requester"),"express-loader" end
-	self:MakeRails()
+	if(not udir)then self:MakeRails() end
 	self:MakeChests(chest)
 	self:MakeLoaders(belt)
 end
-
---		for k,v in pairs({nw={-1,-1},ne={0,-1},sw={-1,0},se={0,0}})do local c=warptorio.railCorn[k]
---			warptorio.LayFloor("hazard-concrete-left",f,c.x+v[1],c.y+v[2],2,2)
---		end
 
 warptorio.railOffset={nw={-1,-1},ne={0,-1},sw={-1,0},se={0,0}}
 function warptorio.BuildRailCorner(cn) local c=warptorio.railCorn[cn] local v=warptorio.railOffset[cn] local vx=warptorio.railLoader[cn]
@@ -395,8 +392,8 @@ function tpcls.b1(upgr,logs)
 	local vw = 3+(lgv and 4 or 0)+lgx*2
 	local makeA,makeB="warptorio-underground-"..lv,"warptorio-underground-"..lv
 	local ades=false local bdes=false
-	if(x:ValidPointA() and (logs or x.PointA.surface~=f))then x:DestroyPointA() x:DestroyLogisticsA() elseif(x:ValidPointA() and x.PointA~=makeA)then x:DestroyPointA() ades=true end
-	if(x:ValidPointB() and (logs or x.PointB.surface~=fb))then x:DestroyPointB() x:DestroyLogisticsB() elseif(x:ValidPointB() and x.PointB~=makeB)then x:DestroyPointB() bdes=true end
+	if(x:ValidPointA())then if((logs or x.PointA.surface~=f))then x:DestroyPointA() x:DestroyLogisticsA() elseif(x.PointA~=makeA)then x:DestroyPointA() ades=true end end
+	if(x:ValidPointB())then if((logs or x.PointB.surface~=fb))then x:DestroyPointB() x:DestroyLogisticsB() elseif(x.PointB~=makeB)then x:DestroyPointB() bdes=true end end
 	if(not x.PointA or not x.PointA.valid)then
 		if(not ades)then warptorio.cleanbbox(f,vx,-8,vw,3) end
 		local e=x:SpawnPointA(makeA,f,{x=-1,y=-7}) e.minable=false e.destructible=false
@@ -423,8 +420,8 @@ function tpcls.b2(upgr,logs)
 	local lgx=gwarptorio.Research["dualloader"] or 0
 	local makeA,makeB="warptorio-underground-"..lv,"warptorio-underground-"..lv
 	local ades=false local bdes=false
-	if(x:ValidPointA() and (logs or x.PointA.surface~=f))then x:DestroyPointA() x:DestroyLogisticsA() elseif(x:ValidPointA() and x.PointA~=makeA)then x:DestroyPointA() ades=true end
-	if(x:ValidPointB() and (logs or x.PointA.surface~=f))then x:DestroyPointB() x:DestroyLogisticsB() elseif(x:ValidPointB() and x.PointB~=makeB)then x:DestroyPointB() bdes=true end
+	if(x:ValidPointA())then if(logs or x.PointA.surface~=f)then x:DestroyPointA() x:DestroyLogisticsA() elseif(x.PointA.name~=makeA)then x:DestroyPointA() ades=true end end
+	if(x:ValidPointB())then if((logs or x.PointB.surface~=f))then x:DestroyPointB() x:DestroyLogisticsB() elseif(x.PointB.name~=makeB)then x:DestroyPointB() bdes=true end end
 	local vx = -2-(lgv and 2 or 0)-lgx
 	local vw = 3+(lgv and 4 or 0)+lgx*2
 	if(not x:ValidPointA())then if(not (upgr) and not ades)then warptorio.cleanbbox(f,vx,4,vw,3) end local e=x:SpawnPointA(makeA,f,{x=-1,y=5}) e.minable=false end
@@ -445,8 +442,8 @@ function warptorio.SpawnTurretTeleporter(c,xp,yp,upgr,logs)
 	local makeA,makeB="warptorio-underground-"..lv,"warptorio-underground-"..lv
 
 	local ades=false local bdes=false
-	if(x:ValidPointA() and (logs or x.PointA.surface~=f))then x:DestroyPointA() x:DestroyLogisticsA() elseif(x:ValidPointA() and x.PointA~=makeA)then x:DestroyPointA() ades=true end
-	if(x:ValidPointB() and (logs or x.PointB.surface~=fb))then x:DestroyPointB() x:DestroyLogisticsB() elseif(x:ValidPointB() and x.PointB~=makeB)then x:DestroyPointB() bdes=true end
+	if(x:ValidPointA())then if((logs or x.PointA.surface~=f))then x:DestroyPointA() x:DestroyLogisticsA() elseif(x.PointA.name~=makeA)then x:DestroyPointA() ades=true end end
+	if(x:ValidPointB())then if((logs or x.PointB.surface~=fb))then x:DestroyPointB() x:DestroyLogisticsB() elseif(x.PointB.name~=makeB)then x:DestroyPointB() bdes=true end end
 	local lgv=(gwarptorio.Research["factory-logistics"] or 0)>0
 	local lgx=gwarptorio.Research["triloader"] or 0
 	local vx = -1-(lgv and 2 or 0)-lgx
@@ -643,7 +640,7 @@ function warptorio.BuildB1() local m=gwarptorio.Floors.b1 local f=m:GetSurface()
 		if(gwarptorio.factory_e)then warptorio.LaySquare("warp-tile",f,z+zxm+4,-2,zvx,zvy)
 			warptorio.LaySquare("warp-tile",f,c.east+zxn,-9-1,zxc,zxc) warptorio.LaySquare("warp-tile",f,c.east+zxn,9-1,zxc,zxc) end
 		if(gwarptorio.factory_n)then warptorio.LaySquare("warp-tile",f,-2,-z-zxm-6,zvy,zvx)
-			warptorio.LaySquare("warp-tile",f,-9-1.5,c.north-zxn,zxc,zxc) warptorio.LaySquare("warp-tile",f,9-1.5,c.north-zxn,zxc,zxc) end
+			warptorio.LaySquare("warp-tile",f,-9-0.5,c.north-zxn,zxc,zxc) warptorio.LaySquare("warp-tile",f,9-0.5,c.north-zxn,zxc,zxc) end
 		if(gwarptorio.factory_s)then warptorio.LaySquare("warp-tile",f,-2,z+zxm+4,zvy,zvx)
 			warptorio.LaySquare("warp-tile",f,-9-1,c.south+zxn,zxc,zxc) warptorio.LaySquare("warp-tile",f,9-1,c.south+zxn,zxc,zxc) end
 
@@ -842,6 +839,7 @@ function warptorio.OnEntityCloned(ev) local d=ev.destination local type,name=d.t
 		end end
 	elseif(v.logs)then for a,x in pairs(v.logs)do if(ev.source==x)then v.logs[a]=d return end end
 	end end
+	if(type=="entity-ghost")then d.direction=e.direction end
 end script.on_event(defines.events.on_entity_cloned, warptorio.OnEntityCloned)
 
 
@@ -1506,6 +1504,7 @@ function warptorio.Warpout()
 	if(tp and tp:ValidPointB())then tp:DestroyPointB() tp:DestroyLogisticsB() end
 
 
+	-- clean new surface
 	local tpply={}
 	local cx=warptorio.corn
 	local etbl=c.find_entities_filtered{type="character",invert=true,area=m.area}
@@ -1513,14 +1512,12 @@ function warptorio.Warpout()
 	--[[ c.clone_area{source_area=bbox, destination_area=bbox, destination_surface=f, destination_force=game.forces.player, expand_map=false, clone_tiles=true, clone_entities=true,
 		clone_decoratives=false, clear_destination=true}]]
 
-	-- teleport players to new surface
+	-- find players to teleport to new platform
 	for k,v in pairs(game.players)do
 		local p,b=m:GetPos(),m:GetBBox()
 		if(v.character~=nil and v.surface.name==c.name and warptorio.isinbbox(v.character.position,{x=p[1],y=p[2]},{x=b[1]-1,y=b[2]}))then
 			table.insert(tpply,{v,{v.position.x,v.position.y}})
-		end --elseif(v.character~=nil and v.surface.name==gwarptorio.Floors.b1:GetSurface().name or v.surface.name==gwarptorio.Floors.b2:GetSurface().name)then
-			--table.insert(tpply,{v,{0,0}})
-		--end
+		end
 	end
 
 	for k,v in pairs({"nw","ne","sw","se"})do local ug=gwarptorio.Research["turret-"..v] or -1 if(ug>=0)then
@@ -1534,11 +1531,13 @@ function warptorio.Warpout()
 	end end
 
 
+	-- copy platform
 	c.clone_entities{entities=etbl,destination_offset={0,0},destination_surface=f,destination_force=game.forces.player}
 
-	for k,v in pairs(tpply)do
-		v[1].teleport(f.find_non_colliding_position("character",{v[2][1],v[2][2]},0,1,1),f)
-	end
+
+
+	-- do the player teleport
+	for k,v in pairs(tpply)do v[1].teleport(f.find_non_colliding_position("character",{v[2][1],v[2][2]},0,1,1),f) end
 
 	gwarptorio.Floors.main:SetSurface(f)
 	--for k,v in pairs(gwarptorio.Teleporters)do v:Warpin() end
