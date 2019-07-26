@@ -839,7 +839,15 @@ function warptorio.OnEntityCloned(ev) local d=ev.destination local type,name=d.t
 		end end
 	elseif(v.logs)then for a,x in pairs(v.logs)do if(ev.source==x)then v.logs[a]=d return end end
 	end end
-	if(type=="entity-ghost")then d.direction=e.direction end
+	if(type=="entity-ghost")then
+		if(d.ghost_type=="splitter")then
+			local df=d.surface
+			local dp=d.position
+			d.destroy()
+			d=df.create_entity{name="entity-ghost",force=e.force,player=e.last_user,inner_name=e.ghost_name,expires=e.time_to_live,position=dp,direction=e.direction}
+			d.copy_settings(e)
+		elseif(e.direction)then d.direction=e.direction end
+	end
 end script.on_event(defines.events.on_entity_cloned, warptorio.OnEntityCloned)
 
 
@@ -1010,7 +1018,7 @@ upcs["boiler-station"]=function(lv,f) local m=gwarptorio.Floors.b2
 end
 
 local lvMsg={
-	{"You've awoken with slight headache, and the only thing you feel sure of is that you need to rebuild your experiment to escape this dangerous world and return home.",
+	{"You first awoke with slight headache on this platform, and the only thing you feel sure of is that you need to rebuild your experiment to escape this dangerous world and return home.",
 	"You cobble together some wires, switches and dials and attach it to the platform.",
 	"Although you are unsure if you managed to achieve anything, you at least feel a bit more in control."},
 
@@ -1744,6 +1752,10 @@ local lootItems={
 ["atomic-bomb"]=2,
 ["warptorio-warponium-fuel-cell"]=2,
 ["warptorio-warponium-fuel"]=1,
+
+["uranium-magazine"]=100,
+["firearm-magazine"]=400,
+["piercing-rounds-magazine"]=200,
 }
 
 
