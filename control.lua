@@ -2,7 +2,7 @@
 -- --------
 -- Setup
 
-local gwarptorio={}
+local gwarptorio
 local util = require("util")
 local mod_gui = require("mod-gui")
 local function new(x,a,b,c,d,e,f,g) local t,v=setmetatable({},x),rawget(x,"__init") if(v)then v(t,a,b,c,d,e,f,g) end return t end
@@ -421,11 +421,11 @@ function tpcls.b2(upgr,logs)
 	local makeA,makeB="warptorio-underground-"..lv,"warptorio-underground-"..lv
 	local ades=false local bdes=false
 	if(x:ValidPointA())then if(logs or x.PointA.surface~=f)then x:DestroyPointA() x:DestroyLogisticsA() elseif(x.PointA.name~=makeA)then x:DestroyPointA() ades=true end end
-	if(x:ValidPointB())then if((logs or x.PointB.surface~=f))then x:DestroyPointB() x:DestroyLogisticsB() elseif(x.PointB.name~=makeB)then x:DestroyPointB() bdes=true end end
+	if(x:ValidPointB())then if((logs or x.PointB.surface~=fb))then x:DestroyPointB() x:DestroyLogisticsB() elseif(x.PointB.name~=makeB)then x:DestroyPointB() bdes=true end end
 	local vx = -2-(lgv and 2 or 0)-lgx
 	local vw = 3+(lgv and 4 or 0)+lgx*2
-	if(not x:ValidPointA())then if(not (upgr) and not ades)then warptorio.cleanbbox(f,vx,4,vw,3) end local e=x:SpawnPointA(makeA,f,{x=-1,y=5}) e.minable=false end
-	if(not x:ValidPointB())then if(not (upgr) and not bdes)then warptorio.cleanbbox(fb,vx,4,vw,3) end local e=x:SpawnPointB(makeB,fb,{x=-1,y=5}) e.minable=false e.destructible=false end
+	if(not x:ValidPointA())then if(not ades)then warptorio.cleanbbox(f,vx,4,vw,3) end local e=x:SpawnPointA(makeA,f,{x=-1,y=5}) e.minable=false end
+	if(not x:ValidPointB())then if(not bdes)then warptorio.cleanbbox(fb,vx,4,vw,3) end local e=x:SpawnPointB(makeB,fb,{x=-1,y=5}) e.minable=false e.destructible=false end
 	if(lgv and not upgr)then x:SpawnLogistics() end
 
 	x:ConnectCircuit()
@@ -857,7 +857,7 @@ end script.on_event(defines.events.on_entity_cloned, warptorio.OnEntityCloned)
 -- further setup
 
 function warptorio.OnLoad()
-	if(not global.warptorio or not gwarptorio)then return end
+	if(not global.warptorio or gwarptorio)then return end
 	gwarptorio=global.warptorio
 	for k,v in pairs(gwarptorio.Floors)do setmetatable(v,warptorio.FloorMeta) end
 	for k,v in pairs(gwarptorio.Teleporters)do setmetatable(v,warptorio.TeleporterMeta) end
@@ -1753,7 +1753,7 @@ local lootItems={
 ["warptorio-warponium-fuel-cell"]=2,
 ["warptorio-warponium-fuel"]=1,
 
-["uranium-magazine"]=100,
+["uranium-rounds-magazine"]=100,
 ["firearm-magazine"]=400,
 ["piercing-rounds-magazine"]=200,
 }
