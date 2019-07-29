@@ -1,3 +1,26 @@
+v0.2.8
+- Added some vanilla bullet damage upgrades
+- Tweaked initial and stabilizer pollution settings
+
+v0.2.7
+- Tweaked the Polluted planet
+- Added Dwarf Planet
+- Changed some planet descriptions
+- Fixed a bug with logistics chests not functioning correctly between floors
+
+v0.2.6
+- Reduced warp multipliers for end game planets
+- Tweaked resource spawning on specialized planets and disabled spawn area resource removal
+
+v0.2.5
+- Fixed a bug with placing the teleporter gate causes the platform teleporter chests to empty
+- Slightly reduced warp robot speed bonus
+- Fixed a bug with dual loader research not applying to boiler floor
+
+v0.2.4
+- Fixed a bug with upgrading energy causing loss of logistics in boiler room.
+- Made early game research slightly more expensive
+
 v0.2.3
 - Mic Drop
 

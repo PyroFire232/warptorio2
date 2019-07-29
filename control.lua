@@ -219,8 +219,8 @@ function TELL:DestroyPoints() self:DestroyPointA() self:DestroyPointB() end
 function TELL:DestroyPointA() if(self.PointA and self.PointA.valid)then self.PointAEnergy=self.PointA.energy self.PointA.destroy() self.PointA=nil end end
 function TELL:DestroyPointB() if(self.PointB and self.PointB.valid)then self.PointBEnergy=self.PointB.energy self.PointB.destroy() self.PointB=nil end end
 function TELL:DestroyLogisticsA() if(self.logs)then for k,v in pairs(self.LogisticsEnts)do local e=self.logs[v.."-a"] if(e)then if(e.valid)then
-	if(e.type=="container")then local inv=e.get_inventory(defines.inventory.chest) self.logcont[v.."-a"]=inv.get_contents()
-		for x,y in pairs(self.logcont[v.."-a"])do game.print(x .. " " .. y) end end
+	if(e.type=="container")then local inv=e.get_inventory(defines.inventory.chest) self.logcont[v.."-a"]=inv.get_contents() end
+		--for x,y in pairs(self.logcont[v.."-a"])do game.print(x .. " " .. y) end
 	e.destroy()
 end self.logs[v.."-a"]=nil end end end end
 function TELL:DestroyLogisticsB() if(self.logs)then for k,v in pairs(self.LogisticsEnts)do local e=self.logs[v.."-b"] if(e)then if(e.valid)then
@@ -253,11 +253,10 @@ function TELL:SwapLoaderChests(i,a,b)
 		local ea=self.logs["chest"..i.."-a"] local eax=(a.loader_type=="input" and "logistic-chest-requester" or "logistic-chest-active-provider")
 		local eb=self.logs["chest"..i.."-b"] local ebx=(a.loader_type=="output" and "logistic-chest-requester" or "logistic-chest-active-provider")
 		local va=warptorio.SpawnEntity(ea.surface,eax,ea.position.x,ea.position.y) va.minable=false va.destructible=false
-		local vb=warptorio.SpawnEntity(eb.surface,ebx,eb.position.x,eb.position.y) vb.minable=false vb.destructible=false 
+		local vb=warptorio.SpawnEntity(eb.surface,ebx,eb.position.x,eb.position.y) vb.minable=false vb.destructible=false
 		warptorio.CopyChestEntity(ea,va) warptorio.CopyChestEntity(eb,vb)
 		local cb if(a.loader_type=="input")then cb=va.get_or_create_control_behavior() else cb=vb.get_or_create_control_behavior() end
 		cb.circuit_mode_of_operation=defines.control_behavior.logistic_container.circuit_mode_of_operation.set_requests
-			
 		ea.destroy() eb.destroy()
 		self.logs["chest"..i.."-a"]=va self.logs["chest"..i.."-b"]=vb
 	end
@@ -370,8 +369,8 @@ function tpcls.offworld(upgr,logs)
 	local bpos={-1,8}
 	local makeA="warptorio-teleporter-"..lv
 	local ades=false
-	if(x:ValidPointA() and x.PointA.name~=makeA)then x:DestroyPointA() ades=true end
-	if(not x.PointA or not x.PointA.valid)then if(not upgr and not ades)then warptorio.cleanbbox(f,-2-lgx-(lgv and 2 or 0),4,3+(lgv and 4 or 0)+lgx*2,3) end local e=x:SpawnPointA("warptorio-teleporter-"..lv,f,{x=-1,y=5}) e.minable=false e.destructible=false end
+	if(x:ValidPointA())then if(logs or x.PointA.surface~=f)then x:DestroyPointA() x:DestroyLogisticsA() elseif(x.PointA.name~=makeA)then x:DestroyPointA() ades=true end end
+	if(not x.PointA or not x.PointA.valid)then if(not ades)then warptorio.cleanbbox(f,-2-lgx-(lgv and 2 or 0),4,3+(lgv and 4 or 0)+lgx*2,3) end local e=x:SpawnPointA("warptorio-teleporter-"..lv,f,{x=-1,y=5}) e.minable=false e.destructible=false end
 
 	local makeB="warptorio-teleporter-gate-"..lv
 	if(x:ValidPointB())then if(x.PointB.name~=makeB)then bpos=x.PointB.position x:DestroyPointB() elseif(x.PointB.surface.name~=f.name)then x:DestroyPointB() x:DestroyLogisticsB() end end
@@ -781,7 +780,7 @@ end
 function warptorio.BalanceLogistics(a,b,bal) if(not a or not b or not a.valid or not b.valid)then return end -- cost is removed because it's derp
 	if(a.type=="accumulator" and b.type==a.type)then -- transfer energy
 		warptorio.Logistics.BalanceEnergy(a,b)
-	elseif(a.type=="container" and b.type==a.type)then -- transfer items
+	elseif((a.type=="container" or b.type=="logistic-container") and b.type==a.type)then -- transfer items
 		warptorio.Logistics.MoveContainer(a,b)
 	elseif(a.type=="pipe-to-ground" and b.type==a.type)then -- transfer fluids
 		if(bal==true)then warptorio.Logistics.BalanceFluid(a,b)
@@ -1075,7 +1074,7 @@ upcs["accelerator"]=function(lv) local m=gwarptorio.Floors.main
 	warptorio.cleanbbox(m:GetSurface(),-3,-3,2,2) local e=warptorio.SpawnEntity(m:GetSurface(),"warptorio-accelerator-"..lv,4,-1) e.minable=false
 end]]
 
-upcs["dualloader"]=function(lv) warptorio.RebuildFloors() local m=gwarptorio.Teleporters.b1 if(m)then m:UpgradeLogistics() end end
+upcs["dualloader"]=function(lv) warptorio.RebuildFloors() local m=gwarptorio.Teleporters.b1 if(m)then m:UpgradeLogistics() end local m=gwarptorio.Teleporters.b2 if(m)then m:UpgradeLogistics() end end
 upcs["triloader"]=function(lv) warptorio.RebuildFloors() for k,m in pairs(gwarptorio.Teleporters)do m:UpgradeLogistics() end end
 upcs["bridgesize"]=function(lv) warptorio.BuildB1() end
 
@@ -1274,7 +1273,7 @@ end
 
 function warptorio.TryStabilizer() if(game.tick<(gwarptorio.ability_next or 0) or not gwarptorio.warp_reactor)then return end warptorio.IncrementAbility(2.5,5)
 	game.forces["enemy"].evolution_factor=0	
-	gwarptorio.pollution_amount = 1.5
+	gwarptorio.pollution_amount = 1.1
 	local f=gwarptorio.Floors.main:GetSurface()
 	f.clear_pollution()
 	f.set_multi_command{command={type=defines.command.flee, from=gwarptorio.warp_reactor}, unit_count=1000, unit_search_distance=500}
@@ -1451,7 +1450,7 @@ function warptorio.BuildNewPlanet()
 
 	local orig=(game.surfaces["nauvis"].map_gen_settings)
 	local seed=(orig.seed + math.random(0,4294967295)) % 4294967296
-	local t=(w.gen and table.deepcopy(w.gen) or {}) t.seed=seed if(w.fgen)then w.fgen(t,lvl>=3) end
+	local t=(w.gen and table.deepcopy(w.gen) or {}) t.seed=seed if(w.fgen)then w.fgen(t,gwarptorio.charting) end
 
 	local f = game.create_surface("warpsurf_"..gwarptorio.warpzone,t)
 	f.request_to_generate_chunks({0,0},3) f.force_generate_chunk_requests()
@@ -1567,7 +1566,7 @@ function warptorio.Warpout()
 	-- stuff to reset
 	gwarptorio.surf_to_leave_angry_biters_counter = 0
 	game.forces["enemy"].evolution_factor=0
-	gwarptorio.pollution_amount=1.5
+	gwarptorio.pollution_amount=1.1
 	gwarptorio.warp_stabilizer_accumulator_discharge_count = 0
 
 	-- warp sound
@@ -1646,7 +1645,7 @@ function warptorio.Initialize()
 	gwarptorio.time_spent_start_tick = game.tick
 	gwarptorio.time_passed = 0
 
-	gwarptorio.pollution_amount = 1+settings.global['warptorio_warp_polution_factor'].value
+	gwarptorio.pollution_amount = 1.1--+settings.global['warptorio_warp_polution_factor'].value
 	gwarptorio.biter_expand_cooldown = 1000 * 60
 	gwarptorio.charge_factor = settings.global['warptorio_warp_charge_factor'].value
 
@@ -1761,7 +1760,7 @@ local lootItems={
 
 function warptorio.cheat() for i,p in pairs(game.players)do for k,v in pairs(lootItems)do p.get_main_inventory().insert{name=k,count=v} end end end
 function warptorio.cmdwarp() warptorio.Warpout() end
-function warptorio.cmdresetplatform() warptorio.BuildPlatform() warptorio.BuildB1() warptorio.BuildB2() end
+function warptorio.cmdresetplatform() warptorio.BuildPlatform() warptorio.BuildB1() warptorio.BuildB2() for k,v in pairs(gwarptorio.Teleporters)do v:Warpin() end end
 remote.add_interface("warptorio",{cheat=warptorio.cheat,warp=warptorio.cmdwarp,resetplatform=warptorio.cmdresetplatform})
 --remote.call("warptorio","cheat")
 

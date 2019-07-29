@@ -444,7 +444,7 @@ ExtendTech(t,{name="warptorio-inserter-cap-5",unit={count=350,time=30},prerequis
 
 
 local t={type="technology",upgrade=true,icon_size=128,icons={ {icon="__base__/graphics/technology/worker-robots-speed.png",tint={r=0.3,g=0.3,b=1,a=1}} },
-	effects={ {type="worker-robot-speed",modifier=0.4},} }
+	effects={ {type="worker-robot-speed",modifier=0.35},} }
 ExtendTech(t,{name="warptorio-bot-speed-1",unit={count=350,time=30},prerequisites={"robotics"}}, {red=1,green=1})
 ExtendTech(t,{name="warptorio-bot-speed-2",unit={count=350,time=30},prerequisites={"warptorio-bot-speed-1","logistic-robotics"}}, {red=2,green=1})
 ExtendTech(t,{name="warptorio-bot-speed-3",unit={count=350,time=30},prerequisites={"warptorio-bot-speed-2","chemical-science-pack"}}, {red=3,green=2,blue=1} )
@@ -458,6 +458,15 @@ ExtendTech(t,{name="warptorio-bot-cap-2",unit={count=200,time=30},prerequisites=
 ExtendTech(t,{name="warptorio-bot-cap-3",unit={count=250,time=30},prerequisites={"warptorio-bot-cap-2","chemical-science-pack"}}, {red=3,green=2,blue=1} )
 ExtendTech(t,{name="warptorio-bot-cap-4",unit={count=300,time=30},prerequisites={"warptorio-bot-cap-3","production-science-pack"}}, {red=4,green=3,blue=2,purple=1} )
 ExtendTech(t,{name="warptorio-bot-cap-5",unit={count=350,time=30},prerequisites={"warptorio-bot-cap-4","utility-science-pack"}}, {red=5,green=4,blue=3,purple=2,yellow=1} )
+
+
+local t={type="technology",upgrade=true,icon_size=128,icons={ {icon="__base__/graphics/technology/physical-projectile-damage-1.png",tint={r=0.3,g=0.3,b=1,a=1}} },
+	effects={ {type="turret-attack",modifier=0.15,turret_id="gun-turret"},{ammo_category="bullet",modifier=0.15,type="ammo-damage"},{ammo_category="shotgun-shell",modifier=0.2,type="ammo-damage"} } }
+ExtendTech(t,{name="warptorio-physdmg-1",unit={count=200,time=30},prerequisites={"warptorio-reactor-1","physical-projectile-damage-1"}}, {red=1})
+ExtendTech(t,{name="warptorio-physdmg-2",unit={count=400,time=30},prerequisites={"warptorio-physdmg-1"}}, {red=1})
+ExtendTech(t,{name="warptorio-physdmg-3",unit={count=200,time=30},prerequisites={"warptorio-reactor-2","warptorio-physdmg-2","physical-projectile-damage-2"}}, {red=2,green=1} )
+ExtendTech(t,{name="warptorio-physdmg-4",unit={count=400,time=30},prerequisites={"warptorio-physdmg-3"}}, {red=2,green=1} )
+ExtendTech(t,{name="warptorio-physdmg-5",unit={count=400,time=30},prerequisites={"warptorio-reactor-3","warptorio-physdmg-4","physical-projectile-damage-3"}}, {red=3,green=2,black=1} )
 
 local t={type="technology",upgrade=true,icon_size=128,icons={ {icon="__base__/graphics/technology/toolbelt.png",tint={r=0.3,g=0.3,b=1,a=1}} },
 	effects={ {type="character-inventory-slots-bonus",modifier=10} }, }
