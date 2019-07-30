@@ -20,6 +20,17 @@ local function ExtendRecipeItem(t)
 end
 local function ExtendDataCopy(a,b,x,ri,tx) local t=MakeDataCopy(a,b,x) if(tx)then for k,v in pairs(tx)do t[k]=v end end data:extend{t} if(ri)then ExtendRecipeItem(t) end return t end
 
+
+local techPacks={red="automation-science-pack",green="logistic-science-pack",blue="chemical-science-pack",black="military-science-pack",
+	purple="production-science-pack",yellow="utility-science-pack",white="space-science-pack"}
+
+local function SciencePacks(x) local t={} for k,v in pairs(x)do table.insert(t,{techPacks[k],v}) end return t end
+local function ExtendTech(t,d,s) local x=table.merge(t,d) if(s)then x.unit.ingredients=SciencePacks(s) end data:extend{x} return x end
+
+
+
+
+
 -- --------
 -- Warp Tiles
 
@@ -202,7 +213,23 @@ for i=2,50,1 do local xt=table.deepcopy(t) xt.name="warptorio-beacon-"..i xt.sup
 
 
 -- ----
--- Stabilizers
+-- Warp Accumulator
+
+local rtint={r=0.4,g=0.4,b=1,a=1}
+local t=ExtendDataCopy("accumulator","accumulator",{name="warptorio-accumulator",
+	energy_source={ type="electric", usage_priority="tertiary", emissions_per_minute=5,
+		input_flow_limit="5GW", output_flow_limit="5GW", buffer_capacity="1GJ",
+	},
+	picture={layers={ {tint=rtint,hr_version={tint=rtint}} }},
+},true)
+
+local t={type="technology",upgrade=true,icon_size=128,icons={
+	{icon="__base__/graphics/technology/electric-energy-acumulators.png",tint={r=0.3,g=0.3,b=1,a=1},priority="low"},
+}, }
+ExtendTech(t,{name="warptorio-accumulator",unit={count=1000,time=5},effects={{recipe="warptorio-accumulator",type="unlock-recipe"}},
+	prerequisites={"warptorio-energy-4","warptorio-teleporter-4","production-science-pack"}}, {red=1,green=1,blue=1,purple=1})
+
+
 --[[ unused
 local entity=table.deepcopy(data.raw.accumulator["accumulator"]) entity.name="warptorio-stabilizer-1"
 entity.picture.layers[1].tint={r=0.8, g=0.8, b=1, a=1}
@@ -232,9 +259,11 @@ entity.energy_source.buffer_capacity="500GJ"
 entity.energy_source.input_flow_limit="5000kW"
 recipe_item_entity_extend(entity)
 
+]]
 
 -- ----
 -- Warp Accelerator
+--[[ unused
 
 --warp accelerator
 local entity=table.deepcopy(data.raw.accumulator["accumulator"])
@@ -256,12 +285,6 @@ recipe_item_entity_extend(entity)
 
 -- -------------------------------------------------------------------------
 -- Technologies
-
-local techPacks={red="automation-science-pack",green="logistic-science-pack",blue="chemical-science-pack",black="military-science-pack",
-	purple="production-science-pack",yellow="utility-science-pack",white="space-science-pack"}
-
-local function SciencePacks(x) local t={} for k,v in pairs(x)do table.insert(t,{techPacks[k],v}) end return t end
-local function ExtendTech(t,d,s) local x=table.merge(t,d) if(s)then x.unit.ingredients=SciencePacks(s) end data:extend{x} return x end
 
 
 -- ----
@@ -356,7 +379,7 @@ local t={type="technology",upgrade=true,icon_size=128,icons={
 ExtendTech(t,{name="warptorio-reactor-8",unit={count=1000,time=30}, prerequisites={"warptorio-reactor-7","warptorio-charting","warptorio-kovarex","rocket-control-unit"}}, {red=1,green=1,black=1,blue=1,purple=1,yellow=1}) -- steering
 
 local t={type="technology",upgrade=false,icon_size=128,icons={
-	{icon="__base__/graphics/technology/electric-energy-acumulators.png",tint={r=0.3,g=0.3,b=1,a=1},priority="low"},
+	{icon="__base__/graphics/technology/battery.png",tint={r=0.3,g=0.3,b=1,a=1},priority="low"},
 }, }
 ExtendTech(t,{name="warptorio-stabilizer",unit={count=400,time=30}, prerequisites={"warptorio-reactor-6","military-3","circuit-network"}}, {red=1,green=1,black=1,blue=1}) -- stabilizer
 
@@ -461,7 +484,7 @@ ExtendTech(t,{name="warptorio-bot-cap-5",unit={count=350,time=30},prerequisites=
 
 
 local t={type="technology",upgrade=true,icon_size=128,icons={ {icon="__base__/graphics/technology/physical-projectile-damage-1.png",tint={r=0.3,g=0.3,b=1,a=1}} },
-	effects={ {type="turret-attack",modifier=0.15,turret_id="gun-turret"},{ammo_category="bullet",modifier=0.15,type="ammo-damage"},{ammo_category="shotgun-shell",modifier=0.2,type="ammo-damage"} } }
+	effects={ {type="turret-attack",modifier=0.10,turret_id="gun-turret"},{ammo_category="bullet",modifier=0.10,type="ammo-damage"},{ammo_category="shotgun-shell",modifier=0.15,type="ammo-damage"} } }
 ExtendTech(t,{name="warptorio-physdmg-1",unit={count=200,time=30},prerequisites={"warptorio-reactor-1","physical-projectile-damage-1"}}, {red=1})
 ExtendTech(t,{name="warptorio-physdmg-2",unit={count=400,time=30},prerequisites={"warptorio-physdmg-1"}}, {red=1})
 ExtendTech(t,{name="warptorio-physdmg-3",unit={count=200,time=30},prerequisites={"warptorio-reactor-2","warptorio-physdmg-2","physical-projectile-damage-2"}}, {red=2,green=1} )

@@ -1,3 +1,9 @@
+v0.2.9
+- Added Warp Accumulators
+- Further tweaks to pollution settings
+- Added alarm to auto-warp
+- fixed logistics bots between warps
+
 v0.2.8
 - Added some vanilla bullet damage upgrades
 - Tweaked initial and stabilizer pollution settings

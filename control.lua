@@ -799,12 +799,13 @@ end
 function warptorio.TickEnergy(e)
 	local points={}
 	for k,v in pairs(gwarptorio.Teleporters)do if(v:ValidPointA())then table.insert(points,v.PointA) end if(v:ValidPointB())then table.insert(points,v.PointB) end end
+	for _,m in pairs(gwarptorio.Floors)do local sf=m:GetSurface() if(sf.valid)then for k,v in pairs(sf.find_entities_filtered{name="warptorio-accumulator"})do table.insert(points,v) end end end
+
 	local pnum=#points
 	local eg=0
 	local ec=0
 	for k,v in pairs(points)do eg=eg+v.energy ec=ec+v.electric_buffer_size end
 	for k,v in pairs(points)do local r=(v.electric_buffer_size/ec) v.energy=eg*r end
-
 end
 
 
@@ -889,22 +890,12 @@ function warptorio.TickPollution()
 	m.b1:GetSurface().clear_pollution()
 	m.b2:GetSurface().clear_pollution()
 	
-	gwarptorio.pollution_amount = gwarptorio.pollution_amount * settings.global['warptorio_warp_polution_factor'].value
-	local expandcd=math.floor(gwarptorio.biter_expand_cooldown / game.forces["enemy"].evolution_factor / 100)
-	local et=game.map_settings.enemy_expansion
-	local ex=expandcd
-	if(expandcd > 3600*60)then ex=3600*60-1 end
-	et.max_expansion_cooldown=math.min(expandcd+1,3600*60)
-
-
+	gwarptorio.pollution_amount = gwarptorio.pollution_amount * settings.global['warptorio_warp_polution_factor'].value + 0.1
 	game.map_settings.enemy_expansion.max_expansion_cooldown = game.map_settings.enemy_expansion.min_expansion_cooldown + 1
-	
 end
 function warptorio.TickWarpAlarm()
-	if gwarptorio.warp_charging == 1 then 
-		if gwarptorio.warp_time_left <= 3600 then 
-			warptorio.playsound("warp_alarm", gwarptorio.Floors.main:GetSurface().name)
-		end
+	if( (gwarptorio.warp_charging == 1 and gwarptorio.warp_time_left <= 3600) or (not gwarptorio.warp_reactor and gwarptorio.warp_auto_end <=3600) )then 
+		warptorio.playsound("warp_alarm", gwarptorio.Floors.main:GetSurface().name)
 	end 
 end
 
@@ -960,12 +951,11 @@ function warptorio.Tick(ev) local e=ev.tick
 
 			if(e%60==0)then
 				warptorio.TickTimers(e)
-				if(e%120==0)then
+				if(e%120==0)then -- every 2 seconds
 					-- attack left behind engineers (removed because not needed and factorissimo support)
 					warptorio.TickPollution(e)
 					warptorio.TickWarpAlarm(e)
 					warptorio.TickWarpEnergy(e)
-					warptorio.TickWarpAlarm(e)
 					warptorio.TickAccelerator(e)
 					warptorio.TickStabilizer(e)
 				end
@@ -1273,7 +1263,7 @@ end
 
 function warptorio.TryStabilizer() if(game.tick<(gwarptorio.ability_next or 0) or not gwarptorio.warp_reactor)then return end warptorio.IncrementAbility(2.5,5)
 	game.forces["enemy"].evolution_factor=0	
-	gwarptorio.pollution_amount = 1.1
+	gwarptorio.pollution_amount = 1.25
 	local f=gwarptorio.Floors.main:GetSurface()
 	f.clear_pollution()
 	f.set_multi_command{command={type=defines.command.flee, from=gwarptorio.warp_reactor}, unit_count=1000, unit_search_distance=500}
@@ -1498,6 +1488,7 @@ function warptorio.Warpout()
 	-- create next surface
 	local f,w=warptorio.BuildNewPlanet()
 	gwarptorio.planet=w
+	for k,v in pairs(f.find_entities_filtered{type="character",invert=true,area=m.area})do v.destroy() end
 
 	-- Add planet warp multiplier
 	if(w.warp_multiply)then gwarptorio.warp_charge_time=gwarptorio.warp_charge_time*w.warp_multiply gwarptorio.warp_time_left=gwarptorio.warp_time_left*w.warp_multiply end
@@ -1505,76 +1496,75 @@ function warptorio.Warpout()
 
 
 	-- Do the thing
+
 	--for k,v in pairs(gwarptorio.Teleporters)do v:Warpout() end
+	local tp=gwarptorio.Teleporters.offworld if(tp and tp:ValidPointB())then tp:DestroyPointB() tp:DestroyLogisticsB() end
 
-	local tp=gwarptorio.Teleporters.offworld
-	if(tp and tp:ValidPointB())then tp:DestroyPointB() tp:DestroyLogisticsB() end
-
-
-	-- clean new surface
+	-- find players to teleport and entities to copy
 	local tpply={}
 	local cx=warptorio.corn
 	local etbl=c.find_entities_filtered{type="character",invert=true,area=m.area}
-	for k,v in pairs(f.find_entities_filtered{type="character",invert=true,area=m.area})do v.destroy() end
-	--[[ c.clone_area{source_area=bbox, destination_area=bbox, destination_surface=f, destination_force=game.forces.player, expand_map=false, clone_tiles=true, clone_entities=true,
-		clone_decoratives=false, clear_destination=true}]]
 
 	-- find players to teleport to new platform
-	for k,v in pairs(game.players)do
-		local p,b=m:GetPos(),m:GetBBox()
+	for k,v in pairs(game.players)do local p,b=m:GetPos(),m:GetBBox()
 		if(v.character~=nil and v.surface.name==c.name and warptorio.isinbbox(v.character.position,{x=p[1],y=p[2]},{x=b[1]-1,y=b[2]}))then
-			table.insert(tpply,{v,{v.position.x,v.position.y}})
-		end
+			table.insert(tpply,{v,{v.position.x,v.position.y}}) end
 	end
 
 	for k,v in pairs({"nw","ne","sw","se"})do local ug=gwarptorio.Research["turret-"..v] or -1 if(ug>=0)then
-		local etc=f.find_entities_filtered{position={cx[v].x+0.5,cx[v].y+0.5},radius=(11+(ug*6))/2} for a,e in pairs(etc)do e.destroy() end
-
-		local etp=c.find_entities_filtered{type="character",position={cx[v].x+0.5,cx[v].y+0.5},radius=(11+(ug*6))/2}
+		local etc=f.find_entities_filtered{position={cx[v].x+0.5,cx[v].y+0.5},radius=(11+(ug*6))/2} for a,e in pairs(etc)do e.destroy() end -- clean new platform
+		local etp=c.find_entities_filtered{type="character",position={cx[v].x+0.5,cx[v].y+0.5},radius=(11+(ug*6))/2} -- find corner players
 		for a,e in pairs(etp)do if(e.player and e.player.character~=nil)then table.insert(tpply,{e.player,{e.position.x,e.position.y}}) end end
 
-		local et=c.find_entities_filtered{type="character",invert=true,position={cx[v].x+0.5,cx[v].y+0.5},radius=(11+(ug*6))/2}
+		local et=c.find_entities_filtered{type="character",invert=true,position={cx[v].x+0.5,cx[v].y+0.5},radius=(11+(ug*6))/2} -- find corner ents
 		for k,v in pairs(et)do table.insertExclusive(etbl,v) end
 	end end
 
+	-- find logistics networks among entities
+	local lgn={} for k,v in pairs(etbl)do if(v.type=="roboport")then local g=v.logistic_network if(g and g.valid)then table.insertExclusive(lgn,g) end end end
+	local ebot={} for k,v in pairs(lgn)do for i,e in pairs(v.robots)do table.insertExclusive(ebot,e) end end
 
-	-- copy platform
-	c.clone_entities{entities=etbl,destination_offset={0,0},destination_surface=f,destination_force=game.forces.player}
 
-
+	--[[ c.clone_area{source_area=bbox, destination_area=bbox, destination_surface=f, destination_force=game.forces.player, expand_map=false, clone_tiles=true, clone_entities=true,
+		clone_decoratives=false, clear_destination=true}]]
 
 	-- do the player teleport
 	for k,v in pairs(tpply)do v[1].teleport(f.find_non_colliding_position("character",{v[2][1],v[2][2]},0,1,1),f) end
+
+	-- clone platform
+	c.clone_entities{entities=etbl,destination_offset={0,0},destination_surface=f,destination_force=game.forces.player}
+
+
 
 	gwarptorio.Floors.main:SetSurface(f)
 	--for k,v in pairs(gwarptorio.Teleporters)do v:Warpin() end
 	if(gwarptorio.Teleporters.offworld)then warptorio.TeleCls.offworld() end
 
+	warptorio.BuildPlatform() -- refresh platform tiles
+	-- clone bots
+	for k,v in pairs(ebot)do v.clone{position=v.position,surface=f,force=v.force} end --local e=f.create_entity{name=v.name,position=v.position,force=v.force} e.copy_settings(v) end --
+
 	-- radar stuff -- game.forces.player.chart(game.player.surface, {lefttop = {x = -1024, y = -1024}, rightbottom = {x = 1024, y = 1024}})
 	--game.forces.player.chart(f,{lefttop={x=-256,y=-256},rightbottom={x=256,y=256}})
 
 	-- build void
-
-	for k,v in pairs({"nw","ne","sw","se"})do local ug=gwarptorio.Research["turret-"..v] or -1 if(ug>=0)then
-			warptorio.LayCircle("out-of-map",c,cx[v].x,cx[v].y,11+ug*6)
-	end end
+	for k,v in pairs({"nw","ne","sw","se"})do local ug=gwarptorio.Research["turret-"..v] or -1 if(ug>=0)then warptorio.LayCircle("out-of-map",c,cx[v].x,cx[v].y,11+ug*6) end end
 	warptorio.LayFloorVec("out-of-map",c,m:GetPos(),m:GetSize())
 
 	-- delete abandoned surfaces
 	for k,v in pairs(game.surfaces)do if(#(v.find_entities_filtered{type="character"})<1 and v.name~=f.name)then local n=v.name if(n:sub(1,9)=="warpsurf_")then game.delete_surface(v) end end end
 
-	-- stuff to reset
-	gwarptorio.surf_to_leave_angry_biters_counter = 0
+	-- reset pollution & biters
 	game.forces["enemy"].evolution_factor=0
-	gwarptorio.pollution_amount=1.1
-	gwarptorio.warp_stabilizer_accumulator_discharge_count = 0
+	gwarptorio.pollution_amount=1.25
+	gwarptorio.pollution_ageing=1.0
 
 	-- warp sound
 	warptorio.playsound("warp_in", c.name)
 	warptorio.playsound("warp_in", f.name)
 
-	-- What an odd bug.
-	warptorio.BuildPlatform()
+	for k,v in pairs(tpply)do v[1].teleport(f.find_non_colliding_position("character",{v[2][1],v[2][2]},0,1,1),f) end -- re-teleport players to prevent getting stuck
+
 end
 
 
@@ -1624,30 +1614,50 @@ function warptorio.spawnbiters(type,n,f) local tbl=game.surfaces[f].find_entitie
 end
 
 
+function warptorio.ApplyMapSettings()
+	local gmp=game.map_settings
+	gmp.pollution.diffusion_ratio = 0.125
+	gmp.pollution.pollution_factor = 0.0000001
 
+	gmp.pollution.min_to_diffuse=30 -- default 15
+	gmp.pollution.ageing=0.88 -- 1.0
+	gmp.pollution.expected_max_per_chunk=250
+	gmp.pollution.min_to_show_per_chunk=100
+	gmp.pollution.pollution_restored_per_tree_damage=9
+	gmp.pollution.enemy_attack_pollution_consumption_modifier=0.95
 
+	gmp.enemy_evolution.destroy_factor=0.0002 -- default 0.002
+
+	gmp.unit_group.min_group_gathering_time = 600
+	gmp.unit_group.max_group_gathering_time = 2 * 600
+	gmp.unit_group.max_unit_group_size = 200
+	gmp.unit_group.max_wait_time_for_late_members = 2 * 360
+	gmp.unit_group.settler_group_min_size = 1
+	gmp.unit_group.settler_group_max_size = 1
+
+end
 
 function warptorio.Initialize()
 	if(not global.warptorio)then global.warptorio={} gwarptorio=global.warptorio else gwarptorio=global.warptorio return end
 	gwarptorio.warpzone=0
 
-	gwarptorio.surf_to_leave_angry_biters_counter = 0
-
-	gwarptorio.warp_charge_time= 10 --in seconds
-	gwarptorio.warp_charge_start_tick = 0
-	gwarptorio.warp_charging = 0
-	gwarptorio.warp_timeleft = 60*10
+	gwarptorio.warp_charge_time=gwarptorio.warp_charge_time or 10 --in seconds
+	gwarptorio.warp_charge_start_tick = gwarptorio.warp_charge_start_tick or 0
+	gwarptorio.warp_charging = gwarptorio.warp_charging or 0
+	gwarptorio.warp_timeleft = gwarptorio.warp_timeleft or 60*10
 	gwarptorio.warp_reactor = nil
-	gwarptorio.warp_auto_time = 60*30
-	gwarptorio.warp_auto_end = 60*60*30
-	gwarptorio.warp_last=game.tick
+	gwarptorio.warp_auto_time = gwarptorio.warp_auto_time or 60*30
+	gwarptorio.warp_auto_end = gwarptorio.warp_auto_end or 60*60*30
+	gwarptorio.warp_last=gwarptorio.warp_last or game.tick
 
-	gwarptorio.time_spent_start_tick = game.tick
-	gwarptorio.time_passed = 0
+	gwarptorio.time_spent_start_tick = gwarptorio.time_spent_start_tick or game.tick
+	gwarptorio.time_passed = gwarptorio.time_passed or 0
 
-	gwarptorio.pollution_amount = 1.1--+settings.global['warptorio_warp_polution_factor'].value
-	gwarptorio.biter_expand_cooldown = 1000 * 60
-	gwarptorio.charge_factor = settings.global['warptorio_warp_charge_factor'].value
+	gwarptorio.pollution_amount = gwarptorio.pollution_amount or 1.1--+settings.global['warptorio_warp_polution_factor'].value
+	gwarptorio.pollution_ageing = 1.0 -- unused for now
+
+
+	gwarptorio.charge_factor = gwarptorio.charge_factor or settings.global['warptorio_warp_charge_factor'].value
 
 	gwarptorio.ability_uses=0
 	gwarptorio.ability_next=0
@@ -1663,30 +1673,8 @@ function warptorio.Initialize()
 	warptorio.InitEntities()
 	warptorio.InitTeleporters()
 
-	game.map_settings.pollution.diffusion_ratio = 0.1
-	game.map_settings.pollution.pollution_factor = 0.0000001
-		
-	game.map_settings.pollution.min_to_diffuse=15
-	game.map_settings.unit_group.min_group_gathering_time = 600
-	game.map_settings.unit_group.max_group_gathering_time = 2 * 600
-	game.map_settings.unit_group.max_unit_group_size = 200
-	game.map_settings.unit_group.max_wait_time_for_late_members = 2 * 360
-	game.map_settings.unit_group.settler_group_min_size = 1
-	game.map_settings.unit_group.settler_group_max_size = 1
+	warptorio.ApplyMapSettings()
 
---[[
-
-
---local warp_charge_time_lengthening = settings.global['warptorio_warp_charge_time_lengthening'].value --in seconds
---local warp_charge_time_at_start = settings.global['warptorio_warp_charge_time_at_start'].value --in seconds
-
-
-	global.warp_reactor = nil
-	global.warp_stabilizer_accumulator = nil
-	global.warp_stabilizer_accumulator_discharge_count = 0
-	global.warp_stabilizer_accumulator_research_level = 0
-
-]]
 end script.on_init(warptorio.Initialize)
 
 

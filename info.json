@@ -1,6 +1,6 @@
 {
 	"name": "warptorio2",
-	"version": "0.2.8",
+	"version": "0.2.9",
 	"title": "Warptorio",
 	"author": "Nonoce and PyroFire",
 	"dependencies": ["base >= 0.17"],
