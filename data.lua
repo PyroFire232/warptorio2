@@ -450,12 +450,12 @@ ExtendTech(t,{name="warptorio-mining-prod-16",unit={count_formula="(20*L)-150",t
 ExtendTech(t,{name="warptorio-mining-prod-21",unit={count_formula="(20*L)-200",time=30},max_level=25,prerequisites={"warptorio-mining-prod-16","utility-science-pack"}}, {red=5,green=4,blue=3,purple=2,yellow=1} )
 
 local t={type="technology",upgrade=true,icon_size=32,icons={ {icon="__base__/graphics/icons/steel-axe.png",tint={r=0.3,g=0.3,b=1,a=1}} },
-	effects={ {type="character-mining-speed",modifier=0.2}}, }
-ExtendTech(t,{name="warptorio-axe-speed-1",unit={count_formula="20*L",time=30},max_level=5}, {red=1})
-ExtendTech(t,{name="warptorio-axe-speed-6",unit={count_formula="(20*L)-50",time=30},max_level=10,prerequisites={"warptorio-axe-speed-1","logistic-science-pack"}}, {red=2,green=1})
-ExtendTech(t,{name="warptorio-axe-speed-11",unit={count_formula="(20*L)-100",time=30},max_level=15,prerequisites={"warptorio-axe-speed-6","chemical-science-pack"}}, {red=3,green=2,blue=1} )
-ExtendTech(t,{name="warptorio-axe-speed-16",unit={count_formula="(20*L)-150",time=30},max_level=20,prerequisites={"warptorio-axe-speed-11","production-science-pack"}}, {red=4,green=3,blue=2,purple=1} )
-ExtendTech(t,{name="warptorio-axe-speed-21",unit={count_formula="(20*L)-200",time=30},max_level=25,prerequisites={"warptorio-axe-speed-16","utility-science-pack"}}, {red=5,green=4,blue=3,purple=2,yellow=1} )
+	effects={ {type="character-mining-speed",modifier=0.5}}, }
+ExtendTech(t,{name="warptorio-axe-speed-1",unit={count_formula="50*L",time=30,prerequisites={"steel-axe"},},max_level=2}, {red=1})
+ExtendTech(t,{name="warptorio-axe-speed-3",unit={count_formula="(50*L)",time=30},max_level=4,prerequisites={"warptorio-axe-speed-1","logistic-science-pack"}}, {red=1,green=1})
+ExtendTech(t,{name="warptorio-axe-speed-5",unit={count_formula="(50*L)",time=30},max_level=6,prerequisites={"warptorio-axe-speed-3","chemical-science-pack"}}, {red=1,green=1,blue=1} )
+ExtendTech(t,{name="warptorio-axe-speed-7",unit={count_formula="(50*L)",time=30},max_level=8,prerequisites={"warptorio-axe-speed-5","production-science-pack"}}, {red=1,green=1,blue=1,purple=1} )
+ExtendTech(t,{name="warptorio-axe-speed-9",unit={count_formula="(50*L)",time=30},max_level=10,prerequisites={"warptorio-axe-speed-7","utility-science-pack"}}, {red=1,green=1,blue=1,purple=1,yellow=1} )
 
 local t={type="technology",upgrade=true,icon_size=128,icons={ {icon="__base__/graphics/technology/inserter-capacity.png",tint={r=0.3,g=0.3,b=1,a=1}} },
 	effects={ {type="stack-inserter-capacity-bonus",modifier=1}, {type="inserter-stack-size-bonus",modifier=1},} }
@@ -478,18 +478,16 @@ local t={type="technology",upgrade=true,icon_size=128,icons={ {icon="__base__/gr
 	effects={ {type="worker-robot-storage",modifier=1}, } }
 ExtendTech(t,{name="warptorio-bot-cap-1",unit={count=150,time=30},prerequisites={"robotics"}}, {red=1,green=1})
 ExtendTech(t,{name="warptorio-bot-cap-2",unit={count=200,time=30},prerequisites={"warptorio-bot-cap-1","construction-robotics"}}, {red=2,green=1})
-ExtendTech(t,{name="warptorio-bot-cap-3",unit={count=250,time=30},prerequisites={"warptorio-bot-cap-2","chemical-science-pack"}}, {red=3,green=2,blue=1} )
-ExtendTech(t,{name="warptorio-bot-cap-4",unit={count=300,time=30},prerequisites={"warptorio-bot-cap-3","production-science-pack"}}, {red=4,green=3,blue=2,purple=1} )
-ExtendTech(t,{name="warptorio-bot-cap-5",unit={count=350,time=30},prerequisites={"warptorio-bot-cap-4","utility-science-pack"}}, {red=5,green=4,blue=3,purple=2,yellow=1} )
+ExtendTech(t,{name="warptorio-bot-cap-3",unit={count=250,time=30},prerequisites={"warptorio-bot-cap-2","chemical-science-pack"}}, {red=2,green=2,blue=1} )
+ExtendTech(t,{name="warptorio-bot-cap-4",unit={count=300,time=30},prerequisites={"warptorio-bot-cap-3","production-science-pack"}}, {red=3,green=3,blue=1,purple=1} )
+ExtendTech(t,{name="warptorio-bot-cap-5",unit={count=350,time=30},prerequisites={"warptorio-bot-cap-4","utility-science-pack"}}, {red=3,green=3,blue=2,purple=1,yellow=1} )
 
 
 local t={type="technology",upgrade=true,icon_size=128,icons={ {icon="__base__/graphics/technology/physical-projectile-damage-1.png",tint={r=0.3,g=0.3,b=1,a=1}} },
-	effects={ {type="turret-attack",modifier=0.10,turret_id="gun-turret"},{ammo_category="bullet",modifier=0.10,type="ammo-damage"},{ammo_category="shotgun-shell",modifier=0.15,type="ammo-damage"} } }
-ExtendTech(t,{name="warptorio-physdmg-1",unit={count=200,time=30},prerequisites={"warptorio-reactor-1","physical-projectile-damage-1"}}, {red=1})
-ExtendTech(t,{name="warptorio-physdmg-2",unit={count=400,time=30},prerequisites={"warptorio-physdmg-1"}}, {red=1})
-ExtendTech(t,{name="warptorio-physdmg-3",unit={count=200,time=30},prerequisites={"warptorio-reactor-2","warptorio-physdmg-2","physical-projectile-damage-2"}}, {red=2,green=1} )
-ExtendTech(t,{name="warptorio-physdmg-4",unit={count=400,time=30},prerequisites={"warptorio-physdmg-3"}}, {red=2,green=1} )
-ExtendTech(t,{name="warptorio-physdmg-5",unit={count=400,time=30},prerequisites={"warptorio-reactor-3","warptorio-physdmg-4","physical-projectile-damage-3"}}, {red=3,green=2,black=1} )
+	effects={ {type="turret-attack",modifier=0.15,turret_id="gun-turret"},{ammo_category="bullet",modifier=0.15,type="ammo-damage"},{ammo_category="shotgun-shell",modifier=0.2,type="ammo-damage"} } }
+ExtendTech(t,{name="warptorio-physdmg-1",unit={count=300,time=30},prerequisites={"warptorio-reactor-1","physical-projectile-damage-1"}}, {red=1})
+ExtendTech(t,{name="warptorio-physdmg-2",unit={count=300,time=30},prerequisites={"warptorio-reactor-2","warptorio-physdmg-1","physical-projectile-damage-2"}}, {red=2,green=1} )
+ExtendTech(t,{name="warptorio-physdmg-3",unit={count=400,time=30},prerequisites={"warptorio-reactor-3","warptorio-physdmg-2","physical-projectile-damage-3"}}, {red=3,green=2,black=1} )
 
 local t={type="technology",upgrade=true,icon_size=128,icons={ {icon="__base__/graphics/technology/toolbelt.png",tint={r=0.3,g=0.3,b=1,a=1}} },
 	effects={ {type="character-inventory-slots-bonus",modifier=10} }, }
@@ -535,7 +533,7 @@ local t={type="technology",upgrade=false,icon_size=128,icons={
 	{icon="__base__/graphics/technology/railway.png",tint={r=0.7,g=0.7,b=1,a=0.9},shift={w[1],w[2]},scale=0.45,priority="high"},
 }, }
 
-ExtendTech(t,{name="warptorio-rail-"..v, unit={count=1000,time=40}, prerequisites={"railway","warptorio-platform-size-6","warptorio-factory-7"}}, {red=1,green=1,black=1,purple=1} )
+ExtendTech(t,{name="warptorio-rail-"..v, unit={count=1000,time=40}, prerequisites={"railway","warptorio-platform-size-6","warptorio-factory-7"}}, {red=1,green=1,black=1,blue=1,purple=1,yellow=1} )
 end
 
 
@@ -720,7 +718,7 @@ ExtendTech(t,{name="warptorio-teleporter-5",unit={count=30,time=20}, prerequisit
 local t={type="technology",upgrade=true,icon_size=32,icons={ {icon="__base__/graphics/icons/beacon.png",tint={r=0.3,g=0.3,b=1,a=1}} }, }
 ExtendTech(t,{name="warptorio-beacon-1",unit={count=300,time=20}, prerequisites={"modules","warptorio-factory-0"},upgrade=false}, {red=3,green=2})
 ExtendTech(t,{name="warptorio-beacon-2",unit={count=300,time=20}, prerequisites={"warptorio-beacon-1","chemical-science-pack"}}, {red=3,green=2,blue=1})
-ExtendTech(t,{name="warptorio-beacon-3",unit={count_formula="150+10*L",time=20},max_level=17, prerequisites={"warptorio-beacon-2","production-science-pack"}}, {red=4,green=2,blue=2,purple=1})
+ExtendTech(t,{name="warptorio-beacon-3",unit={count_formula="200+50*L",time=20},max_level=10, prerequisites={"warptorio-beacon-2","production-science-pack"}}, {red=3,green=2,blue=2,purple=1})
 
 
 -- ----

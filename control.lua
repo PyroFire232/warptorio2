@@ -5,15 +5,19 @@
 local gwarptorio
 local util = require("util")
 local mod_gui = require("mod-gui")
-local function new(x,a,b,c,d,e,f,g) local t,v=setmetatable({},x),rawget(x,"__init") if(v)then v(t,a,b,c,d,e,f,g) end return t end
-function table.Count(t) local c=0 for k,v in pairs(t)do c=c+1 end return c end
-function table.First(t) for k,v in pairs(t)do return k,v end end
-function table.Random(t) local c,i=table.Count(t),1 if(c==0)then return end local rng=math.random(1,c) for k,v in pairs(t)do if(i==rng)then return v,k end i=i+1 end end
 local function istable(x) return type(x)=="table" end
 local function printx(m) for k,v in pairs(game.players)do v.print(m) end end
 local function isvalid(v) return (v and v.valid) end
+local function new(x,a,b,c,d,e,f,g) local t,v=setmetatable({},x),rawget(x,"__init") if(v)then v(t,a,b,c,d,e,f,g) end return t end
+
+function table.Count(t) local c=0 for k,v in pairs(t)do c=c+1 end return c end
+function table.First(t) for k,v in pairs(t)do return k,v end end
+function table.Random(t) local c,i=table.Count(t),1 if(c==0)then return end local rng=math.random(1,c) for k,v in pairs(t)do if(i==rng)then return v,k end i=i+1 end end
 function table.HasValue(t,a) for k,v in pairs(t)do if(v==a)then return true end end return false end
 function table.insertExclusive(t,a) if(not table.HasValue(t,a))then return table.insert(t,a) end return false end
+function table.deepmerge(s,t) for k,v in pairs(t)do if(istable(v) and s[k] and istable(s[k]))then table.deepmerge(s[k],v) else s[k]=v end end end
+function table.merge(s,t) local x={} for k,v in pairs(s)do x[k]=v end for k,v in pairs(t)do x[k]=v end return x end
+
 
 warptorio=warptorio or {}
 
@@ -890,7 +894,7 @@ function warptorio.TickPollution()
 	m.b1:GetSurface().clear_pollution()
 	m.b2:GetSurface().clear_pollution()
 	
-	gwarptorio.pollution_amount = gwarptorio.pollution_amount * settings.global['warptorio_warp_polution_factor'].value + 0.1
+	gwarptorio.pollution_amount = gwarptorio.pollution_amount * settings.global['warptorio_warp_polution_factor'].value + 0.005
 	game.map_settings.enemy_expansion.max_expansion_cooldown = game.map_settings.enemy_expansion.min_expansion_cooldown + 1
 end
 function warptorio.TickWarpAlarm()
@@ -1437,10 +1441,17 @@ function warptorio.BuildNewPlanet()
 
 	if(gwarptorio.charting)then game.print(w.name) end
 	game.print(w.desc)
+	game.print("Generating Planet: " .. w.name)
 
 	local orig=(game.surfaces["nauvis"].map_gen_settings)
 	local seed=(orig.seed + math.random(0,4294967295)) % 4294967296
-	local t=(w.gen and table.deepcopy(w.gen) or {}) t.seed=seed if(w.fgen)then w.fgen(t,gwarptorio.charting) end
+	local t=table.deepcopy(orig) t.seed=seed
+	local wmap=(w.gen and table.deepcopy(w.gen) or {}) if(w.fgen)then w.fgen(wmap,gwarptorio.charting,orig) end
+	--game.print("wmap") for k,v in pairs(wmap)do game.print(tostring(k) .. " " .. tostring(v)) if(istable(v))then for a,b in pairs(v)do game.print("-->" .. tostring(a) .. " " .. tostring(b)) end end end
+	if(w.orig_mul)then
+		if(wmap.autoplace_controls)then for k,v in pairs(wmap.autoplace_controls)do local x=getmetatable(v) if(x~=nil)then wmap[k]=v*(orig.autoplace_controls[k] or 1) end end end
+	end
+	table.deepmerge(t,wmap) 
 
 	local f = game.create_surface("warpsurf_"..gwarptorio.warpzone,t)
 	f.request_to_generate_chunks({0,0},3) f.force_generate_chunk_requests()
@@ -1503,11 +1514,12 @@ function warptorio.Warpout()
 	-- find players to teleport and entities to copy
 	local tpply={}
 	local cx=warptorio.corn
+
 	local etbl=c.find_entities_filtered{type="character",invert=true,area=m.area}
 
 	-- find players to teleport to new platform
 	for k,v in pairs(game.players)do local p,b=m:GetPos(),m:GetBBox()
-		if(v.character~=nil and v.surface.name==c.name and warptorio.isinbbox(v.character.position,{x=p[1],y=p[2]},{x=b[1]-1,y=b[2]}))then
+		if(v.character~=nil and v.surface.name==c.name and warptorio.isinbbox(v.character.position,{x=p[1],y=p[2]},{x=b[1]+1,y=b[2]+1}))then
 			table.insert(tpply,{v,{v.position.x,v.position.y}}) end
 	end
 
@@ -1542,7 +1554,7 @@ function warptorio.Warpout()
 
 	warptorio.BuildPlatform() -- refresh platform tiles
 	-- clone bots
-	for k,v in pairs(ebot)do v.clone{position=v.position,surface=f,force=v.force} end --local e=f.create_entity{name=v.name,position=v.position,force=v.force} e.copy_settings(v) end --
+	for k,v in pairs(ebot)do v.clone{position=v.position,surface=f,force=v.force} v.destroy() end --local e=f.create_entity{name=v.name,position=v.position,force=v.force} e.copy_settings(v) end --
 
 	-- radar stuff -- game.forces.player.chart(game.player.surface, {lefttop = {x = -1024, y = -1024}, rightbottom = {x = 1024, y = 1024}})
 	--game.forces.player.chart(f,{lefttop={x=-256,y=-256},rightbottom={x=256,y=256}})
@@ -1556,7 +1568,7 @@ function warptorio.Warpout()
 
 	-- reset pollution & biters
 	game.forces["enemy"].evolution_factor=0
-	gwarptorio.pollution_amount=1.25
+	gwarptorio.pollution_amount=1.1
 	gwarptorio.pollution_ageing=1.0
 
 	-- warp sound
@@ -1565,6 +1577,8 @@ function warptorio.Warpout()
 
 	for k,v in pairs(tpply)do v[1].teleport(f.find_non_colliding_position("character",{v[2][1],v[2][2]},0,1,1),f) end -- re-teleport players to prevent getting stuck
 
+	-- remove teleporter gate from inventories
+	for k,v in pairs(game.players)do if(v.character~=nil and v.valid)then local iv=v.get_main_inventory() for i,x in pairs(iv.get_contents())do if(i:sub(1,25)=="warptorio-teleporter-gate")then iv.remove{name=i,count=x} end end end end
 end
 
 
@@ -1613,18 +1627,19 @@ function warptorio.spawnbiters(type,n,f) local tbl=game.surfaces[f].find_entitie
 	end
 end
 
+function warptorio.Migrate() end
 
 function warptorio.ApplyMapSettings()
 	local gmp=game.map_settings
-	gmp.pollution.diffusion_ratio = 0.125
+	gmp.pollution.diffusion_ratio = 0.105
 	gmp.pollution.pollution_factor = 0.0000001
 
-	gmp.pollution.min_to_diffuse=30 -- default 15
-	gmp.pollution.ageing=0.88 -- 1.0
+	gmp.pollution.min_to_diffuse=15 -- default 15
+	gmp.pollution.ageing=1.0 -- 1.0
 	gmp.pollution.expected_max_per_chunk=250
 	gmp.pollution.min_to_show_per_chunk=100
 	gmp.pollution.pollution_restored_per_tree_damage=9
-	gmp.pollution.enemy_attack_pollution_consumption_modifier=0.95
+	gmp.pollution.enemy_attack_pollution_consumption_modifier=1.0
 
 	gmp.enemy_evolution.destroy_factor=0.0002 -- default 0.002
 
@@ -1659,15 +1674,15 @@ function warptorio.Initialize()
 
 	gwarptorio.charge_factor = gwarptorio.charge_factor or settings.global['warptorio_warp_charge_factor'].value
 
-	gwarptorio.ability_uses=0
-	gwarptorio.ability_next=0
-	gwarptorio.radar_uses=0
+	gwarptorio.ability_uses=gwarptorio.ability_uses or 0
+	gwarptorio.ability_next=gwarptorio.ability_next or 0
+	gwarptorio.radar_uses=gwarptorio.radar_uses or 0
 
-	gwarptorio.Teleporters={}
-	gwarptorio.Research={}
-	gwarptorio.Floors={}
-	gwarptorio.Turrets={}
-	gwarptorio.Rails={}
+	gwarptorio.Teleporters=gwarptorio.Teleporters or {}
+	gwarptorio.Research=gwarptorio.Research or {}
+	gwarptorio.Floors=gwarptorio.Floors or {}
+	gwarptorio.Turrets=gwarptorio.Turrets or {}
+	gwarptorio.Rails=gwarptorio.Rails or {}
 
 	warptorio.InitFloors()
 	warptorio.InitEntities()
