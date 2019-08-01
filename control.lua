@@ -1441,7 +1441,7 @@ function warptorio.BuildNewPlanet()
 
 	if(gwarptorio.charting)then game.print(w.name) end
 	game.print(w.desc)
-	game.print("Generating Planet: " .. w.name)
+	--game.print("Generating Planet: " .. w.name)
 
 	local orig=(game.surfaces["nauvis"].map_gen_settings)
 	local seed=(orig.seed + math.random(0,4294967295)) % 4294967296
@@ -1449,7 +1449,7 @@ function warptorio.BuildNewPlanet()
 	local wmap=(w.gen and table.deepcopy(w.gen) or {}) if(w.fgen)then w.fgen(wmap,gwarptorio.charting,orig) end
 	--game.print("wmap") for k,v in pairs(wmap)do game.print(tostring(k) .. " " .. tostring(v)) if(istable(v))then for a,b in pairs(v)do game.print("-->" .. tostring(a) .. " " .. tostring(b)) end end end
 	if(w.orig_mul)then
-		if(wmap.autoplace_controls)then for k,v in pairs(wmap.autoplace_controls)do local x=getmetatable(v) if(x~=nil)then wmap[k]=v*(orig.autoplace_controls[k] or 1) end end end
+		if(wmap.autoplace_controls)then for k,v in pairs(wmap.autoplace_controls)do if(getmetatable(v))then wmap.autoplace_controls[k]=v*(orig.autoplace_controls[k] or 1) end end end
 	end
 	table.deepmerge(t,wmap) 
 

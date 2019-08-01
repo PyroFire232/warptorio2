@@ -32,9 +32,9 @@ planet.normal={ rng=23, name="A Normal Planet", desc="This world reminds you of 
 planet.average={ zone=1, rng=17, name="An Average Planet", desc="The usual critters and riches surrounds you, but you feel like something is missing.", -- remove 1-2 resources
 	orig_mul=true,
 	gen={autoplace_controls={}},
-	fgen=function(t,b)
+	fgen=function(t,b,o)
 		local z,x=table.deepcopy(resourceTypes),{} for i=1,math.random(1,2),1 do local u=math.random(1,#z) x[i]=z[u] table.remove(z,u) end
-		for k,v in pairs(x)do t.autoplace_controls[v]={size=0} end
+		for k,v in pairs(x)do t.autoplace_controls[v]=new(czMeta,0,0,0) end --{size=0} end
 		if(b)then local s=x[1] if(x[2])then s=s .. " and " .. x[2] .. " do" else s=s.. " does" end s=s.." not spawn on this planet" game.print(s) end
 	end,
 	spawn=function(f,b)
