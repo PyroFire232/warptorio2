@@ -88,7 +88,7 @@ planet.barren={ zone=12, rng=4, name="A Barren Planet", desc="This world looks d
 	end,
 }
 
-planet.water={ zone=3, rng=6, name="An Ocean Planet", desc="There is water all around and seems to go on forever. The nearby fish that greet you fills you with determination.",
+planet.ocean={ zone=3, rng=6, name="An Ocean Planet", desc="There is water all around and seems to go on forever. The nearby fish that greet you fills you with determination.",
 	warp_multiply=0.25,
 	gen={ starting_area="none",water=999999,default_enable_all_autoplace_controls=false,autoplace_settings={
 		tile={treat_missing_as_default=false,settings={["water"]={frequency=5,size=5},["deepwater"]={frequency=5,size=5}}},
@@ -145,17 +145,17 @@ planet.coal={ zone=7, rng=5, name="A Coal Planet", desc="The piles of raw fuel s
 planet.uranium={ zone=30, rng=4, name="A Uranium Planet", desc="The warmth of this worlds green glow fills you with determination, but you probably shouldn't stay too long",
 	orig_mul=true,
 	gen={
-		autoplace_controls={["uranium-ore"]=setmetatable({frequency=8,size=2},czMeta),["enemy-base"]=setmetatable({frequency=1.5,size=1.5,richness=1},czMeta),
+		autoplace_controls={["uranium-ore"]=setmetatable({frequency=8,size=2,richness=1},czMeta),["enemy-base"]=setmetatable({frequency=1.5,size=1.5,richness=1},czMeta),
 			["iron-ore"]=czIron,["copper-ore"]=czCopper,["coal"]=czCoal,["crude-oil"]=czRes,["stone"]=czRes,
 		},
 	},
 	--spawn=function(f) for k,v in pairs(f.find_entities_filtered{type="resource"})do if(v.name~="uranium-ore")then v.destroy() end end end,
 }
 
-planet.oil={ zone=10, rng=4, name="An Oil Planet", desc="An Oil Planet Description",
+planet.oil={ zone=10, rng=4, name="An Oil Planet", desc="This place has been a wellspring of life for millenia, and they might fuel your flamethrowers for the battles to come.",
 	orig_mul=true,
 	gen={
-		autoplace_controls={["crude-oil"]=new(czMeta,7,2),
+		autoplace_controls={["crude-oil"]=new(czMeta,7,2),["enemy-base"]=new(czMeta,1.25,1.25,1),
 			["iron-ore"]=czIron,["copper-ore"]=czCopper,["coal"]=cRes,["stone"]=czRes,["uranium-ore"]=czRes
 		},
 	},
