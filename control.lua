@@ -14,12 +14,15 @@ function table.Count(t) local c=0 for k,v in pairs(t)do c=c+1 end return c end
 function table.First(t) for k,v in pairs(t)do return k,v end end
 function table.Random(t) local c,i=table.Count(t),1 if(c==0)then return end local rng=math.random(1,c) for k,v in pairs(t)do if(i==rng)then return v,k end i=i+1 end end
 function table.HasValue(t,a) for k,v in pairs(t)do if(v==a)then return true end end return false end
+function table.GetValueIndex(t,a) for k,v in ipairs(t)do if(v==a)then return k end end end
+function table.RemoveValue(t,a) local indexToRemove=table.GetValueIndex(t,a) if(indexToRemove)then table.remove(t, indexToRemove) end end
 function table.insertExclusive(t,a) if(not table.HasValue(t,a))then return table.insert(t,a) end return false end
 function table.deepmerge(s,t) for k,v in pairs(t)do if(istable(v) and s[k] and istable(s[k]))then table.deepmerge(s[k],v) else s[k]=v end end end
 function table.merge(s,t) local x={} for k,v in pairs(s)do x[k]=v end for k,v in pairs(t)do x[k]=v end return x end
 
 
 warptorio=warptorio or {}
+warptorio.varsion = 000040
 
 function warptorio.CopyChestEntity(a,b) local c=b.get_inventory(defines.inventory.chest) for k,v in pairs(a.get_inventory(defines.inventory.chest).get_contents())do c.insert{name=k,count=v} end
 	for c,tbl in pairs(a.circuit_connected_entities)do for k,v in pairs(tbl)do v.connect_neighbour{target_entity=b,wire=defines.wire_type[c]} end end end
@@ -41,7 +44,7 @@ function TRAIL:MakeRails() local f=gwarptorio.Floors.main:GetSurface() local c=w
 	local r=self.rails[2] if(not isvalid(r))then r=warptorio.SpawnEntity(f,"straight-rail",c.x,c.y,defines.direction.east) self.rails[2]=r r.minable=false r.destructible=false end
 end
 
---local t=r.get_inventory(defines.inventory.chest).get_contents() 
+--local t=r.get_inventory(defines.inventory.chest).get_contents()
 function TRAIL:MakeChests(chest) local f=gwarptorio.Floors.b1:GetSurface() local c=warptorio.railCorn[self.name]
 	local rd=(self.dir=="input")
 	local r,rx=self.chests[1]
@@ -293,11 +296,11 @@ function TELL:MakeLoaderPair(f,chest,belt,p,i,u) local ix=(i*2)-1
 	local v=self.logs["loader"..ix+1 .."-"..u] if(not v or not v.valid)then v=warptorio.SpawnEntity(f,belt,p.x+1+i,p.y-1,defines.direction.south) v.minable=false v.destructible=false
 		self.logs["loader"..ix+1 .."-"..u]=v v.loader_type=self.dir[ix+1][(u=="a" and 1 or 2)] end
 
-	local v=self.logs["chest"..ix.."-"..u] if(not v or not v.valid)then v=warptorio.SpawnEntity(f,chest,p.x-1-i,p.y+1) self.logs["chest"..ix.."-"..u]=v v.minable=false v.destructible=false 
+	local v=self.logs["chest"..ix.."-"..u] if(not v or not v.valid)then v=warptorio.SpawnEntity(f,chest,p.x-1-i,p.y+1) self.logs["chest"..ix.."-"..u]=v v.minable=false v.destructible=false
 		local inv=self.logcont["chest"..ix .."-"..u] if(inv)then local cv=v.get_inventory(defines.inventory.chest) for x,y in pairs(inv)do cv.insert({name=x,count=y}) end end
 		self.logcont["chest"..ix .."-"..u]=nil
 	end
-	local v=self.logs["chest"..ix+1 .."-"..u] if(not v or not v.valid)then v=warptorio.SpawnEntity(f,chest,p.x+1+i,p.y+1) self.logs["chest"..ix+1 .."-"..u]=v v.minable=false v.destructible=false 
+	local v=self.logs["chest"..ix+1 .."-"..u] if(not v or not v.valid)then v=warptorio.SpawnEntity(f,chest,p.x+1+i,p.y+1) self.logs["chest"..ix+1 .."-"..u]=v v.minable=false v.destructible=false
 		local inv=self.logcont["chest"..ix+1 .."-"..u] if(inv)then local cv=v.get_inventory(defines.inventory.chest) for x,y in pairs(inv)do cv.insert({name=x,count=y}) end end
 		self.logcont["chest"..ix+1 .."-"..u]=nil
 	end
@@ -652,7 +655,7 @@ function warptorio.BuildB1() local m=gwarptorio.Floors.b1 local f=m:GetSurface()
 
 		--for k,v in pairs({nw={-1,-1},sw={-1,-1},ne={-1,-1},se={-1,-1}})do local c=warptorio.railCorn[k] warptorio.LayFloor("hazard-concrete-left",f,c.x+v[1],c.y+v[2],2,2) end
 	end
-	
+
 
 	if((lvfs or 0)>=7)then -- trains
 		for k,rv in pairs(warptorio.railOffset)do local rc=warptorio.railCorn[k] local rvx=warptorio.railLoader[k]
@@ -704,7 +707,7 @@ function warptorio.BuildB2() local m=gwarptorio.Floors.b2 local f,z=m:GetSurface
 		if(gwarptorio.boiler_s)then warptorio.LaySquare("warp-tile",f,-1,z+zxm+6,zvy,zvx) warptorio.LaySquare("warp-tile",f,-9-1,z+3,7-1,7) warptorio.LaySquare("warp-tile",f,9,z+3,7-1,7)
 			end
 	end
-	
+
 	warptorio.LayFloor("hazard-concrete-left",f,vx,4,vw,3) -- entrance
 	warptorio.LayFloor("hazard-concrete-left",f,-2,-2,3,3) -- old center
 	warptorio.playsound("warp_in",f.name)
@@ -736,17 +739,55 @@ function warptorio.TickTeleporters(e) for k,v in pairs(gwarptorio.Teleporters)do
 	end
 end end end
 
--- Teleporter mined/destroyed/rebuilt
-function warptorio.OnBuiltEntity(event) local e=event.created_entity if(warptorio.IsTeleporterGate(e))then
-	local t=gwarptorio.Teleporters["offworld"]
 
-	if(t:ValidPointB())then e.destroy() game.print("Unable to spawn more than 1 Planet Teleporter Gate at a time") else
-		t:SetPointB(e)
-		if(e.surface.name==gwarptorio.Floors.b1:GetSurface().name)then game.print("The Teleporter only functions on the Planet") return end
-		if(e.surface.name==gwarptorio.Floors.b2:GetSurface().name)then game.print("The Teleporter only functions on the Planet") return end
-		t:Warpin()
+
+-- Teleporter mined/destroyed/rebuilt
+function warptorio.OnBuiltEntity(event)
+	local entity=event.created_entity or event.entity
+
+	if  warptorio.IsAccumulator(entity) then
+		table.insert(gwarptorio.cacheAccumulators, entity)
+	elseif warptorio.IsHeatpipe(entity) then
+		table.insert(gwarptorio.cacheHeatpipes, entity)
+	elseif warptorio.IsWarploader(entity) then
+		if entity.loader_type == "input" then
+			table.insert(gwarptorio.cacheWarploadersIn, entity)
+		else
+			table.insert(gwarptorio.cacheWarploadersOut, entity)
+		end
 	end
-end end script.on_event(defines.events.on_built_entity, warptorio.OnBuiltEntity)
+
+	if(warptorio.IsTeleporterGate(entity))then
+		local t=gwarptorio.Teleporters["offworld"]
+		if(t:ValidPointB())then entity.destroy() game.print("Unable to spawn more than 1 Planet Teleporter Gate at a time") else
+			t:SetPointB(entity)
+			if(entity.surface.name==gwarptorio.Floors.b1:GetSurface().name)then game.print("The Teleporter only functions on the Planet") return end
+			if(entity.surface.name==gwarptorio.Floors.b2:GetSurface().name)then game.print("The Teleporter only functions on the Planet") return end
+			t:Warpin()
+		end
+	end
+end script.on_event({defines.events.on_built_entity, defines.events.on_robot_built_entity, defines.events.script_raised_built}, warptorio.OnBuiltEntity)
+
+
+function warptorio.OnPlayerRotatedEntity(event)
+	local entity=event.entity
+	if warptorio.IsWarploader(entity) then
+		--game.print("on_player_rotated_entity")
+		if entity.loader_type == "input" then
+			local indexToRemove = table.GetValueIndex(gwarptorio.cacheWarploadersOut, entity)
+			if indexToRemove then table.remove(gwarptorio.cacheWarploadersOut, indexToRemove) end
+			table.insert(gwarptorio.cacheWarploadersIn, entity)
+		elseif entity.loader_type == "output" then
+			local indexToRemove = table.GetValueIndex(gwarptorio.cacheWarploadersIn, entity)
+			if indexToRemove then table.remove(gwarptorio.cacheWarploadersIn, indexToRemove) end
+			table.insert(gwarptorio.cacheWarploadersOut, entity)
+		end
+		--game.print("#gwarptorio.cacheWarploadersOut " .. table_size(gwarptorio.cacheWarploadersOut))
+		--game.print("#gwarptorio.cacheWarploadersIn " .. table_size(gwarptorio.cacheWarploadersIn))
+	end
+	
+
+end script.on_event(defines.events.on_player_rotated_entity, warptorio.OnPlayerRotatedEntity)
 
 function warptorio.OnPlayerMinedEntity(event) local e=event.entity if(warptorio.IsTeleporterGate(e))then local t=gwarptorio.Teleporters["offworld"] t:DestroyLogisticsB() end
 end script.on_event(defines.events.on_player_mined_entity,warptorio.OnPlayerMinedEntity)
@@ -755,7 +796,9 @@ function warptorio.OnEntityDied(event) local e=event.entity if(warptorio.IsTelep
 end script.on_event(defines.events.on_entity_died,warptorio.OnEntityDied)
 
 function warptorio.IsTeleporterGate(e) return (e.name:sub(1,25)=="warptorio-teleporter-gate") end
-
+function warptorio.IsAccumulator(e) return (e.name =="warptorio-accumulator") end
+function warptorio.IsHeatpipe(e) return (e.name =="warptorio-heatpipe") end
+function warptorio.IsWarploader(e) return (e.name =="warptorio-warploader") end
 -- --------
 -- Logistics system
 
@@ -808,64 +851,122 @@ for i=1,5,1 do /c local e=game.player.selected for i=1,5,1 do game.print(e.get_f
 
 ]]
 
-local cacheLoadin={}
-local cacheLoadfil={}
-local cacheNextfil={}
+local cacheLinesWithFilter={}
+local cacheNextLineToFill={}
 
 function warptorio.GetTransportLines(v) return {v.get_transport_line(1),v.get_transport_line(2)} end
 
 function warptorio.TickWarpLoaders()
-	local inv={}
-	for k,v in pairs(cacheLoadin)do if(v.valid)then for u,l in pairs(warptorio.GetTransportLines(v))do for a,b in pairs(l.get_contents())do inv[a]=(inv[a] or {}) inv[a][l]=b end end end end
-	for k,v in pairs(inv)do for l,c in pairs(v)do if(v[l]>0)then local vx=cacheLoadfil[k] if(vx)then local cvx=#vx for i=1,cvx*2,1 do if(v[l]>0)then
-			local ui=((cacheNextfil[k])%(cvx*2))+1 cacheNextfil[k]=ui local fv=vx[math.ceil(ui/2)]
-			if(fv.valid)then local li=(ui%2)+1 local fl=fv.get_transport_line(li) if(fl.can_insert_at_back())then
-				fl.insert_at_back({name=k,count=1}) l.remove_item{name=k,count=1} v[l]=v[l]-1
-			end end end
-	end end end end end
+	local inventory={}
+	for key, loader in pairs(gwarptorio.cacheWarploadersIn)do
+		if(loader.valid)then
+			for _, transportLine in pairs(warptorio.GetTransportLines(loader))do
+				for name,count in pairs(transportLine.get_contents())do
+					inventory[name] = inventory[name] or {}
+					inventory[name][transportLine]=count
+				end
+			end
+		else
+			--game.print("cacheWarploadersIn invalid")
+			gwarptorio.cacheWarploadersIn[key] = nil
+		end
+	end
+	for itemName, quantityOnLines in pairs(inventory)do
+		for lineToTakeFrom, quantity in pairs(quantityOnLines)do
+			if quantityOnLines[lineToTakeFrom] > 0 then
+				local receivers=cacheLinesWithFilter[itemName]
+				if(receivers)then
+					local receiversCount= table_size(receivers)
+					for i=1,receiversCount,1 do
+						if quantityOnLines[lineToTakeFrom] > 0 then
+							local lineToFillIndex=(cacheNextLineToFill[itemName]%receiversCount)+1
+							local lineToFill=receivers[lineToFillIndex]
+							if(lineToFill.valid)then
+								cacheNextLineToFill[itemName]=lineToFillIndex
+								if(lineToFill.can_insert_at_back())then
+									lineToFill.insert_at_back({name=itemName,count=1})
+									lineToTakeFrom.remove_item{name=itemName,count=1}
+									quantityOnLines[lineToTakeFrom]=quantityOnLines[lineToTakeFrom]-1
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
 end
 
-function warptorio.TickFindLoaders()
-	local ld={}
-	for _,m in pairs(gwarptorio.Floors)do local sf=m:GetSurface() if(sf.valid)then for k,v in pairs(sf.find_entities_filtered{name="warptorio-warploader"})do table.insert(ld,v) end end end
-	local ldf={} local ldi={}
-	for k,v in pairs(ld)do local ub=(v.loader_type=="input") if(ub)then table.insert(ldi,v) else
-		for i=1,5,1 do local u=v.get_filter(i) if(u)then if(not ldf[u])then ldf[u]={} end table.insert(ldf[u],v) end end
-	end end
-	cacheLoadfil=ldf
-	cacheLoadin=ldi
-	cacheNextfil={} for k,v in pairs(ldf)do cacheNextfil[k]=1 end
+function warptorio.TickFindLoaders(e)
+	-- local ld={}
+	-- for _,m in pairs(gwarptorio.Floors)do
+	-- 	local sf=m:GetSurface()
+	-- 	if(sf.valid)then for k,v in pairs(sf.find_entities_filtered{name="warptorio-warploader"})do
+	-- 		table.insert(ld,v) end
+	-- 	end
+	-- end
+
+	cacheLinesWithFilter = {}
+	for _, loader in pairs(gwarptorio.cacheWarploadersOut) do
+		if loader.valid then
+			for i=1,5,1 do
+				local name=loader.get_filter(i)
+				if name then 
+					for _, transportLine in pairs(warptorio.GetTransportLines(loader))do
+						cacheLinesWithFilter[name] = cacheLinesWithFilter[name] or {}
+						table.insert(cacheLinesWithFilter[name], transportLine)
+					end
+				end
+			end
+		else
+			--game.print("cacheWarploadersOut invalid")
+			gwarptorio.cacheWarploadersOut[_] = nil
+		end
+	end
+
+	cacheNextLineToFill={}
+	for name, loader in pairs(cacheLinesWithFilter)do cacheNextLineToFill[name]=1 end
 end
 
 
 function warptorio.TickLogistics(e)
 	for k,v in pairs(gwarptorio.Teleporters)do v:BalanceLogistics() end
 	for k,v in pairs(gwarptorio.Rails)do v:BalanceLogistics() end
-
 end
 
-local cacheAccum={}
-local cacheHeat={}
-function warptorio.TickAccumulators(e)
-	local accum
-	local points={}
-	cacheHeat={}
-	cacheAccum={}
-	for _,m in pairs(gwarptorio.Floors)do local sf=m:GetSurface() if(sf.valid)then
-		for k,v in pairs(sf.find_entities_filtered{name="warptorio-accumulator"})do table.insert(cacheAccum,v) end
-		for k,v in pairs(sf.find_entities_filtered{name="warptorio-heatpipe"})do table.insert(cacheHeat,v) end
-	end end
+-- local cacheAccum={}
+-- local cacheHeat={}
+function warptorio.TickFindAccumulators(e)
+	-- local accum
+	-- local points={}
+	-- cacheHeat={}
+	-- cacheAccum={}
+	-- for _,m in pairs(gwarptorio.Floors)do local sf=m:GetSurface() if(sf.valid)then
+	-- 	for k,v in pairs(sf.find_entities_filtered{name="warptorio-accumulator"})do table.insert(cacheAccum,v) end
+	-- 	for k,v in pairs(sf.find_entities_filtered{name="warptorio-heatpipe"})do table.insert(cacheHeat,v) end
+	-- end end
 
-	if(isvalid(gwarptorio.warp_reactor))then table.insert(cacheHeat,gwarptorio.warp_reactor) end
-	cacheHeat=points
-
-	warptorio.TickFindLoaders()
+	--if(isvalid(gwarptorio.warp_reactor))then table.insert(cacheHeat,gwarptorio.warp_reactor) end
+	if(isvalid(gwarptorio.warp_reactor) and not table.HasValue(gwarptorio.cacheHeatpipes, gwarptorio.warp_reactor))then
+		table.insert(gwarptorio.cacheHeatpipes, gwarptorio.warp_reactor)
+	end
+	--cacheHeat=points
 end
 
-function warptorio.TickEnergy(e)
+function warptorio.TickEnergyDistribution(e)
 	local points={}
-	for k,v in pairs(gwarptorio.Teleporters)do if(v:ValidPointA())then table.insert(points,v.PointA) end if(v:ValidPointB())then table.insert(points,v.PointB) end end
-	for k,v in pairs(cacheAccum)do if(v.valid)then table.insert(points,v) end end
+	for k,v in pairs(gwarptorio.Teleporters)do
+		if(v:ValidPointA())then table.insert(points,v.PointA) end
+		if(v:ValidPointB())then table.insert(points,v.PointB) end
+	end
+	for _,v in pairs(gwarptorio.cacheAccumulators)do
+		if(v.valid)then
+			table.insert(points,v)
+		else
+			--game.print("cacheAccumulators invalid")
+			gwarptorio.cacheAccumulators[_] = nil
+		end
+	end
 
 	local pnum=#points
 	local eg=0
@@ -874,9 +975,16 @@ function warptorio.TickEnergy(e)
 	for k,v in pairs(points)do local r=(v.electric_buffer_size/ec) v.energy=eg*r end
 end
 
-function warptorio.TickWarpEnergy(e)
+function warptorio.TickHeatDistribution(e)
 	--local up=gwarptorio.Research["reactor"] or 0 if(up==0)then return end
-	local t={} for k,v in pairs(cacheHeat)do if(v.valid)then table.insert(t,v) end end
+	local t={} for _,v in pairs(gwarptorio.cacheHeatpipes)do
+		if(v.valid)then
+			table.insert(t,v)
+		else
+			--game.print("cacheHeatpipes invalid")
+			gwarptorio.cacheHeatpipes[_] = nil
+		end
+	end
 	local h=0 for k,v in pairs(t)do h=h+v.temperature end
 	for k,v in pairs(t)do v.temperature=h/#t end
 end
@@ -897,9 +1005,47 @@ warptorio.BadCloneTypes={["offshore-pump"]=true,["resource"]=true}
 
 local clone={} warptorio.OnEntCloned=clone
 clone["warptorio-reactor"] = function(event)
+	local old_reactor = event.source
+	local indexToRemove = table.GetValueIndex(gwarptorio.cacheHeatpipes, old_reactor)
+	if indexToRemove then table.remove(gwarptorio.cacheHeatpipes, indexToRemove) end
 	--if gwarptorio.warpenergy then event.destination.insert{name="warptorio-reactor-fuel-cell",count=1} end
 	gwarptorio.warp_reactor = event.destination
+	table.insert(gwarptorio.cacheHeatpipes, gwarptorio.warp_reactor)
 end
+
+clone["warptorio-accumulator"] = function(event)
+	local old_entity = event.source
+	local indexToRemove = table.GetValueIndex(gwarptorio.cacheAccumulators, old_entity)
+	if indexToRemove then table.remove(gwarptorio.cacheAccumulators, indexToRemove) end
+
+	local entity = event.destination
+	table.insert(gwarptorio.cacheAccumulators, entity)
+end
+
+clone["warptorio-heatpipe"] = function(event)
+	local old_entity = event.source
+	local indexToRemove = table.GetValueIndex(gwarptorio.cacheAccumulators, old_entity)
+	if indexToRemove then table.remove(gwarptorio.cacheAccumulators, indexToRemove) end
+
+	local entity = event.destination
+	table.insert(gwarptorio.cacheHeatpipes, entity)
+end
+
+clone["warptorio-warploader"] = function(event)
+	local old_entity = event.source
+	local entity = event.destination
+
+	if entity.loader_type == "input" then
+		local indexToRemove = table.GetValueIndex(gwarptorio.cacheWarploadersIn, old_entity)
+		if indexToRemove then table.remove(gwarptorio.cacheWarploadersIn, indexToRemove) end
+		table.insert(gwarptorio.cacheWarploadersIn, entity)
+	elseif entity.loader_type == "output" then
+		local indexToRemove = table.GetValueIndex(gwarptorio.cacheWarploadersOut, old_entity)
+		if indexToRemove then table.remove(gwarptorio.cacheWarploadersOut, indexToRemove) end
+		table.insert(gwarptorio.cacheWarploadersOut, entity)
+	end
+end
+
 
 function warptorio.OnEntityCloned(ev) local d=ev.destination local type,name=d.type,d.name if(type=="character" or warptorio.BadCloneTypes[name])then d.destroy() return
 	elseif(clone[name])then clone[name](ev) return end
@@ -923,9 +1069,6 @@ function warptorio.OnEntityCloned(ev) local d=ev.destination local type,name=d.t
 	end
 end script.on_event(defines.events.on_entity_cloned, warptorio.OnEntityCloned)
 
-
-
-
 -- ----
 -- further setup
 
@@ -935,9 +1078,35 @@ function warptorio.OnLoad()
 	for k,v in pairs(gwarptorio.Floors)do setmetatable(v,warptorio.FloorMeta) end
 	for k,v in pairs(gwarptorio.Teleporters)do setmetatable(v,warptorio.TeleporterMeta) end
 	for k,v in pairs(gwarptorio.Rails)do setmetatable(v,warptorio.TelerailMeta) end
+
 end script.on_load(warptorio.OnLoad)
 
 function warptorio.OnConfigChanged(ev)
+	--game.print("on_configuration_changed")
+	if not global.version then global.version = 0 end
+	if global.version < warptorio.varsion then
+		if global.version < 000040 then
+			--game.print("000040")
+			
+			global.warptorio.cacheHeatpipes = global.warptorio.cacheHeatpipes or {}
+			global.warptorio.cacheAccumulators = global.warptorio.cacheAccumulators or {}
+			global.warptorio.cacheWarploaders = global.warptorio.cacheWarploaders or {}
+			global.warptorio.cacheWarploadersIn = global.warptorio.cacheWarploadersIn or {}
+			global.warptorio.cacheWarploadersOut = global.warptorio.cacheWarploadersOut or {}
+
+			-- gwarptorio.cacheHeatpipes = global.warptorio.cacheWarploadersOut or {}
+			-- gwarptorio.cacheAccumulators = global.warptorio.cacheWarploadersOut or {}
+			-- gwarptorio.cacheWarploaders = global.warptorio.cacheWarploadersOut or {}
+			-- gwarptorio.cacheWarploadersIn = global.warptorio.cacheWarploadersOut or {}
+			-- gwarptorio.cacheWarploadersOut = global.warptorio.cacheWarploadersOut or {}
+			
+		end
+	end
+	global.version = warptorio.varsion
+
+	-- if game.active_mods["loader-redux"] then
+	-- 	remote.call("loader-redux", "add_loader", "warptorio-warploader")
+	-- end
 end script.on_configuration_changed(warptorio.OnConfigChanged)
 
 
@@ -954,16 +1123,16 @@ function warptorio.TickPollution()
 	gwarptorio.Floors.main:GetSurface().pollute({-1,-1},pb1+pb2)
 	m.b1:GetSurface().clear_pollution()
 	m.b2:GetSurface().clear_pollution()
-	
+
 	gwarptorio.pollution_amount = math.min( gwarptorio.pollution_amount * settings.global['warptorio_warp_polution_factor'].value + 0.005, 5000000)
 	game.map_settings.enemy_expansion.max_expansion_cooldown = game.map_settings.enemy_expansion.min_expansion_cooldown + 1
 
 	--game.print("pol: " .. gwarptorio.pollution_amount)
 end
 function warptorio.TickWarpAlarm()
-	if( (gwarptorio.warp_charging == 1 and gwarptorio.warp_time_left <= 3600) or (not gwarptorio.warp_reactor and gwarptorio.warp_auto_end <=3600) )then 
+	if( (gwarptorio.warp_charging == 1 and gwarptorio.warp_time_left <= 3600) or (not gwarptorio.warp_reactor and gwarptorio.warp_auto_end <=3600) )then
 		warptorio.playsound("warp_alarm", gwarptorio.Floors.main:GetSurface().name)
-	end 
+	end
 end
 
 
@@ -986,7 +1155,6 @@ script.on_event(defines.events.on_gui_click, function(event)
 
 	elseif(gui.name == "warptorio_dostabilize")then -- Stabilizer
 		warptorio.TryStabilizer()
-
 	elseif(gui.name == "warptorio_radar")then -- Radar
 		warptorio.TryRadar()
 	elseif(gui.name=="warptorio_accel")then -- Accelerator
@@ -1055,7 +1223,7 @@ function warptorio.TickLoaders(e) for k,v in pairs(gwarptorio.Rails)do v:CheckLo
 function warptorio.Tick(ev) local e=ev.tick
 	warptorio.TickChargeTimer(e)
 	warptorio.TickTeleporters(e)
-	warptorio.TickEnergy(e)
+	warptorio.TickEnergyDistribution(e)
 	warptorio.TickWarpLoaders()
 	if(e%5==0)then
 		warptorio.TickLogistics(e)
@@ -1068,11 +1236,12 @@ function warptorio.Tick(ev) local e=ev.tick
 					-- attack left behind engineers (removed because not needed and factorissimo support)
 					warptorio.TickPollution(e)
 					warptorio.TickWarpAlarm(e)
-					warptorio.TickWarpEnergy(e)
+					warptorio.TickHeatDistribution(e)
 					warptorio.TickAccelerator(e)
 					warptorio.TickStabilizer(e)
 					if(e%(60*10)==0)then -- every 10 seconds
-						warptorio.TickAccumulators(e)
+						warptorio.TickFindAccumulators(e)
+						warptorio.TickFindLoaders(e)
 					end
 				end
 			end
@@ -1167,6 +1336,7 @@ upcs["reactor"]=function(lv) local m=gwarptorio.Floors.main warptorio.playsound(
 		warptorio.cleanplayers(f,-3,-3,5,5)
 		gwarptorio.warp_reactor=e
 		e.minable=false
+		--e.last_user=game.player
 	end
 	if(lv<6)then
 		gwarptorio.warp_auto_time=gwarptorio.warp_auto_time+60*10
@@ -1249,6 +1419,8 @@ ups["warptorio-logistics-4"] = {"factory-logistics"}
 ups["warptorio-beacon-1"] = {"factory-beacon"}
 ups["warptorio-beacon-2"] = {"factory-beacon"}
 ups["warptorio-beacon-3"] = {"factory-beacon"}
+ups["warptorio-beacon-4"] = {"factory-beacon"}
+ups["warptorio-beacon-5"] = {"factory-beacon"}
 
 ups["warptorio-radar-1"] = {"radar"}
 ups["warptorio-radar-2"] = {"radar"}
@@ -1302,8 +1474,6 @@ ups["warptorio-factory-w"] = function() gwarptorio.factory_w=true warptorio.Buil
 ups["warptorio-bridgesize-1"] = {"bridgesize"}
 ups["warptorio-bridgesize-2"] = {"bridgesize"}
 
-
-
 -- --------
 -- Gui
 
@@ -1325,7 +1495,7 @@ function warptorio.BuildGui(player)
 	local fb=f.warptorio_line2 if(fb==nil)then fb=f.add{name="warptorio_line2",type="flow",direction="horizontal"} end
 
 	local g=fa.warptorio_dowarp if(g==nil)then g=fa.add{type="button",name="warptorio_dowarp",caption={"warptorio-warp"}} end
-	local tgl={"(Random)"} if(gwarptorio.homeworld)then table.insert(tgl,"(Homeworld)") end if(gwarptorio.charting)then for k,v in ipairs(planetDropdown)do table.insert(tgl,v) end end 
+	local tgl={"(Random)"} if(gwarptorio.homeworld)then table.insert(tgl,"(Homeworld)") end if(gwarptorio.charting)then for k,v in ipairs(planetDropdown)do table.insert(tgl,v) end end
 	local g=fa.warptorio_target if(g==nil)then g=fa.add{type="drop-down",name="warptorio_target",items={"(Random)"}} end g.items=tgl
 	if(gwarptorio.homeworld)then local g=fa.warptorio_home if(g==nil)then g=fa.add{type="button",name="warptorio_home",caption={"warptorio-btnhome","-"}} end end
 
@@ -1386,8 +1556,8 @@ function warptorio.IncrementAbility(c,m) c=c or 2.5 m=m or 5
 	warptorio.updatelabel("warptorio_ability_next","    Cooldown : " .. util.formattime(math.max(gwarptorio.ability_next-game.tick,0)) )
 end
 
-function warptorio.TryStabilizer() if(game.tick<(gwarptorio.ability_next or 0) or not gwarptorio.warp_reactor)then return end warptorio.IncrementAbility(2.5,5)
-	game.forces["enemy"].evolution_factor=0	
+function warptorio.TryStabilizer() if(game.tick<(gwarptorio.ability_next or 0) or not gwarptorio.warp_reactor or not gwarptorio.warp_reactor.valid)then return end warptorio.IncrementAbility(2.5,5)
+	game.forces["enemy"].evolution_factor=0
 	gwarptorio.pollution_amount = 1.25
 	local f=gwarptorio.Floors.main:GetSurface()
 	f.clear_pollution()
@@ -1532,6 +1702,11 @@ function warptorio.DoNextPlanet()
 	return w
 end
 
+function warptorio.CheckPlanetControls(t) -- mod compatability -_-
+	local pt=game.autoplace_control_prototypes
+	for k,v in pairs(t.autoplace_controls)do if(not pt[k])then t.autoplace_controls[k]=nil end end
+end
+
 function warptorio.BuildNewPlanet()
 	local rng=math.random(1,table.Count(warptorio.Planets))
 	local lvl=gwarptorio.Research["reactor"] or 0
@@ -1539,7 +1714,7 @@ function warptorio.BuildNewPlanet()
 	local w if(lvl>=8 and gwarptorio.planet_target)then local wx=gwarptorio.planet_target
 		if(wx=="home")then
 			if(gwarptorio.Floors.main:GetSurface().name~=gwarptorio.Floors.home:GetSurface().name and math.random(1,10)<=3)then
-				game.print("-Successful Warp-") game.print(gwarptorio.Floors.home.world.name .. ". Home sweet home.") 
+				game.print("-Successful Warp-") game.print(gwarptorio.Floors.home.world.name .. ". Home sweet home.")
 				return gwarptorio.Floors.home:GetSurface(),gwarptorio.Floors.home.world
 			end
 		elseif(math.random(1,10)<=3)then
@@ -1560,8 +1735,9 @@ function warptorio.BuildNewPlanet()
 	if(w.orig_mul)then
 		if(wmap.autoplace_controls)then for k,v in pairs(wmap.autoplace_controls)do if(getmetatable(v))then wmap.autoplace_controls[k]=v*(orig.autoplace_controls[k] or 1) end end end
 	end
-	table.deepmerge(t,wmap) 
+	table.deepmerge(t,wmap)
 
+	warptorio.CheckPlanetControls(t)
 	local f = game.create_surface("warpsurf_"..gwarptorio.warpzone,t)
 	f.request_to_generate_chunks({0,0},3) f.force_generate_chunk_requests()
 	if(w.spawn)then w.spawn(f,gwarptorio.charting) end
@@ -1630,7 +1806,7 @@ function warptorio.Warpout()
 	--local ebit={}
 	for k,v in pairs(c.find_entities_filtered{type="character",invert=true,area=m.area})do if(v.valid and v.last_user)then table.insert(etbl,v) end end
 	--for k,v in pairs(c.find_entities_filtered{type="unit",area=m.area})do if(v.valid and v.force.name=="enemy")then table.insertExclusive(ebit,v) end end
- 
+
 	-- find players to teleport to new platform
 	for k,v in pairs(game.players)do local p,b=m:GetPos(),m:GetBBox()
 		if(v.character~=nil and v.surface.name==c.name and warptorio.isinbbox(v.character.position,{x=p[1],y=p[2]},{x=b[1]+1,y=b[2]+1}))then
@@ -1725,7 +1901,7 @@ function warptorio.cleanplayers(f,x,y,w,h) local e=f.find_entities({{x,y},{x+w,y
 
 function warptorio.cleanbbox(f,x,y,w,h) local e=f.find_entities({{x,y},{x+w,y+h}})
 	for k,v in ipairs(e)do if(v.type~="character")then v.destroy() else warptorio.safeteleport(v,{0,0},f) end end end
-function warptorio.safeteleport(e,x,f) 
+function warptorio.safeteleport(e,x,f)
 	if(e.type=="character")then for k,v in pairs(game.players)do if(v.character==e)then v.teleport(f.find_non_colliding_position("character",x,12,1,true),f) end end end end
 
 function warptorio.PrintToCharacter(c,msg,x) for k,v in pairs(game.players)do if(v.character==c)then v.print(msg) end end end
@@ -1778,7 +1954,7 @@ function warptorio.Initialize()
 	gwarptorio.warp_charge_start_tick = gwarptorio.warp_charge_start_tick or 0
 	gwarptorio.warp_charging = gwarptorio.warp_charging or 0
 	gwarptorio.warp_timeleft = gwarptorio.warp_timeleft or 60*10
-	gwarptorio.warp_reactor = nil
+	gwarptorio.warp_reactor = gwarptorio.warp_reactor or nil
 	gwarptorio.warp_auto_time = gwarptorio.warp_auto_time or 60*30
 	gwarptorio.warp_auto_end = gwarptorio.warp_auto_end or 60*60*30
 	gwarptorio.warp_last=gwarptorio.warp_last or game.tick
@@ -1802,11 +1978,22 @@ function warptorio.Initialize()
 	gwarptorio.Turrets=gwarptorio.Turrets or {}
 	gwarptorio.Rails=gwarptorio.Rails or {}
 
+	--Caches
+	gwarptorio.cacheHeatpipes=gwarptorio.cacheHeatpipes or {}
+	gwarptorio.cacheAccumulators=gwarptorio.cacheAccumulators or {}
+	gwarptorio.cacheWarploaders=gwarptorio.cacheWarploaders or {}
+	gwarptorio.cacheWarploadersIn=gwarptorio.cacheWarploadersIn or {}
+	gwarptorio.cacheWarploadersOut=gwarptorio.cacheWarploadersOut or {}
+
 	warptorio.InitFloors()
 	warptorio.InitEntities()
 	warptorio.InitTeleporters()
 
 	warptorio.ApplyMapSettings()
+
+	-- if game.active_mods["loader-redux"] then
+	-- 	remote.call("loader-redux", "add_loader", "warptorio-warploader")
+	-- end
 
 end script.on_init(warptorio.Initialize)
 
