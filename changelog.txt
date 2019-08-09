@@ -1,4 +1,119 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.5.3
+Date: 09.08.2019
+  Changes:
+    - Minor bug fixing
+
+
+---------------------------------------------------------------------------------------------------
+Version: 0.5.2
+Date: 09.08.2019
+  Changes:
+    - Minor bug fix
+
+---------------------------------------------------------------------------------------------------
+Version: 0.5.1
+Date: 09.08.2019
+  Changes:
+    - Minor bug fix
+
+---------------------------------------------------------------------------------------------------
+Version: 0.5.0
+Date: 09.08.2019
+  Changes:
+    - Added expert difficulty mod setting: autowarp is always on
+    - Added more mod settings for pollution factor and biter expansion rates
+    - Small nerf to biter expansion rates
+    - Added auto warp time mod setting
+
+
+---------------------------------------------------------------------------------------------------
+Version: 0.4.9
+Date: 09.08.2019
+  Changes:
+    - More work on remote interface for other mods to expand the warptorio planets table. Please refer to FAQ.
+
+
+---------------------------------------------------------------------------------------------------
+Version: 0.4.8
+Date: 09.08.2019
+  Changes:
+    - Mod compatability with Dirt Path
+    - Added remote interface for other mods to expand the warptorio planets table
+
+---------------------------------------------------------------------------------------------------
+Version: 0.4.7
+Date: 09.08.2019
+  Changes:
+    - Added mod settings weighted planet probability of occurrence
+    - Fixed a crash related to loot chests
+
+---------------------------------------------------------------------------------------------------
+Version: 0.4.6
+Date: 09.08.2019
+  Changes:
+    - Added carebear difficulty mod setting: Early boiler room water
+
+---------------------------------------------------------------------------------------------------
+Version: 0.4.5
+Date: 08.08.2019
+  Changes:
+    - Added carebear difficulty mod setting: spawns a loot chest of items you'll need to get you through the first few planets alive for those that need help.
+    - Reduced base autowarp timer to 20 mins to better match biter evolution in the early game.
+
+---------------------------------------------------------------------------------------------------
+Version: 0.4.4
+Date: 08.08.2019
+  Changes:
+    - General code cleanup and organising
+    - Added mod setting to turn off autowarp earlier than reactor level 6.
+    - Added mod settings to change warp charge time calculations and ability cooldowns.
+
+---------------------------------------------------------------------------------------------------
+Version: 0.4.3
+Date: 06.08.2019
+  Changes:
+    - Fixed mp issue
+    - Added more provider chest options
+
+---------------------------------------------------------------------------------------------------
+Version: 0.4.2
+Date: 06.08.2019
+  Changes:
+    - Miniaturized the "invisible" radar.
+    - Added mod settings allowing selection of requester/provider chests used with teleporter and stairs loaders.
+
+---------------------------------------------------------------------------------------------------
+Version: 0.4.1
+Date: 06.08.2019
+  Changes:
+    - Fixed a bug with warp rail loaders and chests not switching direction
+
+---------------------------------------------------------------------------------------------------
+Version: 0.4.0
+Date: 06.08.2019
+  Changes:
+    - Reduced warp charge time growth
+    - Fixed a bunch of sizing and alignment issues
+    - Big code cleanup intended for improved mod compatability, performance and reliability.
+    - Reactor research tweaks
+    - Invisible radar to factory and boiler floors (requires charting).
+    - Fixed a multiplayer crash
+
+---------------------------------------------------------------------------------------------------
+Version: 0.3.9
+Date: 06.08.2019
+  Changes:
+    - Fixed missing beacon levels
+    - Fixed some lag issues when staying on a planet for too long
+
+---------------------------------------------------------------------------------------------------
+Version: 0.3.8
+Date: 05.08.2019
+  Changes:
+    - Added crash protection for mods that remove base game resources
+
+---------------------------------------------------------------------------------------------------
 Version: 0.3.7
 Date: 04.08.2019
   Changes:

@@ -681,8 +681,8 @@ data:extend{
             }
           }
         },
-        max_temperature = 5000,
-        max_transfer = "5GW",
+        max_temperature = 1000,
+        max_transfer = "2GW",
         specific_heat = "1MJ"
       },
       heat_glow_light = {

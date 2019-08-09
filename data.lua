@@ -8,6 +8,7 @@ require("data_warpnuke")
 require("data_warptorio-warploader")
 
 local function istable(t) return type(t)=="table" end
+local function rgb(r,g,b,a) a=a or 255 return {r=r/255,g=g/255,b=b/255,a=a/255} end
 
 function table.deepmerge(s,t) for k,v in pairs(t)do if(istable(v) and s[k] and istable(s[k]))then table.deepmerge(s[k],v) else s[k]=v end end end
 function table.merge(s,t) local x={} for k,v in pairs(s)do x[k]=v end for k,v in pairs(t)do x[k]=v end return x end
@@ -35,18 +36,39 @@ local function ExtendTech(t,d,s) local x=table.merge(t,d) if(s)then x.unit.ingre
 -- --------
 -- Warp Tiles
 
-local t=ExtendDataCopy("tile","tutorial-grid",{name="warp-tile",tint={r=0.6,g=0.6,b=0.7,a=1},decorative_removal_probability=1,walking_speed_modifier=1.6,map_color={r=0.2,g=0.1,b=0.25,a=1}})
+local t=ExtendDataCopy("tile","tutorial-grid",{name="warp-tile-concrete",tint={r=0.6,g=0.6,b=0.7,a=1},decorative_removal_probability=1,walking_speed_modifier=1.6,map_color={r=0.2,g=0.1,b=0.25,a=1}})
 
+-- --------
+-- Invisiradar
+local rtint={r=0.4,g=0.4,b=1,a=1}
+local rvtint={scale=1/3,tint={r=1,g=1,b=1,a=0},hr_version={scale=0.5/3,tint={r=1,g=1,b=1,a=0}}}
+local r=ExtendDataCopy("radar","radar",{name="warptorio-invisradar",
+	icon=false,icons={{icon="__base__/graphics/icons/radar.png",tint=rtint}},integration_patch=rvtint,pictures={layers={rvtint,rvtint}},
+},true,{energy_per_nearby_scan="10kJ",energy_per_sector="200kJ",energy_usage="1kW",
+	max_distance_of_nearby_sector_revealed=5,max_distance_of_sector_revealed=18,
+	collision_box={{-1.2/3,-1.2/3},{1.2/3,1.2/3}},selection_box={{-1.5/3,-1.5/3},{1.5/3,1.5/3}},
+})
 
 
 -- --------
 -- Loot Chest
 
 local rtint={r=0.4,g=0.4,b=1,a=1}
-local t=ExtendDataCopy("container","wooden-chest",{name="warptorio-lootchest",
+local t=ExtendDataCopy("container","wooden-chest",{name="warptorio-lootchest",inventory_size=8,
 	icon=false,icons={{icon="__base__/graphics/icons/wooden-chest.png",tint=rtint}},
 	picture={layers={ [1]={tint=rtint,hr_version={tint=rtint}}, }},
 },true,{minable={mining_time=0.1}})
+
+
+-- --------
+-- Carebear Chest
+
+local rtint=rgb(255,20,147)
+local t=ExtendDataCopy("container","wooden-chest",{name="warptorio-carebear-chest",inventory_size=99,
+	icon=false,icons={{icon="__base__/graphics/icons/wooden-chest.png",tint=rtint}},
+	picture={layers={ [1]={tint=rtint,hr_version={tint=rtint}}, }},
+},true,{minable={mining_time=0.1}})
+
 
 
 -- ----
@@ -90,7 +112,7 @@ ExtendDataCopy("recipe","nuclear-fuel",{name="warptorio-warponium-fuel",enabled=
 
 -- The Reactor Itself
 local t=ExtendDataCopy("reactor","nuclear-reactor",{name="warptorio-reactor",max_health=5000,neighbour_bonus=12,consumption="20MW",
-	energy_source={fuel_category="warp"},heat_buffer={specific_heat="5MJ",max_temperature=5000}, light={ intensity=10, size=9.9, shift={0.0,0.0}, color={r=1.0,g=0.0,b=0.0} },
+	energy_source={fuel_category="warp"},heat_buffer={specific_heat="4MJ",max_temperature=1000}, light={ intensity=10, size=9.9, shift={0.0,0.0}, color={r=1.0,g=0.0,b=0.0} },
 	working_light_picture={ filename="__base__/graphics/entity/nuclear-reactor/reactor-lights-grayscale.png", tint={r=1,g=0.4,b=0.4,a=1},
 		hr_version={ filename="__base__/graphics/entity/nuclear-reactor/hr-reactor-lights-grayscale.png", tint={r=1,g=0.4,b=0.4,a=1}, },
 	},
@@ -371,13 +393,13 @@ local t={type="technology",upgrade=true,icon_size=128,icons={
 	{icon="__base__/graphics/technology/nuclear-power.png",tint={r=0.3,g=0.3,b=1,a=1},priority="low"},
 	{icon="__base__/graphics/technology/kovarex-enrichment-process.png",tint={r=0.7,g=0.7,b=1,a=1},scale=0.5,shift={32,32},priority="high"}
 }, }
-ExtendTech(t,{name="warptorio-reactor-7",unit={count=1000,time=30}, effects={{recipe="warptorio-heatpipe",type="unlock-recipe"}}, prerequisites={"nuclear-power","warptorio-reactor-6"}}, {red=1,green=1,black=1,blue=1})
+ExtendTech(t,{name="warptorio-reactor-7",unit={count=1000,time=30}, effects={{recipe="warptorio-heatpipe",type="unlock-recipe"},{recipe="warptorio-warponium-fuel-cell",type="unlock-recipe"}}, prerequisites={"nuclear-power","warptorio-reactor-6"}}, {red=1,green=1,black=1,blue=1})
 
 local t={type="technology",upgrade=true,icon_size=128,icons={
 	{icon="__base__/graphics/technology/nuclear-power.png",tint={r=0.3,g=0.3,b=1,a=1},priority="low"},
 	{icon="__warptorio2__/graphics/technology/earth.png",tint={r=0.8,g=0.8,b=1,a=1},scale=0.5,shift={32,32},priority="high"}
 }, }
-ExtendTech(t,{name="warptorio-reactor-8",unit={count=1000,time=30}, prerequisites={"warptorio-reactor-7","warptorio-charting","warptorio-kovarex","rocket-control-unit"}}, {red=1,green=1,black=1,blue=1,purple=1,yellow=1}) -- steering
+ExtendTech(t,{name="warptorio-reactor-8",unit={count=1000,time=30}, prerequisites={"warptorio-reactor-7","warptorio-charting","warptorio-accelerator","warptorio-stabilizer","warptorio-kovarex","rocket-control-unit"}}, {red=1,green=1,black=1,blue=1,purple=1,yellow=1}) -- steering
 
 
 
@@ -411,7 +433,7 @@ local t={type="technology",upgrade=true,icon_size=128,icons={
 	{icon="__base__/graphics/technology/nuclear-power.png",tint={r=0.3,g=0.3,b=1,a=1},priority="low"},
 	{icon="__base__/graphics/technology/rocket-fuel.png",tint={r=0.7,g=0.7,b=1,a=1},scale=0.5,shift={32,32},priority="high"},
 	},
-	effects={{recipe="warptorio-warponium-fuel",type="unlock-recipe"},{recipe="warptorio-warponium-fuel-cell",type="unlock-recipe"}},
+	effects={{recipe="warptorio-warponium-fuel",type="unlock-recipe"}},
 }
 ExtendTech(t,{name="warptorio-kovarex",unit={count=1000,time=15}, prerequisites={"warptorio-reactor-7","kovarex-enrichment-process"}}, {red=1,green=1,black=1,blue=1,purple=1}) -- Kovarex
 

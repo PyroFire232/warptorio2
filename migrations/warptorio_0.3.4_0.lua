@@ -1,7 +1,7 @@
 
 warptorio.OnLoad()
+warptorio.Migrate()
 if(global.warptorio)then
-	warptorio.ApplyMapSettings()
 	local gwarptorio=global.warptorio
 	warptorio.BuildPlatform()
 	warptorio.BuildB1()
