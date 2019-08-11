@@ -1,9 +1,34 @@
 data:extend(
 {
-	{type="bool-setting",name="warptorio_autowarp_always",order="aaa",
+
+	{type="double-setting",name="warptorio_votewarp_multi",order="1a",
+	setting_type="runtime-global",default_value=0.5,
+	minimum_value=0,maximum_value=1},
+
+	{type="string-setting",name="warptorio_loader_top",order="aaaa",
+	setting_type="runtime-global",default_value="up",
+	allowed_values={"up","down"}},
+
+	{type="string-setting",name="warptorio_loader_bottom",order="aaab",
+	setting_type="runtime-global",default_value="down",
+	allowed_values={"up","down"}},
+
+	{type="string-setting", name="warptorio_loaderchest_provider",order="aaac",
+	setting_type="runtime-global", default_value="logistic-chest-active-provider",
+	allowed_values={"logistic-chest-active-provider","logistic-chest-buffer","logistic-chest-passive-provider","logistic-chest-storage","steel-chest"},
+	},
+
+	{type="string-setting",name="warptorio_loaderchest_requester",order="aaad",
+	setting_type="runtime-global",default_value="logistic-chest-requester",
+	allowed_values={"logistic-chest-requester","logistic-chest-buffer"},
+	},
+
+
+
+	{type="bool-setting",name="warptorio_autowarp_always",order="aaba",
 	setting_type="runtime-global",default_value=false,},
 
-	{type="bool-setting",name="warptorio_autowarp_disable",order="aaba",
+	{type="bool-setting",name="warptorio_autowarp_disable",order="aabb",
 	setting_type="runtime-global",default_value=false,},
 
 	{type="double-setting",name="warptorio_autowarp_time",order="aabc",
@@ -22,38 +47,54 @@ data:extend(
 
 	{type = "double-setting", name = "warptorio_warp_polution_factor",order="abb",
 	setting_type = "runtime-global",default_value = 1.01,
-	minimum_value = 1.01,maximum_value = 2},
+	minimum_value = 1.0001,maximum_value = 2},
 
 
 	{type = "bool-setting", name = "warptorio_biter_disable",order="abc",
 	setting_type = "runtime-global",default_value =false},
 
 	{type = "double-setting", name = "warptorio_biter_expansion",order="adab",
-	setting_type = "runtime-global",default_value = 1.01,
-	minimum_value = 1.01,maximum_value = 2},
+	setting_type = "runtime-global",default_value = 1.009,
+	minimum_value = 1.0001,maximum_value = 2},
 
 	{type = "double-setting", name = "warptorio_biter_redux",order="adb",
 	setting_type = "runtime-global",default_value = 1,
-	minimum_value = 0,maximum_value = 5},
+	minimum_value = 0},
 
 	{type = "double-setting", name = "warptorio_biter_min",order="adc",
 	setting_type = "runtime-global",default_value = 5,
-	minimum_value = 4,maximum_value = 10},
+	minimum_value = 3},
 
 	{type = "double-setting", name = "warptorio_biter_max",order="add",
 	setting_type = "runtime-global",default_value = 5,
-	minimum_value = 4,maximum_value = 10},
+	minimum_value = 3},
 
 
-	{type="string-setting", name="warptorio_loaderchest_provider",order="ba",
-	setting_type="runtime-global", default_value="logistic-chest-active-provider",
-	allowed_values={"logistic-chest-active-provider","logistic-chest-buffer","logistic-chest-passive-provider","logistic-chest-storage","steel-chest"},
-	},
 
-	{type="string-setting",name="warptorio_loaderchest_requester",order="bb",
-	setting_type="runtime-global",default_value="logistic-chest-requester",
-	allowed_values={"logistic-chest-requester","logistic-chest-buffer"},
-	},
+	{type = "double-setting", name = "warptorio_biter_wavestart",order="aea1",
+	setting_type = "runtime-global",default_value = 5,
+	minimum_value = 1,maximum_value=10},
+
+	{type = "double-setting", name = "warptorio_biter_wavemin",order="aea2",
+	setting_type = "runtime-global",default_value = 360,
+	minimum_value = 10},
+
+	{type = "double-setting", name = "warptorio_biter_wavemax",order="aeb",
+	setting_type = "runtime-global",default_value = 3000,
+	minimum_value = 10,},
+
+	{type = "int-setting", name = "warptorio_biter_waverng",order="aec",
+	setting_type = "runtime-global",default_value = 15,
+	minimum_value = 1},
+
+	{type = "int-setting", name = "warptorio_biter_wavesize",order="aed",
+	setting_type = "runtime-global",default_value = 3,
+	minimum_value = 1},
+
+	{type = "int-setting", name = "warptorio_biter_wavesizemax",order="aee",
+	setting_type = "runtime-global",default_value = 500,
+	minimum_value = 0},
+
 
 
 	{type="int-setting",name="warptorio_warpcharge_max",order="ca",
@@ -130,6 +171,10 @@ data:extend(
 	minimum_value=0},
 
 	{type="int-setting",name="warptorio_planet_biter",order="ek",
+	setting_type="startup",default_value=4,
+	minimum_value=0},
+
+	{type="int-setting",name="warptorio_planet_rogue",order="el",
 	setting_type="startup",default_value=4,
 	minimum_value=0},
 

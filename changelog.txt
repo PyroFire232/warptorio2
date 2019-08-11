@@ -1,3 +1,66 @@
+
+---------------------------------------------------------------------------------------------------
+Version: 0.6.1
+Date: 11.08.2019
+  Changes:
+    - Fixed a crash related to Alien Biomes
+
+---------------------------------------------------------------------------------------------------
+Version: 0.6.0
+Date: 10.08.2019
+  Changes:
+    - Bug Fix
+    - More progress on mod compatability: Alien Biomes
+
+---------------------------------------------------------------------------------------------------
+Version: 0.5.9
+Date: 10.08.2019
+  Changes:
+    - Completed Mod Extendable Planets.
+    - Official Warptorio2 Planet Pack: https://mods.factorio.com/mod/warptorio_planet_pack
+    - Progress on mod compatability: Alien Biomes.
+    - Progress on mod compatability for modded ores
+
+---------------------------------------------------------------------------------------------------
+Version: 0.5.8
+Date: 10.08.2019
+  Changes:
+    - Added Biter Waves, ensuring biter attacks always happen
+    - Added Biter Wave difficulty settings
+    - Added a tiny bit of pollution to everything (such as chests, inserters)
+
+---------------------------------------------------------------------------------------------------
+Version: 0.5.7
+Date: 10.08.2019
+  Changes:
+    - Adjusted spawn settings of the Barren planet
+    - Added Rogue planet
+
+---------------------------------------------------------------------------------------------------
+Version: 0.5.6
+Date: 10.08.2019
+  Changes:
+    - Added votewarp multiplier mod setting
+
+---------------------------------------------------------------------------------------------------
+Version: 0.5.5
+Date: 10.08.2019
+  Changes:
+    - Added nauvis_override to the modded planet api
+    - Added votewarp for multiplayer (untested)
+    - Reversed direction of logistics on north half of platform.
+    - Added mod settings allowing you to set the direction of platform logistics (north and south halves)
+
+
+---------------------------------------------------------------------------------------------------
+Version: 0.5.4
+Date: 10.08.2019
+  Changes:
+    - Full factorissimo mod support
+    - Fixed a bug with the southeast and southwest warp rails
+    - Fixed a bug with corner stairs not benefiting from stairs energy research
+    - Known Issue: Multiplayer Desync related to cloning accumulators. This is a factorio bug: https://forums.factorio.com/viewtopic.php?f=7&t=74363
+
 ---------------------------------------------------------------------------------------------------
 Version: 0.5.3
 Date: 09.08.2019

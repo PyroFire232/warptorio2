@@ -1,9 +1,9 @@
 {
 	"name": "warptorio2",
-	"version": "0.5.3",
+	"version": "0.6.1",
 	"title": "Warptorio",
 	"author": "Nonoce and PyroFire",
-	"dependencies": ["base >= 0.17","! NewGamePlus"],
+	"dependencies": ["base >= 0.17","! NewGamePlus","! Space Exploration"],
 	"description": "Build your base on a platform that warps from planet to planet and escape bitters before they overwhelm you.",
 	"factorio_version": "0.17",
 	"homepage":"none"

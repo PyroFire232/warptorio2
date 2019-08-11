@@ -1,4 +1,5 @@
 warptorio.OnLoad()
+warptorio.Migrate()
 if(global.warptorio)then
 	local gwarptorio=global.warptorio
 	local r=gwarptorio.Research["reactor"] or 0

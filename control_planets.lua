@@ -13,27 +13,39 @@ local resourceTypes={"coal","crude-oil","copper-ore","iron-ore","stone","uranium
 warptorio.OreTypes=resourceTypes
 --["iron-ore"]={size=0},["copper-ore"]={size=0},["coal"]={size=0},["crude-oil"]={size=0},["uranium-ore"}={size=0},["stone"]={size=0}
 
-local czMeta={}
+local czMeta={} warptorio.PlanetControlMeta=czMeta
 function czMeta.__init(t,f,z,r) t.size=z or 1 t.frequency=f or 1 t.richness=r or 1 return t end
 function czMeta.__mul(a,b) local t=setmetatable({},czMeta) if(istable(b))then for k,v in pairs(a)do t[k]=v*(b[k] or 1) end else for k,v in pairs(a)do t[k]=v*b end end return t end
+function czMeta.__call(f,z,r) return new(czMeta,f,z,r) end
+local function czControl(f,z,r) return {frequency=f or 1,size=z or 1,richness=r or 1} end
 
 local czRes=setmetatable({size=0.25,frequency=0.23,richness=0.22},czMeta)
 local czCoal=setmetatable({size=0.275,frequency=0.3,richness=0.23},czMeta)
 local czIron=setmetatable({size=0.25,frequency=0.25,richness=0.23},czMeta)
 local czCopper=setmetatable({size=0.23,frequency=0.23,richness=0.21},czMeta)
-local czUranium=setmetatable({size=0.25,frequency=0.25,richness=0.21},czMeta)
-
+local czUranium=setmetatable({size=0.25,frequency=0.25,richness=0.21},czMeta) -- this metatable is mostly used 
 
 -- "trees","grass","dirt","sand","desert" autoplace-control-names
 
 local function getrng(v) return settings.startup["warptorio_planet_"..v].value end
+
+local decal={}
+decal.rocks={"rock-tiny","rock-small","rock-medium","rock-big","rock-huge"}
+decal.sandrocks={"sand-rock-tiny","sand-rock-small","sand-rock-medium","sand-rock-big","sand-rock-huge"}
+decal.sanddune={"sand-dune-decal","sand-decal","sand-rock"}
+decal.bush={"white-desert-bush","green-bush-mini","desert-bush",}
+decal.pita={"green-pita","green-pita-mini","red-asterisk"}
+decal.mud={"dark-mud-decal"}
+decal.garballo={"garballo","garballo-mini-dry"}
+decal.puberty={"puberty-decal"}
+decal.ship={"big-ship-wreck-1","small-ship-wreck-grass","medium-ship-wreck-grass","big-ship-wreck-grass","small-ship-wreck","medium-ship-wreck","big-ship-wreck"}
 
 -- --------
 -- Regular Planets
 
 planet.normal={ zone=0, rng=getrng("normal"), name="A Normal Planet", desc="This world reminds you of home."} -- default
 
-planet.average={ zone=1, rng=getrng("average"), name="An Average Planet", desc="The usual critters and riches surrounds you, but you feel like something is missing.", -- remove 1-2 resources
+planet.average={ zone=2, rng=getrng("average"), name="An Average Planet", desc="The usual critters and riches surrounds you, but you feel like something is missing.", -- remove 1-2 resources
 	orig_mul=true,
 	gen={autoplace_controls={}},
 	fgen=function(t,b,o)
@@ -66,22 +78,30 @@ planet.jungle={ zone=27, rng=getrng("jungle"), name="A Jungle Planet", desc="The
 	spawn=function(f) f.daytime=math.random(0,1) end
 }
 
+
 planet.barren={ zone=12, rng=getrng("barren"), name="A Barren Planet", desc="This world looks deserted and we appear to be safe. .. For now.",
 	warp_multiply=0.25,
+	nowater=true,
 	gen={
 	starting_area = "none",
-	cliff_settings = { cliff_elevation_0 = 1024 },
+	--cliff_settings = { cliff_elevation_0 = 1024 },
 	default_enable_all_autoplace_controls = false,
+
 	autoplace_settings = {
-		decorative = { treat_missing_as_default = false },
-		entity = { treat_missing_as_default = false },
+		decorative = { treat_missing_as_default = false,settings={} },
+		entity = { treat_missing_as_default = false,settings={} },
 		tile = { treat_missing_as_default = false, settings = {}, },
 		},
 	},
-	fgen=function(t,b) local x=t.autoplace_settings.tile.settings local y={frequency="very-low",size=2}
+	fgen=function(t,b) local x=t.autoplace_settings.tile.settings local y={frequency="very-low",size=2,richness=1}
 		for i=1,3,1 do x["sand-"..i]=y end
 		for i=1,7,1 do x["dirt-"..i]=y end
 		x["dry-dirt"]=y x["sand-decal"]=y x["sand-dune-decal"]=y
+		local ed=t.autoplace_settings.decorative.settings
+		ed["rocks"]={frequency="very-high",size=2,richness=2}
+		local ex=t.autoplace_settings.entity.settings
+		ex["rocks"]={frequency="very-high",size=2,richness=2}
+
 		if(b)then end
 	end,
 	spawn=function(f)
@@ -91,10 +111,17 @@ planet.barren={ zone=12, rng=getrng("barren"), name="A Barren Planet", desc="Thi
 		for k,v in pairs(f.find_entities_filtered{type="resource"})do v.destroy() end
 	end,
 }
+for a,b in pairs({"rocks","sandrocks"})do
+	local v=decal[b]
+	for i,e in pairs(v)do planet.barren.gen.autoplace_settings.entity.settings[e]=czControl(1.5,1.5,1) end
+	for i,e in pairs(v)do planet.barren.gen.autoplace_settings.decorative.settings[e]=czControl(1.5,1.5,1) end
+end
+-- if v.prototype.autoplace_specification
+
 
 planet.ocean={ zone=3, rng=getrng("ocean"), name="An Ocean Planet", desc="There is water all around and seems to go on forever. The nearby fish that greet you fills you with determination.",
 	warp_multiply=0.25,
-	gen={ starting_area="none",water=999999,default_enable_all_autoplace_controls=false,autoplace_settings={
+	gen={ starting_area="none",water=999999,default_enable_all_autoplace_controls=false,autoplace_controls={["trees"]={frequency=1,size=1,richness=1}},autoplace_settings={
 		tile={treat_missing_as_default=false,settings={["water"]={frequency=5,size=5},["deepwater"]={frequency=5,size=5}}},
 		entity={treat_missing_as_default=false,settings={["fish"]={frequency=5,size=5,richness=10}}},decorative = { treat_missing_as_default = false },
 	}},
@@ -208,7 +235,7 @@ planet.midnight={ zone=20,rng=getrng("midnight"),name="A Planet Called Midnight"
 
 
 planet.biter={ zone=60,rng=getrng("biter"),name="A Biter Planet", desc="Within moments of warping in, your factory is immediately under siege. We must survive until the next warp!",
-	warp_multiply=1.5,
+	warp_multiply=1,
 	orig_mul=true,
 	gen={
 		starting_area=0.3,
@@ -216,6 +243,39 @@ planet.biter={ zone=60,rng=getrng("biter"),name="A Biter Planet", desc="Within m
 	},
 }
 
+planet.rogue={ zone=100,rng=getrng("rogue"),name="A Rogue Planet", desc="Ah, just your usual barren wasteland, nothing to worry about. But something seems a little off.",
+	warp_multiply=1,
+	orig_mul=false,
+	nowater=true,
+	gen={
+		starting_area=2.5,
+		autoplace_controls={["enemy-base"]=new(czMeta,3,3,1),["trees"]=new(czMeta,3,0.25,0.25), ["dirt"]=new(czMeta,4,4,4),["sand"]=new(czMeta,4,4,4)},
+		autoplace_settings = {
+			decorative = { treat_missing_as_default = false,settings={} },
+			entity = { treat_missing_as_default = true,settings={} },
+			tile = { treat_missing_as_default = false, settings = {}, },
+		},
+		default_enable_all_autoplace_controls = true
+	},
+	fgen=function(t,b) local x=t.autoplace_settings.tile.settings local y={frequency="very-low",size=2}
+		for i=1,3,1 do x["sand-"..i]=y end
+		for i=1,7,1 do x["dirt-"..i]=y end
+		x["dry-dirt"]=y x["sand-decal"]=y x["sand-dune-decal"]=y
+		if(b)then end
+	end,
+	spawn=function(f)
+		f.daytime=0.5
+		f.freeze_daytime=0
+	end,
+}
+for a,b in pairs({"rocks","sandrocks","bush"})do
+	local v=decal[b]
+	for i,e in pairs(v)do planet.rogue.gen.autoplace_settings.entity.settings[e]=czControl(1.5,1.5,1) end
+	for i,e in pairs(v)do planet.rogue.gen.autoplace_settings.decorative.settings[e]=czControl(1.5,1.5,1) end
+end
+for k,v in pairs(warptorio.OreTypes)do
+	planet.rogue.gen.autoplace_controls[v]={size=0}
+end
 
 
 
