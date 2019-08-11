@@ -83,26 +83,33 @@ planet.barren={ zone=12, rng=getrng("barren"), name="A Barren Planet", desc="Thi
 	warp_multiply=0.25,
 	nowater=true,
 	gen={
-	starting_area = "none",
-	--cliff_settings = { cliff_elevation_0 = 1024 },
-	default_enable_all_autoplace_controls = false,
+		starting_area = "none",
+		--cliff_settings = { cliff_elevation_0 = 1024 },
+		default_enable_all_autoplace_controls = false,
 
-	autoplace_settings = {
-		decorative = { treat_missing_as_default = false,settings={} },
-		entity = { treat_missing_as_default = false,settings={} },
-		tile = { treat_missing_as_default = false, settings = {}, },
+		autoplace_settings = {
+			decorative = { treat_missing_as_default = false,settings={
+				["trees"]={frequency=0,size=0,richness=0},
+				["rocks"]={frequency=2,size=2,richness=2}
+			} },
+			entity = { treat_missing_as_default = false,settings={
+				--["rock-huge-white"]={frequency=2,size=2,richness=2},
+				["rock-huge"]={frequency=2,size=2,richness=2},
+			} },
+			tile = { treat_missing_as_default = false, settings = {
+				["sand-1"]=czControl(1,1,1),["sand-2"]=czControl(1,1,1),["sand-3"]=czControl(1,1,1),
+				["dirt-1"]=czControl(1,1,1),["dirt-2"]=czControl(2,2,2),["dirt-3"]=czControl(),
+				["dirt-4"]=czControl(),["dirt-5"]=czControl(),["dirt-6"]=czControl(),["dirt-7"]=czControl(),
+				["dry-dirt"]=czControl(),
+			}, },
+		},
+		property_expression_names={
+			--["entity:rock-huge-white:probability"]=1000,
+			--["decorative:rock-small-white:probability"]=1000,
 		},
 	},
-	fgen=function(t,b) local x=t.autoplace_settings.tile.settings local y={frequency="very-low",size=2,richness=1}
-		for i=1,3,1 do x["sand-"..i]=y end
-		for i=1,7,1 do x["dirt-"..i]=y end
-		x["dry-dirt"]=y x["sand-decal"]=y x["sand-dune-decal"]=y
-		local ed=t.autoplace_settings.decorative.settings
-		ed["rocks"]={frequency="very-high",size=2,richness=2}
-		local ex=t.autoplace_settings.entity.settings
-		ex["rocks"]={frequency="very-high",size=2,richness=2}
+	fgen=function(t,b)
 
-		if(b)then end
 	end,
 	spawn=function(f)
 		f.daytime=0

@@ -35,6 +35,467 @@
 
 
 
+game.player.surface.map_gen_settings on barren planet with alien biomes:
+
+local nv=game.player.surface.map_gen_settings log(table.Print(nv)):1: 
+terrain_segmentation==1,
+water==1,
+autoplace_controls= {
+coal= {frequency==1,size==1,richness==1,}
+
+cold= {frequency==0,size==0,richness==0,}
+
+copper-ore= {frequency==1,size==1,richness==1,}
+
+crude-oil= {frequency==1,size==1,richness==1,}
+
+enemy-base= {frequency==1,size==1,richness==1,}
+
+hot= {frequency==0,size==0,richness==0,}
+
+iron-ore= {frequency==1,size==1,richness==1,}
+
+stone= {frequency==1,size==1,richness==1,}
+
+trees= {frequency==1,size==1,richness==1,}
+
+uranium-ore= {frequency==1,size==1,richness==1,}
+}
+
+
+autoplace_settings= {
+decorative= {treat_missing_as_default==false,
+settings= {
+cold= {frequency==0,size==0,richness==1,}
+
+crater= {frequency==0,size==0,richness==1,}
+
+grass3= {frequency==0,size==0,richness==1,}
+
+hot= {frequency==0,size==0,richness==1,}
+
+mud-decal= {frequency==0,size==0,richness==1,}
+
+puddle-decal= {frequency==0,size==0,richness==1,}
+
+rock-big= {frequency==1.5,size==1.5,richness==1,}
+
+rock-huge= {frequency==1.5,size==1.5,richness==1,}
+
+rock-medium= {frequency==1.5,size==1.5,richness==1,}
+
+rock-small= {frequency==1.5,size==1.5,richness==1,}
+
+rock-tiny= {frequency==1.5,size==1.5,richness==1,}
+
+rocks= {frequency==2,size==2,richness==2,}
+
+sand-rock-big= {frequency==1.5,size==1.5,richness==1,}
+
+sand-rock-huge= {frequency==1.5,size==1.5,richness==1,}
+
+sand-rock-medium= {frequency==1.5,size==1.5,richness==1,}
+
+sand-rock-small= {frequency==1.5,size==1.5,richness==1,}
+
+sand-rock-tiny= {frequency==1.5,size==1.5,richness==1,}
+
+stone-decal= {frequency==0,size==0,richness==1,}
+
+terrain-variation= {frequency==0,size==0,richness==1,}
+
+water= {frequency==0,size==0,richness==1,}
+
+wetland-decal= {frequency==0,size==0,richness==1,}
+}
+}
+
+
+entity= {treat_missing_as_default==false,
+settings= {
+rock-big= {frequency==0,size==0,richness==1,}
+
+rock-big-white= {frequency==1.5,size==1.5,richness==1,}
+
+rock-huge= {frequency==0,size==0,richness==1,}
+
+rock-huge-white= {frequency==1.5,size==1.5,richness==1,}
+
+rock-medium= {frequency==0,size==0,richness==1,}
+
+rock-medium-white= {frequency==1.5,size==1.5,richness==1,}
+
+rock-small= {frequency==0,size==0,richness==1,}
+
+rock-small-white= {frequency==1.5,size==1.5,richness==1,}
+
+rock-tiny= {frequency==0,size==0,richness==1,}
+
+rock-tiny-white= {frequency==1.5,size==1.5,richness==1,}
+
+rocks= {frequency==2,size==2,richness==2,}
+
+sand-rock-big= {frequency==0,size==0,richness==1,}
+
+sand-rock-big-white= {frequency==1.5,size==1.5,richness==1,}
+
+sand-rock-huge= {frequency==0,size==0,richness==1,}
+
+sand-rock-huge-white= {frequency==1.5,size==1.5,richness==1,}
+
+sand-rock-medium= {frequency==0,size==0,richness==1,}
+
+sand-rock-medium-white= {frequency==1.5,size==1.5,richness==1,}
+
+sand-rock-small= {frequency==0,size==0,richness==1,}
+
+sand-rock-small-white= {frequency==1.5,size==1.5,richness==1,}
+
+sand-rock-tiny= {frequency==0,size==0,richness==1,}
+
+sand-rock-tiny-white= {frequency==1.5,size==1.5,richness==1,}
+}
+}
+
+
+tile= {treat_missing_as_default==false,
+settings= {
+dirt-1= {frequency==0,size==0,richness==1,}
+
+dirt-2= {frequency==0,size==0,richness==1,}
+
+dirt-3= {frequency==0,size==0,richness==1,}
+
+dirt-4= {frequency==0,size==0,richness==1,}
+
+dirt-5= {frequency==0,size==0,richness==1,}
+
+dirt-6= {frequency==0,size==0,richness==1,}
+
+dirt-7= {frequency==0,size==0,richness==1,}
+
+dry-dirt= {frequency==0,size==0,richness==1,}
+
+frozen-snow-0= {frequency==0,size==0,richness==1,}
+
+frozen-snow-1= {frequency==0,size==0,richness==1,}
+
+frozen-snow-2= {frequency==0,size==0,richness==1,}
+
+frozen-snow-3= {frequency==0,size==0,richness==1,}
+
+frozen-snow-4= {frequency==0,size==0,richness==1,}
+
+frozen-snow-5= {frequency==0,size==0,richness==1,}
+
+frozen-snow-6= {frequency==0,size==0,richness==1,}
+
+frozen-snow-7= {frequency==0,size==0,richness==1,}
+
+frozen-snow-8= {frequency==0,size==0,richness==1,}
+
+frozen-snow-9= {frequency==0,size==0,richness==1,}
+mineral-aubergine-dirt-1= {frequency==0,size==0,richness==1,}
+
+mineral-aubergine-dirt-2= {frequency==0,size==0,richness==1,}
+
+mineral-aubergine-dirt-3= {frequency==0,size==0,richness==1,}
+
+mineral-aubergine-dirt-4= {frequency==0,size==0,richness==1,}
+
+mineral-aubergine-dirt-5= {frequency==0,size==0,richness==1,}
+
+mineral-aubergine-dirt-6= {frequency==0,size==0,richness==1,}
+
+mineral-aubergine-sand-1= {frequency==0,size==0,richness==1,}
+
+mineral-aubergine-sand-2= {frequency==0,size==0,richness==1,}
+
+mineral-aubergine-sand-3= {frequency==0,size==0,richness==1,}
+
+mineral-beige-dirt-1= {frequency==0,size==0,richness==1,}
+
+mineral-beige-dirt-2= {frequency==0,size==0,richness==1,}
+
+mineral-beige-dirt-3= {frequency==0,size==0,richness==1,}
+
+mineral-beige-dirt-4= {frequency==0,size==0,richness==1,}
+
+mineral-beige-dirt-5= {frequency==0,size==0,richness==1,}
+
+mineral-beige-dirt-6= {frequency==0,size==0,richness==1,}
+
+mineral-beige-sand-1= {frequency==0,size==0,richness==1,}
+
+mineral-beige-sand-2= {frequency==0,size==0,richness==1,}
+
+mineral-beige-sand-3= {frequency==0,size==0,richness==1,}
+
+mineral-black-dirt-1= {frequency==0,size==0,richness==1,}
+
+mineral-black-dirt-2= {frequency==0,size==0,richness==1,}
+
+mineral-black-dirt-3= {frequency==0,size==0,richness==1,}
+
+mineral-black-dirt-4= {frequency==0,size==0,richness==1,}
+
+mineral-black-dirt-5= {frequency==0,size==0,richness==1,}
+
+mineral-black-dirt-6= {frequency==0,size==0,richness==1,}
+
+mineral-black-sand-1= {frequency==0,size==0,richness==1,}
+
+mineral-black-sand-2= {frequency==0,size==0,richness==1,}
+
+mineral-black-sand-3= {frequency==0,size==0,richness==1,}
+
+mineral-brown-dirt-2= {frequency==0,size==0,richness==1,}
+
+mineral-brown-dirt-3= {frequency==0,size==0,richness==1,}
+
+mineral-brown-dirt-4= {frequency==0,size==0,richness==1,}
+
+mineral-brown-sand-1= {frequency==0.5,size==2,richness==1,}
+
+mineral-brown-sand-2= {frequency==0.5,size==2,richness==1,}
+
+mineral-cream-dirt-1= {frequency==0,size==0,richness==1,}
+
+mineral-cream-dirt-2= {frequency==0,size==0,richness==1,}
+
+mineral-cream-dirt-3= {frequency==0,size==0,richness==1,}
+
+mineral-cream-dirt-4= {frequency==0,size==0,richness==1,}
+
+mineral-cream-dirt-5= {frequency==0,size==0,richness==1,}
+
+mineral-cream-dirt-6= {frequency==0,size==0,richness==1,}
+
+mineral-cream-sand-1= {frequency==0,size==0,richness==1,}
+
+mineral-cream-sand-2= {frequency==0,size==0,richness==1,}
+
+mineral-cream-sand-3= {frequency==0,size==0,richness==1,}
+
+mineral-dustyrose-dirt-1= {frequency==0,size==0,richness==1,}
+
+mineral-dustyrose-dirt-2= {frequency==0,size==0,richness==1,}
+
+mineral-dustyrose-dirt-3= {frequency==0,size==0,richness==1,}
+
+mineral-dustyrose-dirt-4= {frequency==0,size==0,richness==1,}
+
+mineral-dustyrose-dirt-5= {frequency==0,size==0,richness==1,}
+
+mineral-dustyrose-dirt-6= {frequency==0,size==0,richness==1,}
+
+mineral-dustyrose-sand-1= {frequency==0,size==0,richness==1,}
+
+mineral-dustyrose-sand-2= {frequency==0,size==0,richness==1,}
+
+mineral-dustyrose-sand-3= {frequency==0,size==0,richness==1,}
+
+mineral-grey-dirt-1= {frequency==0,size==0,richness==1,}
+
+mineral-grey-dirt-2= {frequency==0,size==0,richness==1,}
+
+mineral-grey-dirt-3= {frequency==0,size==0,richness==1,}
+
+mineral-grey-dirt-4= {frequency==0,size==0,richness==1,}
+
+mineral-grey-dirt-5= {frequency==0,size==0,richness==1,}
+
+mineral-grey-dirt-6= {frequency==0,size==0,richness==1,}
+
+mineral-grey-sand-1= {frequency==0,size==0,richness==1,}
+
+mineral-grey-sand-2= {frequency==0,size==0,richness==1,}
+
+mineral-grey-sand-3= {frequency==0,size==0,richness==1,}
+
+mineral-purple-dirt-1= {frequency==0,size==0,richness==1,}
+
+mineral-purple-dirt-2= {frequency==0,size==0,richness==1,}
+
+mineral-purple-dirt-3= {frequency==0,size==0,richness==1,}
+
+mineral-purple-dirt-4= {frequency==0,size==0,richness==1,}
+
+mineral-purple-dirt-5= {frequency==0,size==0,richness==1,}
+
+mineral-purple-dirt-6= {frequency==0,size==0,richness==1,}
+
+mineral-purple-sand-1= {frequency==0,size==0,richness==1,}
+
+mineral-purple-sand-2= {frequency==0,size==0,richness==1,}
+
+mineral-purple-sand-3= {frequency==0,size==0,richness==1,}
+
+mineral-red-dirt-1= {frequency==0,size==0,richness==1,}
+
+mineral-red-dirt-2= {frequency==0,size==0,richness==1,}
+
+mineral-red-dirt-3= {frequency==0,size==0,richness==1,}
+
+mineral-red-dirt-4= {frequency==0,size==0,richness==1,}
+
+mineral-red-dirt-5= {frequency==0,size==0,richness==1,}
+
+mineral-red-dirt-6= {frequency==0,size==0,richness==1,}
+
+mineral-red-sand-1= {frequency==0,size==0,richness==1,}
+
+mineral-red-sand-2= {frequency==0,size==0,richness==1,}
+
+mineral-red-sand-3= {frequency==0,size==0,richness==1,}
+
+mineral-tan-dirt-1= {frequency==0.5,size==2,richness==1,}
+
+mineral-tan-dirt-2= {frequency==0.5,size==2,richness==1,}
+
+mineral-tan-dirt-3= {frequency==0.5,size==2,richness==1,}
+
+mineral-tan-dirt-4= {frequency==0.5,size==2,richness==1,}
+
+mineral-tan-dirt-5= {frequency==0.5,size==2,richness==1,}
+
+mineral-tan-dirt-6= {frequency==0.5,size==2,richness==1,}
+
+mineral-tan-sand-1= {frequency==0,size==0,richness==1,}
+
+mineral-tan-sand-2= {frequency==0,size==0,richness==1,}
+
+mineral-tan-sand-3= {frequency==0,size==0,richness==1,}
+
+mineral-violet-dirt-1= {frequency==0,size==0,richness==1,}
+
+mineral-violet-dirt-2= {frequency==0,size==0,richness==1,}
+
+mineral-violet-dirt-3= {frequency==0,size==0,richness==1,}
+
+mineral-violet-dirt-4= {frequency==0,size==0,richness==1,}
+
+mineral-violet-dirt-5= {frequency==0,size==0,richness==1,}
+
+mineral-violet-dirt-6= {frequency==0,size==0,richness==1,}
+
+mineral-violet-sand-1= {frequency==0,size==0,richness==1,}
+
+mineral-violet-sand-2= {frequency==0,size==0,richness==1,}
+
+mineral-violet-sand-3= {frequency==0,size==0,richness==1,}
+
+mineral-white-dirt-1= {frequency==0,size==0,richness==1,}
+
+mineral-white-dirt-2= {frequency==0,size==0,richness==1,}
+
+mineral-white-dirt-3= {frequency==0,size==0,richness==1,}
+
+mineral-white-dirt-4= {frequency==0,size==0,richness==1,}
+
+mineral-white-dirt-5= {frequency==0,size==0,richness==1,}
+
+mineral-white-dirt-6= {frequency==0,size==0,richness==1,}
+
+mineral-white-sand-1= {frequency==0,size==0,richness==1,}
+
+mineral-white-sand-2= {frequency==0,size==0,richness==1,}
+
+mineral-white-sand-3= {frequency==0,size==0,richness==1,}
+
+sand-1= {frequency==0,size==0,richness==1,}
+
+sand-2= {frequency==0,size==0,richness==1,}
+
+sand-3= {frequency==0,size==0,richness==1,}
+
+sand-decal= {frequency==0.5,size==2,richness==1,}
+
+sand-dune-decal= {frequency==0.5,size==2,richness==1,}
+
+vegetation-blue-grass-1= {frequency==0,size==0,richness==1,}
+
+vegetation-blue-grass-2= {frequency==0,size==0,richness==1,}
+
+vegetation-mauve-grass-1= {frequency==0,size==0,richness==1,}
+
+vegetation-mauve-grass-2= {frequency==0,size==0,richness==1,}
+
+vegetation-olive-grass-1= {frequency==0,size==0,richness==1,}
+
+vegetation-orange-grass-1= {frequency==0,size==0,richness==1,}
+
+vegetation-orange-grass-2= {frequency==0,size==0,richness==1,}
+
+vegetation-purple-grass-1= {frequency==0,size==0,richness==1,}
+
+vegetation-purple-grass-2= {frequency==0,size==0,richness==1,}
+
+vegetation-red-grass-1= {frequency==0,size==0,richness==1,}
+
+vegetation-red-grass-2= {frequency==0,size==0,richness==1,}
+
+vegetation-turquoise-grass-1= {frequency==0,size==0,richness==1,}
+
+vegetation-turquoise-grass-2= {frequency==0,size==0,richness==1,}
+
+vegetation-violet-grass-1= {frequency==0,size==0,richness==1,}
+
+vegetation-violet-grass-2= {frequency==0,size==0,richness==1,}
+
+vegetation-yellow-grass-1= {frequency==0,size==0,richness==1,}
+
+vegetation-yellow-grass-2= {frequency==0,size==0,richness==1,}
+
+volcanic-blue-heat-1= {frequency==0,size==0,richness==1,}
+
+volcanic-blue-heat-2= {frequency==0,size==0,richness==1,}
+
+volcanic-blue-heat-3= {frequency==0,size==0,richness==1,}
+
+volcanic-blue-heat-4= {frequency==0,size==0,richness==1,}
+
+volcanic-green-heat-1= {frequency==0,size==0,richness==1,}
+
+volcanic-green-heat-2= {frequency==0,size==0,richness==1,}
+
+volcanic-green-heat-3= {frequency==0,size==0,richness==1,}
+
+volcanic-green-heat-4= {frequency==0,size==0,richness==1,}
+
+volcanic-orange-heat-1= {frequency==0,size==0,richness==1,}
+
+volcanic-orange-heat-2= {frequency==0,size==0,richness==1,}
+
+volcanic-orange-heat-3= {frequency==0,size==0,richness==1,}
+
+volcanic-orange-heat-4= {frequency==0,size==0,richness==1,}
+
+volcanic-purple-heat-1= {frequency==0,size==0,richness==1,}
+
+volcanic-purple-heat-2= {frequency==0,size==0,richness==1,}
+
+volcanic-purple-heat-3= {frequency==0,size==0,richness==1,}
+
+volcanic-purple-heat-4= {frequency==0,size==0,richness==1,}
+
+water-mud= {frequency==0,size==0,richness==1,}
+
+water-shallow= {frequency==0,size==0,richness==1,}
+}
+}
+}
+
+
+property_expression_names= {}
+
+
+starting_points= {1= {x==0,y==0,}
+}
+
+seed==2990487961,width==2000000,height==2000000,starting_area==0,peaceful_mode==true,cliff_settings= {name==cliff,cliff_elevation_0==10,cliff_elevation_interval==40,richness==1,}
+
+
 
 
 
@@ -150,10 +611,10 @@ function warptorio.DoAlienBiomesTiles(x)
 	for k,v in pairs(warptorio.GetModAutoplacements())do if(not x.autoplace_settings.decorative.settings[v])then x.autoplace_settings.decorative.settings[v]={frequency=0,size=0} end end
 	for k,v in pairs(warptorio.GetModNoise())do if(not x.autoplace_settings.decorative.settings[v])then x.autoplace_settings.decorative.settings[v]={frequency=0,size=0} end end
 	for k,v in pairs(x.autoplace_settings.tile.settings)do
-		if(nauvis.alienbiomes[k])then x.autoplace_settings.tile.settings[nauvis.alienbiomes[k]]=v x.autoplace_settings.tile.settings[k]={frequency=0,size=0} end
+		if(nauvis.alienbiomes[k])then x.autoplace_settings.tile.settings[nauvis.alienbiomes[k]]=v end --x.autoplace_settings.tile.settings[k]={frequency=0,size=0,richness=0} end
 	end
 	for k,v in pairs(x.autoplace_settings.entity.settings)do
-		if(nauvis.alienbiomes[k])then x.autoplace_settings.entity.settings[nauvis.alienbiomes[k]]=v x.autoplace_settings.entity.settings[k]={frequency=0,size=0} end
+		if(nauvis.alienbiomes[k])then x.autoplace_settings.entity.settings[nauvis.alienbiomes[k]]=v x.autoplace_settings.entity.settings[k]={frequency=0,size=0,richness=0} end
 	end
 	return x
 end
@@ -178,6 +639,10 @@ function warptorio.GetModNoise() if(warptorio.ModNoise)then return warptorio.Mod
 	for k,v in pairs(pt)do if(not table.HasValue(nauvis.noise,v.name))then table.insert(at,v.name) end end warptorio.ModNoise=at return at
 end
 
+function warptorio.GetModDecoratives() if(warptorio.ModDecoratives)then return warptorio.ModDecoratives end local pt=game.decorative_prototypes local at={}
+	for k,v in pairs(pt)do if(not table.HasValue(nauvis.decoratives,v.name))then table.insert(at,v.name) end end warptorio.ModDecoratives=at return at
+end
+
 
 
 function istable(v) return type(v)=="table" end
@@ -194,7 +659,7 @@ function warptorio.OverrideNauvis(bClear)
 	f.autoplace_settings={tile={settings={}},decorative={settings={}}}
 	for k,v in pairs(warptorio.GetModTiles())do f.autoplace_settings.tile.settings[v]={frequency=0,size=0} end
 	for k,v in pairs(warptorio.GetModAutoplacements())do f.autoplace_settings.decorative.settings[v]={frequency=0,size=0} end
-	for k,v in pairs(warptorio.GetModNoise())do f.autoplace_settings.decorative.settings[v]={frequency=0,size=0} end
+	--for k,v in pairs(warptorio.GetModNoise())do f.autoplace_settings.decorative.settings[v]={frequency=0,size=0} end
 	
 	game.surfaces[1].map_gen_settings=f
 
