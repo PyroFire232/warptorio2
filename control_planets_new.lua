@@ -43,13 +43,15 @@ pmods.daytime={ spawn=function(f,g,ev,r) if(ev.time)then f.daytime=ev.time end i
 
 
 --[[ Resource Modifiers ]]
+-- todo: similar searching to other modifiers
 
 pmods.resource_multiply_all={ fgen=function(g,ev) for k,v in pairs(warptorio.GetAllResources())do g.autoplace_controls[k]=PCRMul(g.autoplace_controls[k] or PCR(1),ev) end return g end }
 pmods.resource_multiply={ fgen=function(g,ev) for k,v in pairs(ev)do g.autoplace_controls[k]=PCRMul(g.autoplace_controls[k] or PCR(1),v) end return g end }
 pmods.resource_multiply_random={
 	fgen=function(g,ev) local x,t={},table.copy(warptorio.GetAllResources()) local c=math.min( (ev.count and ev.count or (ev.random and math.random(1,ev.random) or 1)), #t)
-		if(c>0)then for i=1,c,1 do local u=math.random(1,#t) table.insert(x,table.remove(t,u)) end
-		for k,v in pairs(x)do g.autoplace_controls[v]=PCRMul(g.autoplace_controls[v] or PCR(1),ev.value) end end
+		if(c>0)then for i=1,c,1 do local u=math.random(1,#t) table.insert(x,table.remove(t,u)) end for k,v in pairs(x)do
+			g.autoplace_controls[v]=PCRMul(g.autoplace_controls[v] or PCR(1),ev.value)
+		end end
 		return g,x
 	end
 } -- Multiply a random resource. {"resource_multiply_random",{ (count=1 or random=2), value=PCR(2)}}
@@ -76,7 +78,7 @@ pmods.resource_set_random={
 
 
 --[[ Decorative Modifiers ]]
-
+-- todo: similar decorative searching to autoplacement, entity and tile modifiers
 
 pmods.rocks={
 	fgen=function(g,ev) for k,v in pairs(game.decorative_prototypes)do if(v.autoplace_specification and v.name:match("rock"))then
@@ -109,52 +111,74 @@ pmods.decals_multiply={
 	end end return g end,
 }
 
+pmods.decals_expr={
+	fgen=function(g,ev) for k,v in pairs(game.decorative_prototypes)do if(v.autoplace_specification and v.name:match(ev[1]))then
+		g.property_expression_names[v.name .. ":" .. ev[2]]=ev[3]
+	end end return g end,
+}
+pmods.decals_expr_inv={
+	fgen=function(g,ev) for k,v in pairs(game.decorative_prototypes)do if(v.autoplace_specification and not v.name:match(ev[1]))then
+		g.property_expression_names[v.name .. ":" .. ev[2]]=ev[3]
+	end end return g end,
+}
 
 --[[ Autoplacement Modifiers ]]
 
-pmod.autoplace={
-	fgen=function(g,ev) for k,v in pairs(game.autoplace_control_prototypes)do if(v.autoplace_specification and v.category~="resource")then
-		g.autoplace_controls[v.name]=PCRMul(PCR(1),ev)
-	end end return g end,
-}
-pmod.autoplace_multiply={
-	fgen=function(g,ev) for k,v in pairs(game.autoplace_control_prototypes)do if(v.autoplace_specification and v.category~="resource")then
-		g.autoplace_controls[v.name]=PCRMul(g.autoplace_controls[v.name] or PCR(1),ev)
-	end end return g end,
-}
+pmod.autoplace={fgen=function(g,ev) for k,v in pairs(warptorio.GetAutoplacers(ev[1]))do g.autoplace_controls[v]=PCRMul(PCR(1),ev) end return g end,}
+pmod.autoplace_multiply={fgen=function(g,ev) for k,v in pairs(warptorio.GetAutoplacers(ev[1]))do g.autoplace_controls[v]=PCRMul(g.autoplace_controls[v] or PCR(1),ev[2]) end return g end,}
+pmod.autoplace_expr={fgen=function(g,ev) for k,v in pairs(warptorio.GetAutoplacers(ev[1]))do g.property_expression_names[v..":"..ev[2]]=PCRMul(PCR(1),ev[3]) end return g end,}
+
+pmod.autoplace_nauvis={fgen=function(g,ev) for k,v in pairs(warptorio.GetNauvisAutoplacers(ev[1]))do g.autoplace_controls[v]=PCRMul(PCR(1),ev[2]) end return g end,}
+pmod.autoplace_nauvis_multiply={fgen=function(g,ev) for k,v in pairs(warptorio.GetNauvisAutoplacers(ev[1]))do g.autoplace_controls[v]=PCRMul(g.autoplace_controls[v] or PCR(1),ev[2]) end return g end,}
+pmod.autoplace_nauvis_expr={fgen=function(g,ev) for k,v in pairs(warptorio.GetNauvisAutoplacers(ev[1]))do g.property_expression_names[v..":"..ev[2]]=PCRMul(PCR(1),ev[3]) end return g end,}
+
+pmod.autoplace_mod={fgen=function(g,ev) for k,v in pairs(warptorio.GetModAutoplacers(ev[1]))do g.autoplace_controls[v]=PCRMul(PCR(1),ev[2]) end return g end,}
+pmod.autoplace_mod_multiply={fgen=function(g,ev) for k,v in pairs(warptorio.GetModAutoplacers(ev[1]))do g.autoplace_controls[v]=PCRMul(g.autoplace_controls[v] or PCR(1),ev[2]) end return g end,}
+pmod.autoplace_mod_expr={fgen=function(g,ev) for k,v in pairs(warptorio.GetNauvisAutoplacers(ev[1]))do g.property_expression_names[v..":"..ev[2]]=PCRMul(PCR(1),ev[3]) end return g end,}
 
 --[[ Entity Modifiers ]]
 
-pmod.entity={
-	fgen=function(g,ev) for k,v in pairs(game.entity_prototypes)do if(v.autoplace_specification and v.name:match(ev[1]))then
-		g.autoplace_settings.entity.settings[v.name]=PCRMul(PCR(1),ev[2])
-	end end return g end,
-}
-pmod.entity_multiply={
-	fgen=function(g,ev) for k,v in pairs(game.autoplace_control_prototypes)do if(v.autoplace_specification and v.name:match(ev[1]))then
-		g.autoplace_settings.entity.settings[v.name]=PCRMul(g.autoplace_settings.entity.settings[v.name] or PCR(1),ev[2])
-	end end return g end,
-}
+pmod.entity={fgen=function(g,ev) for k,v in pairs(warptorio.GetEntities(ev[1])) g.autoplace_settings.entity.settings[v]=PCRMul(PCR(1),ev[2]) end return g end,}
+pmod.entity_multiply={fgen=function(g,ev) for k,v in pairs(warptorio.GetEntities(ev[1]))do g.autoplace_settings.entity.settings[v]=PCRMul(g.autoplace_settings.entity.settings[v] or PCR(1),ev[2]) end return g end,}
+pmod.entity_expr={ fgen=function(g,ev) for k,v in pairs(warptorio.GetEntities(ev[1]))do g.property_expression_names[v .. ":" .. ev[2]]=ev[3] end return g end,}
 
+pmod.entity_mod={fgen=function(g,ev) for k,v in pairs(warptorio.GetModEntities(ev[1])) g.autoplace_settings.entity.settings[v]=PCRMul(PCR(1),ev[2]) end return g end,}
+pmod.entity_mod_multiply={fgen=function(g,ev) for k,v in pairs(warptorio.GetModEntities(ev[1]))do g.autoplace_settings.entity.settings[v]=PCRMul(g.autoplace_settings.entity.settings[v] or PCR(1),ev[2]) end return g end,}
+pmod.entity_mod_expr={ fgen=function(g,ev) for k,v in pairs(warptorio.GetModEntities(ev[1]))do g.property_expression_names[v .. ":" .. ev[2]]=ev[3] end return g end,}
+
+pmod.entity_nauvis={fgen=function(g,ev) for k,v in pairs(warptorio.GetNauvisEntities(ev[1])) g.autoplace_settings.entity.settings[v]=PCRMul(PCR(1),ev[2]) end return g end,}
+pmod.entity_nauvis_multiply={fgen=function(g,ev) for k,v in pairs(warptorio.GetNauvisEntities(ev[1]))do g.autoplace_settings.entity.settings[v]=PCRMul(g.autoplace_settings.entity.settings[v] or PCR(1),ev[2]) end return g end,}
+pmod.entity_nauvis_expr={ fgen=function(g,ev) for k,v in pairs(warptorio.GetNauvisEntities(ev[1]))do g.property_expression_names[v .. ":" .. ev[2]]=ev[3] end return g end,}
 
 --[[ Tile Modifiers ]]
 
-pmods.tile_mods={ fgen=function(g,ev) for k,v in pairs(warptorio.GetModTiles())do g.autoplace_settings.tile.settings[v]=PCRMul(g.autoplace_settings.tile.settings[v] or PCR(1),ev) end return g end }
+pmods.tile_mods={ fgen=function(g,ev) for k,v in pairs(warptorio.GetModTiles(ev[1]))do g.autoplace_settings.tile.settings[v]=PCRMul(g.autoplace_settings.tile.settings[v] or PCR(1),ev[2]) end return g end }
 pmods.tile_nauvis={ fgen=function(g,ev) for k,v in pairs(warptorio.GetNauvisTiles(ev[1]))do g.autoplace_settings.tile.settings[v]=PCRMul(g.autoplace_settings.tile.settings[v] or PCR(1),ev[2]) end return g end }
-pmods.tile={ fgen=function(g,ev) for k,v in pairs(game.tile_prototypes)do
-	if(v.autoplace_specification and v.name:match(ev[1]))then g.autoplace_settings.tile.settings[v.name]=PCRMul(g.autoplace_settings.tile.settings[v] or PCR(1),ev[2]) end return g end }
+pmods.tile={ fgen=function(g,ev) for k,v in pairs(warptorio.GetTiles(ev[1]))do g.autoplace_settings.tile.settings[v]=PCRMul(g.autoplace_settings.tile.settings[v] or PCR(1),ev[2]) end return g end }
 
---[[ Nauvis-Only Modifier -- Remove all other tiles and decorations except nauvis ones ]]
 
+--[[ Nauvis Modifier -- Remove all other tiles, descorations, entities and autoplacers except nauvis ones ]]
+
+function table.HasValueMatch(t,u) for k,v in pairs(t)do if(v:match(u))then return v end end
 
 pmods.nauvis={ -- remove mod tiles, decoratives and autoplacements
 	fgen=function(g,ev) ev=ev or {}
-		if(ev.tiles~=false)then for k,v in pairs(warptorio.GetModTiles())do g.autoplace_settings.tile.settings[v]=g.autoplace_settings.tile.settings[v] or PCR(0) end end
+		--[[if(ev.tiles~=false)then for k,v in pairs(warptorio.GetModTiles())do g.autoplace_settings.tile.settings[v]=g.autoplace_settings.tile.settings[v] or PCR(0) end end
 		if(ev.decor~=false)then for k,v in pairs(warptorio.GetModDecoratives())do g.autoplace_settings.decorative.settings[v]=g.autoplace_settings.decorative[v] or PCR(0) end end
-		if(ev.autop~=false)then for k,v in pairs(warptorio.GetModAutoplacers())do g.autoplace_controls[v]=g.autoplace_controls[v] or PCR(0) end end
+		if(ev.autop~=false)then for k,v in pairs(warptorio.GetModAutoplacers())do g.autoplace_controls[v]=g.autoplace_controls[v] or PCR(0) end end]]
+
+		g.default_enable_all_autoplace_controls=false,
+		g.autoplace_settings.decorative.treat_missing_as_default=false
+		g.autoplace_settings.entity.treat_missing_as_default=false
+		g.autoplace_settings.tile.treat_missing_as_default=false
+
+		if(ev.tiles~=false)then for k,v in pairs(warptorio.GetNauvisTiles(ev.tiles))do g.autoplace_settings.tile.settings[v]={} end end
+		if(ev.decor~=false)then for k,v in pairs(warptorio.GetNauvisDecoratives(ev.decor))do g.autoplace_settings.decorative.settings[v]={} end end
+		if(ev.ents~=false)then for k,v in pairs(warptorio.GetNauvisEntities(ev.ents))do g.autoplace_settings.entity.settings[v]={} end end
+		if(ev.autoplace~=false)then for k,v in pairs(warptorio.GetNauvisAutoplacers(ev.autoplace))do g.autoplace_controls[v]={} end end
+
 	end
 }
-
 
 local function PlanetRNG(name) return settings.startup["warptorio_planet_"..name].value end
 
@@ -199,12 +223,12 @@ local planet={ key="average", name="An Average Planet", zone=3,rng=PlanetRNG("av
 local planet={
 	key="barren", name="A Barren Planet", zone=12, rng=PlanetRNG("barren"), warptime=0.5, nowater=true,
 	desc="This world looks deserted and we appear to be safe. .. For now.",
-	modifiers={{"nauvis",{decor=false}},{"resource_set_all",0},{"trees",0},{"shrubs",0},{"tile-nauvis",{"grass",0}},{"tile",{"water",0}},{"water",0}},
+	modifiers={{"nauvis",{decor=false,tiles={"dirt","sand"},ents={"rock"},decor={"rock"},autoplace=false}},{"water",0}},
 }
 
 local planet={
 	key="ocean", name="An Ocean Planet", zone=3, rng=PlanetRNG("ocean"), warptime=0.5,
-	modifiers={{"nauvis"},{"resource_set_all",0},{"trees",0},{"shrubs",0},{"tile",{"sand",0}},{"tile",{"dirt",0}},{"water",1000},{"starting_area",0},{"entity",{"fish",8}}},
+	modifiers={{"nauvis",{tiles={"grass","water"},ents={"fish"},autoplace=false},{"water",1000},{"starting_area",0},{"entity",{"fish",8}} },
 }
 
 local planet={
@@ -269,7 +293,7 @@ local planet={
 local planet={
 	key="midnight", name="A Planet Called Midnight", zone=20, rng=PlanetRNG("midnight"), warptime=1.5,
 	desc="Your hands disappear before your eyes as you are shrouded in darkness. This place seems dangerous.",
-	modifiers={ {"nauvis"},{"biters",PCR(2)} },
+	modifiers={ {"nauvis"},{"biters",PCR(2)},{"daytime",{time=0.5,freeze=true}} },
 }
 
 local planet={
@@ -288,9 +312,9 @@ local planet={
 }
 
 local planet={
-	key="rogue", name="A Rogue Planet", zone=100, rng=PlanetRNG("barren"), warptime=0.5, nowater=true,
-	desc="This world looks deserted and we appear to be safe. .. For now.",
-	modifiers={{"nauvis",{decor=false}},{"resource_set_all",0},{"tile",{"grass",0}},{"tile",{"water",0}},{"water",0},{"starting_area",2.5},{"biters",3},},
+	key="rogue", name="A Rogue Planet", zone=100, rng=PlanetRNG("rogue"), warptime=0.5, nowater=true,
+	desc="Ah, just your usual barren wasteland, nothing to worry about. But something seems a little off.",
+	modifiers={{"nauvis",{tiles={"dirt","sand"}}},{"water",0},{"starting_area",2.5},{"biters",3}},
 }
 
 
