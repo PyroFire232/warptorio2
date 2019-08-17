@@ -9,7 +9,7 @@ data:extend{
 	},
 
 	{ name="warptorio-warploader", type="recipe",category="crafting-with-fluid",enabled=false,energy_required=2,
-		ingredients={ {"iron-gear-wheel",400},{"express-underground-belt",50},{amount=200,name="lubricant",type="fluid"} },
+		ingredients={ {"iron-gear-wheel",400},{"express-underground-belt",50},{"express-transport-belt",100},{"express-splitter",50},{amount=200,name="lubricant",type="fluid"} },
 		result="warptorio-warploader",result_count=1,
 	},
 	

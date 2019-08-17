@@ -1,5 +1,103 @@
 
 ---------------------------------------------------------------------------------------------------
+Version: 0.7.4
+Date: 17.08.2019
+  Changes:
+    - Added more mod remote commands
+    - Added tile overrides to disable certain tiles unless otherwise enabled.
+
+---------------------------------------------------------------------------------------------------
+Version: 0.7.3
+Date: 17.08.2019
+  Changes:
+    - migration issues
+
+---------------------------------------------------------------------------------------------------
+Version: 0.7.2
+Date: 17.08.2019
+  Changes:
+    - More bug fix
+
+---------------------------------------------------------------------------------------------------
+Version: 0.7.1
+Date: 17.08.2019
+  Changes:
+    - Progress on mod compatability Alien Biomes
+
+---------------------------------------------------------------------------------------------------
+Version: 0.7.0
+Date: 17.08.2019
+  Changes:
+    - Fixed gui not updating on autowarp settings changes
+    - Added a fix to make spawn area resources spawn further away from the platform as it gets bigger (this apparently did nothing)
+
+
+---------------------------------------------------------------------------------------------------
+Version: 0.6.9
+Date: 17.08.2019
+  Changes:
+    - Mod setting for %chance of landing on selected planet
+    - Added Warp Portal item
+
+---------------------------------------------------------------------------------------------------
+Version: 0.6.8
+Date: 17.08.2019
+  Changes:
+    - Fixed a bug with the warp charge timer
+    - Fixed a bug with the planets gui dropdown
+    - Fixed missing ocean planet description
+    - Planets API tweaks
+    - Fixed player corpse between warps
+
+---------------------------------------------------------------------------------------------------
+Version: 0.6.7
+Date: 15.08.2019
+  Changes:
+    - Added fix for dropped items being lost on warp
+    - More 0.6.5 typos
+
+---------------------------------------------------------------------------------------------------
+Version: 0.6.6
+Date: 15.08.2019
+  Changes:
+    - Added missing multiplier for original map settings starting_area and water
+    - 0.6.5 typo
+
+---------------------------------------------------------------------------------------------------
+Version: 0.6.5
+Date: 15.08.2019
+  Changes:
+    - Fixed a big with picking up warp heatpipes
+    - Fixed a bug with the early boiler room water setting not working when starting a new map with it enabled (migration for this is done too)
+    - Fixed a bug with modded ores not appearing on any planets
+    - Added checks to ensure resource specific planets are not spawned if a mod is added that removes base game resources.
+    - Fixed interactions with Factorissimo2
+    - More progress on Alien Biomes compatability (trees and such should spawn now). It should only spawn nauvis-like planets currently.
+
+---------------------------------------------------------------------------------------------------
+Version: 0.6.4
+Date: 12.08.2019
+  Changes:
+    - Fixed typos in 0.6.3
+
+
+---------------------------------------------------------------------------------------------------
+Version: 0.6.3
+Date: 12.08.2019
+  Changes:
+    - Temporarily disabled loader mod detection
+    - Re-wrote the planet generator with improved mod compatability and improved api
+    - Tweaked a bunch of planet generation settings
+    - Added Uncharted planet
+
+---------------------------------------------------------------------------------------------------
+Version: 0.6.2
+Date: 12.08.2019
+  Changes:
+    - Added mod compatability: Mods that introduce new/faster loaders will replace the existing platform loaders at logistics level 4. Exception: miniloaders
+    - Prep for mod compatible planet generator update
+
+---------------------------------------------------------------------------------------------------
 Version: 0.6.1
 Date: 11.08.2019
   Changes:

@@ -1325,7 +1325,7 @@ data:extend{
       max_health = 200,
       minable = {
         mining_time = 0.1,
-        result = "heat-pipe"
+        result = "warptorio-heatpipe"
       },
       minimum_glow_temperature = 350,
       name = "warptorio-heatpipe",

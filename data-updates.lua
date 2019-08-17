@@ -1,5 +1,13 @@
 --[[
 
+Add research for mod loaders
+
+]]
+
+
+
+--[[
+
 Add emissions to all entities
 
 ]]
@@ -79,4 +87,5 @@ for u,n in pairs(entTbl)do
 	end
 end
 --error(s)
+
 

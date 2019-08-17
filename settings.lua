@@ -23,7 +23,9 @@ data:extend(
 	allowed_values={"logistic-chest-requester","logistic-chest-buffer"},
 	},
 
-
+	{type="int-setting",name="warptorio_warpchance",order="aab3a",
+	setting_type="runtime-global",default_value=30,
+	minimum_value=1,maximum_value=100},
 
 	{type="bool-setting",name="warptorio_autowarp_always",order="aaba",
 	setting_type="runtime-global",default_value=false,},
@@ -130,9 +132,21 @@ data:extend(
 	setting_type="runtime-global",default_value=2,
 	minimum_value=1,maximum_value=30},
 
-	{type="int-setting",name="warptorio_planet_normal",order="ea",
-	setting_type="startup",default_value=23,
+
+
+	--[[ used in nauvis preset -- unused -- {type="int-setting",name="warptorio_nauvis_override",order="e1aa",
+	setting_type="startup",default_value=12,
+	minimum_value=1},]]
+
+
+	{type="int-setting",name="warptorio_planet_normal",order="eaa",
+	setting_type="startup",default_value=12,
 	minimum_value=1},
+
+	{type="int-setting",name="warptorio_planet_uncharted",order="eab",
+	setting_type="startup",default_value=12,
+	minimum_value=1},
+
 
 	{type="int-setting",name="warptorio_planet_average",order="eb",
 	setting_type="startup",default_value=17,
@@ -178,5 +192,8 @@ data:extend(
 	setting_type="startup",default_value=4,
 	minimum_value=0},
 
+	--[[ {type="int-setting",name="warptorio_planet_void",order="em",
+	setting_type="startup",default_value=1,
+	minimum_value=0}, ]]
 
 })

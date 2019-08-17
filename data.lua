@@ -6,6 +6,8 @@ require("data_warptorio-logistics-pipe")
 require("data_warptorio-warpstation")
 require("data_warpnuke")
 require("data_warptorio-warploader")
+require("data_warptorio-townportal")
+--require("data_nauvis_preset")
 
 local function istable(t) return type(t)=="table" end
 local function rgb(r,g,b,a) a=a or 255 return {r=r/255,g=g/255,b=b/255,a=a/255} end
@@ -387,7 +389,7 @@ local t={type="technology",upgrade=true,icon_size=128,icons={
 	{icon="__base__/graphics/technology/nuclear-power.png",tint={r=0.3,g=0.3,b=1,a=1},priority="low"},
 	{icon="__base__/graphics/technology/atomic-bomb.png",tint={r=0.7,g=0.7,b=1,a=1},scale=0.5,shift={32,32},priority="high"}
 }, }
-ExtendTech(t,{name="warptorio-reactor-6",unit={count=100,time=90}, prerequisites={"warptorio-reactor-5","uranium-processing","robotics"}}, {red=5,black=5}) -- reactor module
+ExtendTech(t,{name="warptorio-reactor-6",unit={count=100,time=90}, effects={{recipe="warptorio-townportal",type="unlock-recipe"}},prerequisites={"warptorio-reactor-5","uranium-processing","robotics"}}, {red=5,black=5}) -- reactor module
 
 local t={type="technology",upgrade=true,icon_size=128,icons={
 	{icon="__base__/graphics/technology/nuclear-power.png",tint={r=0.3,g=0.3,b=1,a=1},priority="low"},
