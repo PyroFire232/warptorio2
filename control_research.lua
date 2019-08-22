@@ -10,7 +10,7 @@ local function new(x,a,b,c,d,e,f,g) local t,v=setmetatable({},x),rawget(x,"__ini
 
 local upcs={} warptorio.UpgradeClass=upcs
 
-function warptorio.DoUpgrade(ev) local up=ev.name local u=warptorio.Research[up] if(u)then
+function warptorio.DoUpgrade(ev) local up=ev.name local u=warptorio.Research[up] if(u)then game.print("doneresearch: " .. up .. ", " .. tostring(ev.level))
 	if(type(u)=="table")then local lv=ev.level or 0 gwarptorio.Research[u[1]]=lv local c=warptorio.UpgradeClass[u[1]]
 		if(u[3])then u[2](lv) elseif(c)then c(lv,u[2]) end -- (gwarptorio.Research[u[1]] or 0)+1
 	elseif(type(u)=="function")then u(ev.level or 0) end
@@ -24,7 +24,7 @@ upcs["platform-size"]=function(lv,f) local n=f(lv) local m=gwarptorio.Floors.mai
 upcs["factory-size"]=function(lv,f) local n=f(lv) local m=gwarptorio.Floors.b1 m:SetSize(n) warptorio.BuildB1() end
 upcs["boiler-size"]=function(lv,f) local n=f(lv) local m=gwarptorio.Floors.b2 m:SetSize(n) warptorio.BuildB2() end
 
-upcs["teleporter-energy"]=function(lv) gwarptorio.Teleporters.offworld:UpgradeEnergy() end
+upcs["teleporter-energy"]=function(lv) if(not gwarptorio.Teleporters.offworld)then warptorio.BuildPlatform() warptorio.TeleCls.offworld() end gwarptorio.Teleporters.offworld:UpgradeEnergy() end
 upcs["factory-logistics"]=function(lv) warptorio.RebuildFloors() for k,v in pairs(gwarptorio.Teleporters)do v:UpgradeLogistics() end for k,v in pairs(gwarptorio.Rails)do v:DoMakes(true) end end
 upcs["factory-energy"]=function(lv) local m=gwarptorio.Teleporters
 	if(m.b1)then m.b1:UpgradeEnergy() end if(m.b2)then m.b2:UpgradeEnergy() end
@@ -151,7 +151,7 @@ ups["warptorio-reactor-6"] = {"reactor"}
 ups["warptorio-reactor-7"] = {"reactor"}
 ups["warptorio-reactor-8"] = {"reactor"}
 
-ups["warptorio-teleporter-0"] = {"teleporter-energy",function() warptorio.BuildPlatform() warptorio.TeleCls.offworld() end,true}
+ups["warptorio-teleporter-portal"] = function() warptorio.BuildPlatform() warptorio.TeleCls.offworld() end
 ups["warptorio-teleporter-1"] = {"teleporter-energy"}
 ups["warptorio-teleporter-2"] = {"teleporter-energy"}
 ups["warptorio-teleporter-3"] = {"teleporter-energy"}

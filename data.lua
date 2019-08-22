@@ -755,8 +755,8 @@ ExtendTech(t,{name="warptorio-energy-5",unit={count=250,time=40}, prerequisites=
 -- Teleporter
 
 local t={type="technology",upgrade=true,icon_size=128,icons={ {icon="__base__/graphics/technology/research-speed.png",tint={r=0.3,g=0.3,b=1,a=1}} }, }
-ExtendTech(t,{name="warptorio-teleporter-0",unit={count=30,time=20}, prerequisites={"warptorio-factory-0","electronics",},upgrade=false}, {red=1})
-ExtendTech(t,{name="warptorio-teleporter-1",unit={count=30,time=20}, prerequisites={"warptorio-teleporter-0","electric-energy-distribution-1"}}, {red=1,green=1})
+ExtendTech(t,{name="warptorio-teleporter-portal",unit={count=30,time=20}, prerequisites={"warptorio-factory-0","electronics",},upgrade=false}, {red=1})
+ExtendTech(t,{name="warptorio-teleporter-1",unit={count=30,time=20}, prerequisites={"warptorio-teleporter-portal","electric-energy-distribution-1"}}, {red=1,green=1})
 ExtendTech(t,{name="warptorio-teleporter-2",unit={count=30,time=20}, prerequisites={"warptorio-teleporter-1","advanced-electronics"}}, {red=2,green=2,})
 ExtendTech(t,{name="warptorio-teleporter-3",unit={count=30,time=20}, prerequisites={"warptorio-teleporter-2","electric-energy-distribution-2","advanced-electronics-2"}}, {red=2,green=2,blue=1})
 ExtendTech(t,{name="warptorio-teleporter-4",unit={count=30,time=20}, prerequisites={"warptorio-teleporter-3","nuclear-power"}}, {red=2,green=2,blue=2,})

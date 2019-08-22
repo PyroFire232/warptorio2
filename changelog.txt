@@ -1,3 +1,60 @@
+---------------------------------------------------------------------------------------------------
+Version: 0.8.2
+Date: 22.08.2019
+  Changes:
+    - Full mod compatability: Force Fields 2 - https://mods.factorio.com/mod/ForceFields2
+
+---------------------------------------------------------------------------------------------------
+Version: 0.8.1
+Date: 22.08.2019
+  Changes:
+    - Fixed a bug with the Stone planet
+    - Review for multiplayer planet selection drop-down bug
+    - Mod Compatability: Added remote interface for other mods to prevent certain entities from being cloned by name
+
+---------------------------------------------------------------------------------------------------
+Version: 0.8.0
+Date: 21.08.2019
+  Changes:
+    - Fixed a bug with circuits and loader chests
+
+---------------------------------------------------------------------------------------------------
+Version: 0.7.9
+Date: 21.08.2019
+  Changes:
+    - New Planet: Smog Planet
+    - New Planet: Mirror Planet
+
+---------------------------------------------------------------------------------------------------
+Version: 0.7.8
+Date: 21.08.2019
+  Changes:
+    - Mod Compatability: Alien Biomes - bug fixing
+    - More pollution nerfs (reset settings in existing saves)
+
+---------------------------------------------------------------------------------------------------
+Version: 0.7.7
+Date: 20.08.2019
+  Changes:
+    - Nerfed Pollution Factor
+    - Fixed a bug with autowarp on/off
+    - New Planet Expansion Pack: DangOreus Planet
+
+---------------------------------------------------------------------------------------------------
+Version: 0.7.6
+Date: 19.08.2019
+  Changes:
+    - Waterless, Biter, and "Rest" Planets can no longer occur twice in a row respectively.
+    - Moved the first teleporter research into it's own research
+    - Mod Compatability: Big Brother radars
+    - Mod Compatability: Alien Biomes - Fixed a bug with water not spawning on planets
+    - Mod Compatability: Alien Biomes - Fixed a multiplayer desync issue
+
+---------------------------------------------------------------------------------------------------
+Version: 0.7.5
+Date: 17.08.2019
+  Changes:
+    - Fixed a bug with the warp target dropdown in multiplayer
 
 ---------------------------------------------------------------------------------------------------
 Version: 0.7.4
@@ -69,8 +126,8 @@ Date: 15.08.2019
   Changes:
     - Fixed a big with picking up warp heatpipes
     - Fixed a bug with the early boiler room water setting not working when starting a new map with it enabled (migration for this is done too)
-    - Fixed a bug with modded ores not appearing on any planets
     - Added checks to ensure resource specific planets are not spawned if a mod is added that removes base game resources.
+    - Fixed a bug with modded ores not appearing on any planets
     - Fixed interactions with Factorissimo2
     - More progress on Alien Biomes compatability (trees and such should spawn now). It should only spawn nauvis-like planets currently.
 

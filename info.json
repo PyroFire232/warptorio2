@@ -1,6 +1,6 @@
 {
 	"name": "warptorio2",
-	"version": "0.7.4",
+	"version": "0.8.2",
 	"title": "Warptorio",
 	"author": "Nonoce and PyroFire",
 	"dependencies": ["base >= 0.17","! NewGamePlus","! Space Exploration"],

@@ -71,6 +71,9 @@ alienbiome.tile={ -- tile-alias.lua -- mod compatability -_-
     ["sand-2"] = "mineral-brown-sand-1" ,
     ["sand-3"] = "mineral-brown-sand-2" ,
     ["sand-4"] = "mineral-brown-sand-3" ,
+	["water"]="water",
+	["deepwater"]="deepwater",
+	--["water-shallow"]="water-shallow",
 }
 
 
@@ -100,7 +103,7 @@ function warptorio.CacheAllTiles() if(warptorio.AllTiles)then return warptorio.A
 	for k,v in pairs(pt)do if(v.autoplace_specification)then table.insert(at,v.name) end end warptorio.AllTiles=at return at end
 
 function warptorio.GetModTiles(n) local t=warptorio.CacheModTiles() if(not n or n==true)then return t else return table.GetMatchTable(t,n) end end
-function warptorio.GetNauvisTiles(n) local t,tn=nauvis.tile if(warptorio.alienBiomes)then tn=t t=nauvis.ab.tile end if(not n or n==true)then return t end
+function warptorio.GetNauvisTiles(n) local t,tn=nauvis.tile if(game.active_mods["alien-biomes"])then tn=t t=nauvis.ab.tile end if(not n or n==true)then return t end
 	if(tn)then
 		local y,x={},table.GetMatchTable(tn,n)
 		for k,v in pairs(x)do if(t[v])then table.insertExclusive(y,t[v]) end end
@@ -177,12 +180,12 @@ pmods.disable_all_defaults={gen={ default_enable_all_autoplace_controls=false,
 	autoplace_settings={ decorative={treat_missing_as_default=false},entity={treat_missing_as_default=false},tile={treat_missing_as_default=false} }
 }}
 
-pmods.moisture={ fgen=function(g,ev) g.moisture=ev return g end}
-pmods.aux={ fgen=function(g,ev) g.aux=ev return g end}
-pmods.temperature={ fgen=function(g,ev) g.temperature=ev return g end}
-pmods.elevation={ fgen=function(g,ev) g.elevation=ev return g end}
-pmods.cliffiness={ fgen=function(g,ev) g.cliffiness=ev return g end}
-pmods.aux={ fgen=function(g,ev) g.aux=ev return g end}
+pmods.moisture={ fgen=function(g,ev) g.property_expression_names["moisture"]=ev return g end}
+pmods.aux={ fgen=function(g,ev) g.property_expression_names["aux"]=ev return g end}
+pmods.temperature={ fgen=function(g,ev) g.property_expression_names["temperature"]=ev return g end}
+pmods.elevation={ fgen=function(g,ev) g.property_expression_names["elevation"]=ev return g end}
+pmods.cliffiness={ fgen=function(g,ev) g.property_expression_names["cliffiness"]=ev return g end}
+pmods.terrain_segmentation={ fgen=function(g,ev) g.terrain_segmentation=ev return g end}
 
 pmods.property={ fgen=function(g,ev) g[ev[1]]=ev[2] end}
 
@@ -351,6 +354,12 @@ function warptorio.RegisterPlanet(p)
 	if(game and warptorio.Loaded)then for k,v in pairs(game.players)do warptorio.BuildGui(v) end end
 end
 
+function warptorio.CallPlanetEvent(p,n,ev,...)
+	local x=p[n .. "_call"]
+	if(x)then return remote.call(x[1],x[2],ev,...)
+	elseif(p[n]~=nil)then return p[n](ev,...) end
+end
+
 local mapgen={} warptorio.Mapgen=mapgen
 
 function warptorio.GeneratePlanetSettings(p,chart)
@@ -361,7 +370,6 @@ end
 
 function warptorio.GeneratePlanetSurface(p,g,chart)
 	local f=game.create_surface("warpsurf_"..gwarptorio.warpzone,g)
-	f.request_to_generate_chunks({0,0},5) f.force_generate_chunk_requests()
 
 	if(p.modifiers)then for k,v in ipairs(p.modifiers)do
 		local mod=warptorio.PlanetModifiers[v[1]]
@@ -373,12 +381,14 @@ function warptorio.GeneratePlanetSurface(p,g,chart)
 	elseif(p.spawn)then p.spawn(f,g,chart)
 	end
 
+	f.request_to_generate_chunks({0,0},5) f.force_generate_chunk_requests()
+
 	return f
 end
 
 function warptorio.CheckPlanetControls(t) -- mod compatability -_-
 	local pt=game.autoplace_control_prototypes
-	if(warptorio.alienBiomes)then warptorio.DoAlienBiomesTiles(t) end
+	if(game.active_mods["alien-biomes"])then warptorio.DoAlienBiomesTiles(t) end
 	for k,v in pairs(t.autoplace_controls)do if(not pt[k])then t.autoplace_controls[k]=nil end end
 end
 
@@ -441,10 +451,18 @@ warptorio.RegisterPlanet({
 	-- Call tables are used for remote interfaces: { {"remote_interface","remote_name"} }
 	fgen_call=nil, -- Final function calls on map_gen_settings, behaving similar to a modifier function but planet specific.
 	spawn_call=nil, -- Function calls after surface is created.
-	tick_call=nil, -- Function calls per tick
-	chunk_call=nil, -- Functions called when a chunk is generated on the planet
 	warpout_call=nil, -- Function called upon warpout of this planet event{oldsurface=surface,oldplanet=planet_table,newsurface=surface,newplanet=planet_table}
 	postwarpout_call=nil, -- Function called upon warpout of this planet event{oldsurface=surface,oldplanet=planet_table,newsurface=surface,newplanet=planet_table}
+
+	-- Built-in event calls:
+	on_built_entity_call=nil,
+	on_robot_built_entity_call=nil,
+	script_raised_built=nil,
+	script_raised_revive=nil,
+	on_chunk_generated_call=nil,
+	on_chunk_deleted_call=nil,
+	on_entity_died_call=nil,
+	on_tick_call=nil,
 
 	fgen=nil, -- function(map_gen_settings) end, -- planet modify function (warptorio internal)
 	spawn=nil, -- function(surface_object, table_of_modifier_return_values) -- planet spawn function (warptorio internal)
@@ -465,7 +483,7 @@ warptorio.RegisterPlanet({ key="average", name="An Average Planet", zone=3,rng=P
 })
 
 warptorio.RegisterPlanet({
-	key="barren", name="A Barren Planet", zone=12, rng=PlanetRNG("barren"), warptime=0.5, nowater=true,
+	key="barren", name="A Barren Planet", zone=12, rng=PlanetRNG("barren"), warptime=0.5, nowater=true, rest=true,
 	desc="This world looks deserted and we appear to be safe. .. For now.",
 	modifiers={
 		{"nauvis",{tiles={"dirt","sand"},ents={"rock"},decor={"rock"},autoplace=false}},
@@ -476,7 +494,7 @@ warptorio.RegisterPlanet({
 })
 
 warptorio.RegisterPlanet({
-	key="ocean", name="An Ocean Planet", zone=3, rng=PlanetRNG("ocean"), warptime=0.5,
+	key="ocean", name="An Ocean Planet", zone=3, rng=PlanetRNG("ocean"), warptime=0.5, rest=true,
 	desc="There is water all around and seems to go on forever. The nearby fish that greet you fills you with determination.",
 	modifiers={
 		{"nauvis",{tiles={"grass","water"},ents={"fish","tree","trunk"},autoplace={"tree"}}},
@@ -490,7 +508,7 @@ warptorio.RegisterPlanet({
 })
 
 warptorio.RegisterPlanet({
-	key="jungle", name="A Jungle Planet", zone=27, rng=PlanetRNG("jungle"), warptime=1,
+	key="jungle", name="A Jungle Planet", zone=27, rng=PlanetRNG("jungle"), warptime=1, rest=true,
 	desc="These trees might be enough to conceal your location from the natives. .. At least for a while.",
 	modifiers={
 		{"nauvis"},
@@ -541,7 +559,7 @@ warptorio.RegisterPlanet({
 warptorio.RegisterPlanet({
 	key="stone", name="A Stone Planet", zone=15, rng=PlanetRNG("res"), warptime=1,
 	desc="This planet is like your jouney through warpspacetime. Stuck somewhere between a rock and a hard place.",
-	modifiers={ {"nauvis"},{"resource_set_all",0.3},{"resource_set",{["crude-oil"]=PCR(7,2,1)}} },
+	modifiers={ {"nauvis"},{"resource_set_all",0.3},{"resource_set",{["stone"]=PCR(7,2,1)}} },
 	required_controls={"stone"},
 })
 
@@ -560,13 +578,13 @@ warptorio.RegisterPlanet({
 })
 
 warptorio.RegisterPlanet({
-	key="midnight", name="A Planet Called Midnight", zone=20, rng=PlanetRNG("midnight"), warptime=1.5,
+	key="midnight", name="A Planet Called Midnight", zone=20, rng=PlanetRNG("midnight"), warptime=1.5, biter=true,
 	desc="Your hands disappear before your eyes as you are shrouded in darkness. This place seems dangerous.",
 	modifiers={ {"nauvis"},{"biters",PCR(2)},{"daytime",{time=0.5,freeze=true}} },
 })
 
 warptorio.RegisterPlanet({
-	key="polluted", name="A Polluted Planet", zone=40, rng=PlanetRNG("polluted"), warptime=1.5,
+	key="polluted", name="A Polluted Planet", zone=40, rng=PlanetRNG("polluted"), warptime=1.5, biter=true,
 	desc="A heavy aroma of grease and machinery suddenly wafts over the platform and you wonder if you have been here before.",
 	modifiers={ {"nauvis"},{"resource_set_all",0.75},{"biters",PCR(1.75)} },
 	spawn=function(f,g,chart)
@@ -575,13 +593,13 @@ warptorio.RegisterPlanet({
 })
 
 warptorio.RegisterPlanet({
-	key="biter", name="A Biter Planet", zone=60, rng=PlanetRNG("biter"), warptime=1.2,
+	key="biter", name="A Biter Planet", zone=60, rng=PlanetRNG("biter"), warptime=1.2, biter=true,
 	desc="Within moments of warping in, your factory is immediately under siege. We must survive until the next warp!",
 	modifiers={ {"nauvis"},{"biters",PCR(8)},{"starting_area",0.3} },
 })
 
 warptorio.RegisterPlanet({
-	key="rogue", name="A Rogue Planet", zone=100, rng=PlanetRNG("rogue"), warptime=1.25, nowater=true,
+	key="rogue", name="A Rogue Planet", zone=100, rng=PlanetRNG("rogue"), warptime=1.25, nowater=true, biter=true,
 	desc="Ah, just your usual barren wasteland, nothing to worry about. But something seems a little off.",
 	modifiers={
 		{"nauvis",{tiles={"dirt","sand"},decor={"rock"}}},

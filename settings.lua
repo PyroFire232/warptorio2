@@ -47,9 +47,9 @@ data:extend(
 	{type = "bool-setting", name = "warptorio_pollution_disable",order="aba",
 	setting_type = "runtime-global",default_value =false},
 
-	{type = "double-setting", name = "warptorio_warp_polution_factor",order="abb",
-	setting_type = "runtime-global",default_value = 1.01,
-	minimum_value = 1.0001,maximum_value = 2},
+	{type = "double-setting", name = "warptorio_pollution_exponent",order="abb",
+	setting_type = "runtime-global",default_value = 0.225,
+	minimum_value = 0.01,maximum_value = 0.4},
 
 
 	{type = "bool-setting", name = "warptorio_biter_disable",order="abc",
@@ -68,7 +68,7 @@ data:extend(
 	minimum_value = 3},
 
 	{type = "double-setting", name = "warptorio_biter_max",order="add",
-	setting_type = "runtime-global",default_value = 5,
+	setting_type = "runtime-global",default_value = 10,
 	minimum_value = 3},
 
 
@@ -78,19 +78,19 @@ data:extend(
 	minimum_value = 1,maximum_value=10},
 
 	{type = "double-setting", name = "warptorio_biter_wavemin",order="aea2",
-	setting_type = "runtime-global",default_value = 360,
+	setting_type = "runtime-global",default_value = 700,
 	minimum_value = 10},
 
 	{type = "double-setting", name = "warptorio_biter_wavemax",order="aeb",
-	setting_type = "runtime-global",default_value = 3000,
+	setting_type = "runtime-global",default_value = 5000,
 	minimum_value = 10,},
 
 	{type = "int-setting", name = "warptorio_biter_waverng",order="aec",
-	setting_type = "runtime-global",default_value = 15,
+	setting_type = "runtime-global",default_value = 10,
 	minimum_value = 1},
 
 	{type = "int-setting", name = "warptorio_biter_wavesize",order="aed",
-	setting_type = "runtime-global",default_value = 3,
+	setting_type = "runtime-global",default_value = 2,
 	minimum_value = 1},
 
 	{type = "int-setting", name = "warptorio_biter_wavesizemax",order="aee",

@@ -10,9 +10,9 @@ local function printx(m) for k,v in pairs(game.players)do v.print(m) end end
 local function isvalid(v) return (v and v.valid) end
 local function new(x,a,b,c,d,e,f,g) local t,v=setmetatable({},x),rawget(x,"__init") if(v)then v(t,a,b,c,d,e,f,g) end return t end
 
-function table.Count(t) local c=0 for k,v in pairs(t)do c=c+1 end return c end
+function table.Count(t) return table_size(t) end --local c=0 for k,v in pairs(t)do c=c+1 end return c end
 function table.First(t) for k,v in pairs(t)do return k,v end end
-function table.Random(t) local c,i=table.Count(t),1 if(c==0)then return end local rng=math.random(1,c) for k,v in pairs(t)do if(i==rng)then return v,k end i=i+1 end end
+function table.Random(t) local c,i=table_size(t),1 if(c==0)then return end local rng=math.random(1,c) for k,v in pairs(t)do if(i==rng)then return v,k end i=i+1 end end
 function table.HasValue(t,a) for k,v in pairs(t)do if(v==a)then return true end end return false end
 function table.GetValueIndex(t,a) for k,v in pairs(t)do if(v==a)then return k end end return false end
 function table.RemoveByValue(t,a) local i=table.GetValueIndex(t,a) if(i)then table.remove(t,i) end end
@@ -46,7 +46,9 @@ function warptorio.TryCleanEntity(v) if(v.force.name~="player" and v.force.name~
 
 function warptorio.SetLogisticsCircuitMode(r) local cb=r.get_or_create_control_behavior() cb.circuit_mode_of_operation=defines.control_behavior.logistic_container.circuit_mode_of_operation.set_requests end
 function warptorio.CopyChestEntity(a,b) local c=b.get_inventory(defines.inventory.chest) for k,v in pairs(a.get_inventory(defines.inventory.chest).get_contents())do c.insert{name=k,count=v} end
-	for c,tbl in pairs(a.circuit_connected_entities)do for k,v in pairs(tbl)do v.connect_neighbour{target_entity=b,wire=defines.wire_type[c]} end end end
+	local net=a.circuit_connection_definitions
+	for c,tbl in pairs(net)do b.connect_neighbour{target_entity=tbl.target_entity,wire=tbl.wire,source_circuit_id=tbl.source_circuit_id,target_circuit_id=tbl.target_circuit_id} end
+end
 function warptorio.FlipDirection(v) return (v+4)%8 end
 
 
@@ -801,11 +803,19 @@ function warptorio.TrySpawnWarploader(e)
 	warptorio.InsertCacheLoader(e)
 end
 
-function warptorio.OnBuiltEntity(ev) local e=ev.created_entity if(not e)then e=ev.entity end
+function warptorio.DoOnBuiltEntity(ev) local e=ev.created_entity if(not e)then e=ev.entity end
 	if(warptorio.IsTeleporterGate(e))then warptorio.TrySpawnTeleporterGate(e)
 	elseif(warptorio.IsWarpLoader(e))then warptorio.TrySpawnWarploader(e)
 	elseif(warptorio.CacheMonitor[e.name])then warptorio.InsertCache(warptorio.CacheMonitor[e.name],e) end
-end script.on_event({defines.events.on_built_entity, defines.events.on_robot_built_entity, defines.events.script_raised_built,defines.events.script_raised_revive}, warptorio.OnBuiltEntity)
+end
+function warptorio.OnBuiltEntity(ev) warptorio.DoOnBuiltEntity(ev) local p=gwarptorio.planet if(p)then warptorio.CallPlanetEvent(p,"on_built_entity",ev) end end
+function warptorio.OnRobotBuiltEntity(ev) warptorio.DoOnBuiltEntity(ev) local p=gwarptorio.planet if(p)then warptorio.CallPlanetEvent(p,"on_robot_built_entity",ev) end end
+function warptorio.OnScriptRaisedBuilt(ev) warptorio.DoOnBuiltEntity(ev) local p=gwarptorio.planet if(p)then warptorio.CallPlanetEvent(p,"script_raised_built",ev) end end
+function warptorio.OnScriptRevived(ev) warptorio.DoOnBuiltEntity(ev) local p=gwarptorio.planet if(p)then warptorio.CallPlanetEvent(p,"script_raised_revive",ev) end end
+script.on_event(defines.events.on_built_entity, warptorio.OnBuiltEntity)
+script.on_event(defines.events.on_robot_built_entity, warptorio.OnRobotBuiltEntity)
+script.on_event(defines.events.script_raised_built, warptorio.OnScriptRaisedBuilt)
+script.on_event(defines.events.script_raised_revive, warptorio.OnScriptRevived)
 
 function warptorio.OnPlayerMinedEntity(ev) local e=ev.entity
 	if(warptorio.IsTeleporterGate(e))then local t=gwarptorio.Teleporters["offworld"] t:DestroyLogisticsB()
@@ -816,6 +826,7 @@ end script.on_event({defines.events.on_player_mined_entity,defines.events.on_rob
 
 function warptorio.OnEntityDied(ev) local e=ev.entity if(warptorio.IsTeleporterGate(e))then local t=gwarptorio.Teleporters["offworld"] t:DestroyLogisticsB() t.PointB=nil t:Warpin()
 	else warptorio.OnPlayerMinedEntity(ev) end
+	local p=gwarptorio.planet if(p)then warptorio.CallPlanetEvent(p,"on_entity_died",ev) end
 end script.on_event(defines.events.on_entity_died,warptorio.OnEntityDied)
 
 function warptorio.IsTeleporterGate(e) return (e.name:sub(1,25)=="warptorio-teleporter-gate") end
@@ -882,6 +893,7 @@ function warptorio.TickPollution()
 	if(not f or not f.valid)then return end
 	if(settings.global["warptorio_pollution_disable"].value~=true)then
 		f.pollute({-1,-1},gwarptorio.pollution_amount)
+		gwarptorio.pollution_amount = math.min( gwarptorio.pollution_amount+(gwarptorio.pollution_amount ^ settings.global['warptorio_pollution_exponent'].value), 1000000)
 	end
 
 	local m=gwarptorio.Floors
@@ -891,7 +903,6 @@ function warptorio.TickPollution()
 	m.b1:GetSurface().clear_pollution()
 	m.b2:GetSurface().clear_pollution()
 	
-	gwarptorio.pollution_amount = math.min( (gwarptorio.pollution_amount * settings.global['warptorio_warp_polution_factor'].value) + 0.005, 5000000)
 
 	if(settings.global["warptorio_biter_disable"].value~=true)then
 		gwarptorio.pollution_expansion = math.min( gwarptorio.pollution_expansion * settings.global["warptorio_biter_expansion"].value, 60*60*settings.global["warptorio_biter_redux"].value )
@@ -983,7 +994,7 @@ function warptorio.TickTimers(e)
 	end
 
 	local rta=(gwarptorio.Research.reactor or 0)
-	if(not gwarptorio.warp_reactor)then
+	if(warptorio.IsAutowarpEnabled())then
 		gwarptorio.warp_auto_end=60*gwarptorio.warp_auto_time - (e-gwarptorio.warp_last)
 		warptorio.updatelabel("warptorio_autowarp","    Auto-Warp In : " .. util.formattime(gwarptorio.warp_auto_end))
 		if(gwarptorio.warp_auto_end<=0)then
@@ -1009,6 +1020,8 @@ function warptorio.TickChargeTimer(e)
 end
 
 function warptorio.Tick(ev) local e=ev.tick
+	local p=gwarptorio.planet if(p)then warptorio.CallPlanetEvent(p,"on_tick",ev) end
+
 	warptorio.TickChargeTimer(e)
 	warptorio.TickTeleporters(e)
 	warptorio.TickEnergy(e)
@@ -1088,14 +1101,13 @@ function warptorio.BuildGui(player)
 
 end
 
-script.on_event(defines.events.on_gui_selection_state_changed,function(event) local gui=event.element
-	if(gui.name=="warptorio_target")then
+warptorio.SwitchingTarget=false
+script.on_event(defines.events.on_gui_selection_state_changed,function(event) local gui=event.element local pidx=event.player_index
+	if(gui.name=="warptorio_target" and not warptorio.SwitchingTarget)then warptorio.SwitchingTarget=true
 		local s=gui.items[gui.selected_index] if(not s)then return end local sx=s:lower()
 		if(sx=="(random)")then gwarptorio.planet_target=nil elseif(sx=="(homeworld)")then gwarptorio.planet_target="home" else gwarptorio.planet_target=sx end
-		for k,v in pairs(game.players)do
-			warptorio.getlabelcontrol(v,"warptorio_target").selected_index=gui.selected_index
-		end
-		game.print("Selected Planet: " .. s)
+		--for k,v in pairs(game.players)do if(v.index~=pidx)then warptorio.getlabelcontrol(v,"warptorio_target").selected_index=gui.selected_index end end
+		game.print("Selected Planet: " .. s) warptorio.SwitchingTarget=false
 	end
 end)
 
@@ -1307,7 +1319,9 @@ end
 
 function warptorio.RandomPlanet(z) z=z or gwarptorio.warpzone local zp={}
 	local zx=0
-	for k,v in pairs(warptorio.Planets)do if(v.zone<=z and v.rng>0 and warptorio.PlanetCanSpawn(v))then zx=zx+v.rng table.insert(zp,k) end end --for i=1,(v.rng or 1) do table.insert(zp,k) end end end
+	local lpt=gwarptorio.planet local nowater,norest,nobiter=false,false,false
+	if(lpt)then if(lpt.rest)then norest=true end if(lpt.nowater)then nowater=true end if(lpt.biter)then nobiter=true end end
+	for k,v in pairs(warptorio.Planets)do if(v.zone<=z and v.rng>0 and warptorio.PlanetCanSpawn(v,nowater,norest,nobiter))then zx=zx+v.rng table.insert(zp,k) end end --for i=1,(v.rng or 1) do table.insert(zp,k) end end end
 	if(zx<=0)then return warptorio.Planets["normal"] end
 	local rng=math.random(1,zx) local zy=0
 	for _,k in pairs(zp)do local v=warptorio.Planets[k] if(v.zone<=z and v.rng>0)then zy=zy+v.rng if(rng<=zy)then return v end end end
@@ -1318,8 +1332,9 @@ function warptorio.DoNextPlanet()
 	local w=warptorio.RandomPlanet(gwarptorio.warpzone+1)
 	return w
 end
-function warptorio.PlanetCanSpawn(p)
+function warptorio.PlanetCanSpawn(p,w,r,b)
 	if(p.required_controls)then for k,v in pairs(p.required_controls)do if(not game.autoplace_control_prototypes[v])then return false end end end
+	if(w and p.nowater)then return false elseif(r and p.rest)then return false elseif(b and p.biter)then return false end
 	return true
 end
 
@@ -1345,6 +1360,8 @@ function warptorio.BuildNewPlanet(vplanet) local w
 
 	if(gwarptorio.charting or not w.desc)then game.print(w.name) end
 	if(w.desc)then game.print(w.desc) end
+
+	gwarptorio.planet=w
 
 	local g=warptorio.GeneratePlanetSettings(w,gwarptorio.charting)
 	local f=warptorio.GeneratePlanetSurface(w,g,gwarptorio.charting)
@@ -1375,6 +1392,7 @@ end
 
 	warptorio.CheckPlanetControls(t)
 	local f = game.create_surface("warpsurf_"..gwarptorio.warpzone,t)
+
 	f.request_to_generate_chunks({0,0},3) f.force_generate_chunk_requests()
 	if(w.spawn_event)then script.raise_event(w.spawn_event,{surface=f.name,oldsurface=gwarptorio.Floors.main:GetSurface().name,map_gen=t,charting=gwarptorio.charting,zone=gwarptorio.warpzone,key=w.key}) end
 	if(w.spawn)then w.spawn(f,gwarptorio.charting) end
@@ -1403,7 +1421,17 @@ end
 
 function warptorio.IsElectricPole(e) return (e.name:match("electric-pole") or e.name:match("substation")) end
 
-local badEnts={"highlight-box"}
+
+function warptorio.ValidateWarpBlacklist() if(not gwarptorio.warp_blacklist)then gwarptorio.warp_blacklist={} end
+	for k,v in pairs(gwarptorio.warp_blacklist)do if(not game.active_mods[k])then gwarptorio.warp_blacklist[k]=nil end end
+end
+local staticBlacklist={"highlight-box","big_brother-blueprint-radar"}
+function warptorio.GetWarpBlacklist() if(warptorio.WarpBlacklist)then return warptorio.WarpBlacklist else
+	local t={} for k,v in pairs(gwarptorio.warp_blacklist)do for i,e in pairs(v)do table.insertExclusive(t,e) end end
+	for k,v in pairs(staticBlacklist)do table.insertExclusive(t,v) end
+	warptorio.WarpBlacklist=t return t
+end end
+
 function warptorio.Warpout(vplanet)
 	warptorio.IsWarping=true
 	gwarptorio.warp_charge=0 gwarptorio.warp_charging=0 gwarptorio.warpzone = gwarptorio.warpzone+1
@@ -1440,6 +1468,8 @@ function warptorio.Warpout(vplanet)
 		warptorio.updatelabel("warptorio_ability_next","    Cooldown : " .. util.formattime(gwarptorio.ability_next-game.tick))
 	end
 
+	local cp=gwarptorio.planet
+
 	-- Designate next planet and make new surface
 	local f,w=warptorio.BuildNewPlanet(vplanet)
 
@@ -1459,13 +1489,13 @@ function warptorio.Warpout(vplanet)
 	--local vfFactorissimo=c.find_entities_filtered{name={"factory-1","factory-2","factory-3"}}
 	--for k,v in pairs(vfFactorissimo)do script.raise_event(defines.events.on_marked_for_deconstruction,{entity=v}) end
 
-	if(gwarptorio.warpevent_name)then script.raise_event(gwarptorio.warpevent_name,{newplanet=f,newworld=w,oldplanet=c,oldworld=gwarptorio.planet}) end
-	if(gwarptorio.planet)then
-		local pnt=gwarptorio.planet
-		if(pnt.warpout)then pnt.onwarpout(f,w,c,pnt) end
-		if(pnt.warpout_call)then remote.call(pnt.warpout_call[1],pnt.warpout_call[2],f,w,c,pnt) end
+	if(gwarptorio.warpevent_name)then script.raise_event(gwarptorio.warpevent_name,{newplanet=f,newworld=w,oldplanet=c,oldworld=cp}) end
+
+	if(cp)then
+		if(cp.warpout)then pnt.onwarpout(f,w,c,cp) end
+		if(cp.warpout_call)then remote.call(pnt.warpout_call[1],pnt.warpout_call[2],f,w,c,cp) end
 	end
-	gwarptorio.planet=w
+
 
 	-- find entities and players to copy/transfer to new surface
 	local tpply={} local cx=warptorio.corn
@@ -1493,7 +1523,9 @@ function warptorio.Warpout(vplanet)
 
 	end end
 
-
+	local blacktbl={}
+	for k,v in pairs(etbl)do if(table.HasValue(warptorio.GetWarpBlacklist(),v.name))then table.insert(blacktbl,v) etbl[k]=nil end end --script.raise_event(defines.events.on_robot_pre_mined,{entity=v}) end
+	--for k,v in pairs(etbl)do if(not v or not v.valid)then etbl[k]=nil end end
 
 	-- do the cloning
 	c.clone_entities{entities=etbl,destination_offset={0,0},destination_surface=f} --,destination_force=game.forces.player}
@@ -1511,7 +1543,8 @@ function warptorio.Warpout(vplanet)
 
 	--// cleanup past entities
 	
-	for k,v in pairs(etbl)do v.destroy{raise_destroy=true} end
+	for k,v in pairs(etbl)do if(v and v.valid)then v.destroy{raise_destroy=true} end end
+	for k,v in pairs(blacktbl)do if(v and v.valid)then v.destroy{raise_destroy=true} end end
 	--for k,v in pairs(vfFactorissimo)do if(v.valid)then v.cancel_deconstruction(game.forces.player) end end
 
 	--// radar -- game.forces.player.chart(f,{lefttop={x=-256,y=-256},rightbottom={x=256,y=256}})
@@ -1672,8 +1705,7 @@ function warptorio.Initialize()
 	warptorio.Migrate()
 	if(settings.global["warptorio_carebear"].value)then warptorio.MakeCarebearChest() end
 	if(settings.global["warptorio_water"].value)then game.forces.player.technologies["warptorio-boiler-water-1"].researched=true gwarptorio.waterboiler=1 end
-	for n,v in pairs(game.active_mods)do if(n=="alien-biomes")then warptorio.alienBiomes=true end end
-
+	warptorio.ValidateWarpBlacklist()
 	--warptorio.OverrideNauvis(true)
 end script.on_init(warptorio.Initialize)
 
@@ -1701,15 +1733,15 @@ end script.on_event(defines.events.on_runtime_mod_setting_changed,warptorio.OnMo
 function warptorio.OnConfigChanged(ev)
 	warptorio.OnLoad()
 	warptorio.Migrate()
-	for n,v in pairs(game.active_mods)do if(n=="alien-biomes")then warptorio.alienBiomes=true end end
 
 	local fb=warptorio.GetFastestLoader()
 	if(gwarptorio.fastest_loader ~= fb)then
 		for k,v in pairs(gwarptorio.Teleporters)do v:UpgradeLogistics() end for k,v in pairs(gwarptorio.Rails)do v:DoMakes(true) end
 		gwarptorio.fastest_loader=fb
 	end
-
+	warptorio.ValidateWarpBlacklist()
 	--warptorio.OverrideNauvis()
+
 end script.on_configuration_changed(warptorio.OnConfigChanged)
 
 function warptorio.Migrate() if(warptorio.Loaded)then return end
@@ -1727,8 +1759,8 @@ function warptorio.Migrate() if(warptorio.Loaded)then return end
 	gwarptorio.warp_auto_time = gwarptorio.warp_auto_time or 60*settings.global["warptorio_autowarp_time"].value
 	gwarptorio.warp_auto_end = gwarptorio.warp_auto_end or 60*60*settings.global["warptorio_autowarp_time"].value
 	gwarptorio.warp_last=gwarptorio.warp_last or game.tick
-	gwarptorio.autowarp_disable=(gwarptorio.autowarp_disable~=nil and gwarptorio.autowarp_disable or false)
-	gwarptorio.autowarp_always=(gwarptorio.autowarp_always~=nil and gwarptorio.autowarp_always or false)
+	gwarptorio.autowarp_disable=settings.global["warptorio_autowarp_disable"].value
+	gwarptorio.autowarp_always=settings.global["warptorio_autowarp_always"].value
 
 	gwarptorio.pollution_amount = gwarptorio.pollution_amount or 1.1--+settings.global['warptorio_warp_polution_factor'].value
 	gwarptorio.pollution_expansion = gwarptorio.pollution_expansion or 1.1
@@ -1758,6 +1790,7 @@ function warptorio.Migrate() if(warptorio.Loaded)then return end
 
 	gwarptorio.LogisticLoaderChestProvider=settings.global['warptorio_loaderchest_provider'].value
 	gwarptorio.LogisticLoaderChestRequester=settings.global['warptorio_loaderchest_requester'].value
+	gwarptorio.warp_blacklist=gwarptorio.warp_blacklist or {}
 
 	warptorio.Loaded=true
 
@@ -1831,10 +1864,12 @@ local lootItems={
 ["gun-turret"]=10,
 }
 
-
 function warptorio.cheat() for i,p in pairs(game.players)do for k,v in pairs(lootItems)do p.get_main_inventory().insert{name=k,count=v} end end end
 function warptorio.cmdwarp(v) warptorio.Warpout(v) end
 function warptorio.cmdresetplatform() warptorio.BuildPlatform() warptorio.BuildB1() warptorio.BuildB2() for k,v in pairs(gwarptorio.Teleporters)do v:Warpin() end end
+function warptorio.cmdinsertcloneblacklist(mn,e) if(not gwarptorio.warp_blacklist[mn])then gwarptorio.warp_blacklist[mn]={} end table.insertExclusive(gwarptorio.warp_blacklist[mn],e) end
+function warptorio.cmdremovecloneblacklist(mn,e) if(not gwarptorio.warp_blacklist[mn])then gwarptorio.warp_blacklist[mn]={} end table.RemoveByValue(gwarptorio.warp_blacklist[mn],e) end
+function warptorio.cmdiscloneblacklisted(mn,e) if(not gwarptorio.warp_blacklist[mn])then return false end return table.HasValue(gwarptorio.warp_blacklist[mn],e) end
 
 function warptorio.cmdgetresources() return warptorio.GetAllResources() end
 function warptorio.cmdgetglobal(k) return global.warptorio[k] end
@@ -1854,7 +1889,7 @@ function warptorio.cmdgetpostwarpevent() if(not gwarptorio.warpevent_post_name)t
 
 function warptorio.cmdtiledefault(n,b) warptorio.TileDefault(n,b) end
 
-remote.add_interface("warptorio",{
+local interfaceTable={
 
 	warp=warptorio.cmdwarp, -- force warp to a specific planet
 
@@ -1874,16 +1909,27 @@ remote.add_interface("warptorio",{
 	warpevent=warptorio.cmdgetwarpevent, -- get the named event for on warpout
 	postwarpevent=warptorio.cmdgetpostwarpevent, -- get the named event for post warpout
 
+
+
 	cheat=warptorio.cheat, -- give free items cheat command for debugging purposes
 	reveal=warptorio.cmdreveal, -- map reveal cheat command for debugging purposes
 	generateplanet=warptorio.cmdgenerateplanet, -- generate a planet table for debugging purposes
 	resetplatform=warptorio.cmdresetplatform, -- Reconstruct the platforms for debugging purposes
 
+	insert_warp_blacklist=warptorio.cmdinsertcloneblacklist,
+	remove_warp_blacklist=warptorio.cmdremovecloneblacklist,
+	is_warp_blacklisted=warptorio.cmdiscloneblacklisted,
 
-})
+	event_warp=warptorio.cmdgetwarpevent, -- alias
+	event_post_warp=warptorio.cmdgetpostwarpevent, -- alias
+}
 
+remote.add_interface("warptorio",interfaceTable)
+remote.add_interface("warptorio2",interfaceTable)
 
 function warptorio.OnChunkGenerated(ev) local a=ev.area local f=ev.surface
+	local p=gwarptorio.planet if(p)then warptorio.CallPlanetEvent(p,"on_chunk_generated",ev) end
+
 	if(f.name=="nauvis" or f.name~=(gwarptorio.Floors.main:GetSurface().name))then return end
 	-- spawn chest with goodies
 	if(math.random(1,175)>1)then return end
@@ -1906,5 +1952,9 @@ function warptorio.OnChunkGenerated(ev) local a=ev.area local f=ev.surface
 		--game.print("Insert Random Item: " .. tostring(k) .. " c: " .. cx .. " u: " .. tostring(u) .. " dv: " .. dv .. " fc: " .. fc)
 		inv.insert{name=k,count=cx}
 	end
-
 end script.on_event(defines.events.on_chunk_generated,warptorio.OnChunkGenerated)
+
+
+function warptorio.OnChunkDeleted(ev)
+	local p=gwarptorio.planet if(p)then warptorio.CallPlanetEvent(p,"on_chunk_deleted",ev) end
+end script.on_event(defines.events.on_chunk_deleted,warptorio.OnChunkDeleted)
