@@ -1,4 +1,51 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.8.8
+Date: 26.08.2019
+  Changes:
+    - Massive re-write and code cleanup
+    - Fixed bugs related to multiple planets (eg. homeworld plus platform) with special chunk generation functions interfering with eachother, particularly for multiplayer.
+    - Tri-loader now adds an extra belt pair to ALL stairs, making the central stairs have 6 belts instead of 4.
+    - New Harvester Floor and a new relating gameplay mechanic.
+    - Made a bunch of things use locale for translation later
+    - Fixed the teleporter logistics blocked message on warp
+
+
+---------------------------------------------------------------------------------------------------
+Version: 0.8.7
+Date: 26.08.2019
+  Changes:
+    - Added sound to warp button and a message for multiplayer
+    - Fixed a bug with planet selector
+
+---------------------------------------------------------------------------------------------------
+Version: 0.8.6
+Date: 24.08.2019
+  Changes:
+    - More pollution nerfs
+    - Added pollution exponent multiplier setting
+    - Added pollution tick rate setting
+
+
+---------------------------------------------------------------------------------------------------
+Version: 0.8.5
+Date: 22.08.2019
+  Changes:
+    - Teleporter hitbox adjustments
+
+---------------------------------------------------------------------------------------------------
+Version: 0.8.4
+Date: 22.08.2019
+  Changes:
+    - Mod Compatability: Von Neumann Mod. Please use v0.0.3 that i have posted if you wish to play that mod with this one: https://github.com/abaines/Von-Neumann/issues/1
+
+---------------------------------------------------------------------------------------------------
+Version: 0.8.3
+Date: 22.08.2019
+  Changes:
+    - Leftover test code
+
+
+---------------------------------------------------------------------------------------------------
 Version: 0.8.2
 Date: 22.08.2019
   Changes:
