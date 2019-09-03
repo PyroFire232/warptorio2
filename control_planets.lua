@@ -1,34 +1,50 @@
+--[[-------------------------------------
+
+Author: Pyro-Fire
+https://mods.factorio.com/mod/warptorio2
+
+]]---------------------------------------
+--[[ Environment ]]
 
 local gwarptorio=setmetatable({},{__index=function(t,k) return global.warptorio[k] end,__newindex=function(t,k,v) global.warptorio[k]=v end})
 local function PlanetRNG(name) return settings.startup["warptorio_planet_"..name].value end
 local function ErrorNoHalt(s) game.print(s) end
 warptorio=warptorio or {}
 
+
+--[[ Helper Code - Planet Table Math for tile searching ]]
+
+function table.GetMatchTable(t,n) local x={}
+	if(istable(n))then for k,v in pairs(t)do if(table.HasMatchValue(n,v))then table.insert(x,v) end end
+	else for i,v in pairs(t)do if(v:match(n))then table.insert(x,v) end end
+	end return x
+end
+function table.HasValueMatch(t,u) for k,v in pairs(t)do if(v:match(u))then return v end end end
+function table.HasMatchValue(t,u) for k,v in pairs(t)do if(u:match(v))then return v end end end
+
+
 --[[ Nauvis Whitelist ]]--
 
 local nauvis={} warptorio.nauvis=nauvis
 nauvis.autoplace={"trees","enemy-base"} -- game.autoplace_control_prototypes
-nauvis.resource={"iron-ore","copper-ore","stone","coal","uranium-ore","crude-oil"} -- these are also autoplace
+nauvis.resource={"iron-ore","copper-ore","stone","coal","uranium-ore","crude-oil"} -- game.autoplace_control_prototypes (resources edition)
 
-nauvis.tile={ -- game.tile_prototypes with autoplace
+nauvis.tile={ -- game.tile_prototypes (with autoplace)
 "concrete","stone-path","tutorial-grid","refined-concrete","refined-hazard-concrete-left","refined-hazard-concrete-right","hazard-concrete-left","hazard-concrete-right",
 "grass-1","grass-2","grass-3","grass-4","dirt-1","dirt-2","dirt-3","dirt-4","dirt-5","dirt-6","dirt-7","dry-dirt","sand-1","sand-2","sand-3",
-"red-desert-0","red-desert-1","red-desert-2","red-desert-3",
-"lab-dark-1","lab-dark-2","lab-white","landfill","out-of-map",
-"water","deepwater",
+"red-desert-0","red-desert-1","red-desert-2","red-desert-3","lab-dark-1","lab-dark-2","lab-white","landfill","out-of-map","water","deepwater",
 }
 
-nauvis.noise={ -- game.noise_layer_prototypes, i think. todo: double check
+nauvis.noise={ -- game.noise_layer_prototypes (isn't used nor needed for planets)
 "aux","brown-fluff","coal","copper-ore","crude-oil","dirt-1","dirt-2","dirt-3","dirt-4","dirt-5","dirt-6","dirt-7","dry-dirt",
 "elevation","elevation-persistence","enemy-base","fluff","garballo",
 "grass-1","grass-2","grass-3","grass-4","grass1","grass2","green-fluff","iron-ore","moisture","pita","pita-mini",
 "red-desert-0","red-desert-1","red-desert-2","red-desert-3","red-desert-decal","rocks",
 "sand-1","sand-2","sand-3","sand-decal","sand-dune-decal","starting-area","stone","temperature",
 "trees","trees-1","trees-10","trees-11","trees-12","trees-13","trees-14","trees-15","trees-2","trees-3","trees-4","trees-5","trees-6","trees-7","trees-8","trees-9",
-"uranium-ore",
-}
+"uranium-ore",}
 
-nauvis.decor={ -- game.decorative_prototypes with autoplace
+nauvis.decor={ -- game.decorative_prototypes (with autoplace)
 "brown-hairy-grass","green-hairy-grass","brown-carpet-grass",
 "green-carpet-grass","green-small-grass","green-asterisk",
 "brown-asterisk-mini","green-asterisk-mini","brown-asterisk",
@@ -41,16 +57,16 @@ nauvis.decor={ -- game.decorative_prototypes with autoplace
 
 }
 
-nauvis.entities={
+nauvis.entities={ -- game.entity_prototypes (with autoplace)
 "fish","tree-01","tree-02","tree-03","tree-04","tree-05","tree-09","tree-02-red","tree-07","tree-06","tree-06-brown",
 "tree-09-brown","tree-09-red","tree-08","tree-08-brown","tree-08-red","dead-dry-hairy-tree","dead-grey-trunk",
 "dead-tree-desert","dry-hairy-tree","dry-tree","rock-huge","rock-big","sand-rock-big","small-worm-turret",
 "medium-worm-turret","big-worm-turret","behemoth-worm-turret","biter-spawner","spitter-spawner",
 "crude-oil","coal","copper-ore","iron-ore","stone","uranium-ore",
-} --game.entity_prototypes
+}
 
-nauvis.ab={} local alienbiome=nauvis.ab
-alienbiome.tile={ -- tile-alias.lua -- mod compatability -_-
+local ab={} nauvis.alienbiome=ab
+ab.tile={ -- tile-alias.lua -- mod compatability -_-
     ["grass-1"] = "vegetation-green-grass-1" ,
     ["grass-2"] = "vegetation-green-grass-2" ,
     ["grass-3"] = "vegetation-green-grass-3" ,
@@ -76,16 +92,11 @@ alienbiome.tile={ -- tile-alias.lua -- mod compatability -_-
 	--["water-shallow"]="water-shallow",
 }
 
-
-alienbiome.entities={
-
-}
-
-alienbiome.decor={
+ab.entities={ -- todo;
 
 }
 
-alienbiome.noise={
+ab.decor={ -- todo;
 
 }
 
@@ -143,8 +154,6 @@ function warptorio.GetNauvisEntities(n) local t=nauvis.entities if(not n or n==t
 function warptorio.GetEntities(n) local t=warptorio.CacheAllEntities() if(not n or n==true)then return t else return table.GetMatchTable(t,n) end end
 
 
-
-
 --[[ Planet Control Data ]]--
 
 
@@ -174,7 +183,7 @@ pmods.trees_multiply={ fgen=function(g,ev) g.autoplace_controls.trees= PCRMul(g.
 pmods.trees_add={ fgen=function(g,ev) g.autoplace_controls.trees=PCRAdd(g.autoplace_controls.trees or PCR(1),ev) return g end }
 pmods.trees_random={ fgen=function(g,ev) g.autoplace_controls.trees= PCRMul( g.autoplace_controls.trees or PCR(1),math.random(ev[1]*100,ev[2]*100)/100 ) return g end }
 
-pmods.cliffs={ fgen=function(g,ev) g.cliffs=ev return g end } -- {"cliffs",{data here}}
+pmods.cliffs={ fgen=function(g,ev) g.cliff_settings=ev return g end } -- {"cliffs",{data here}}
 pmods.starting_area={ fgen=function(g,ev) g.starting_area=ev return g end }
 pmods.disable_all_defaults={gen={ default_enable_all_autoplace_controls=false,
 	autoplace_settings={ decorative={treat_missing_as_default=false},entity={treat_missing_as_default=false},tile={treat_missing_as_default=false} }
@@ -200,6 +209,7 @@ end } -- {"daytime",{time=0,freeze=true}}
 
 --[[ Resource Modifiers ]]--
 -- todo: similar searching to other modifiers
+-- todo: fluid-type, solid-type, and solid-requiring-liquid-type distinctions required.
 
 pmods.resource_multiply_all={ fgen=function(g,ev) for k,v in pairs(warptorio.GetAllResources())do g.autoplace_controls[k]=PCRMul(g.autoplace_controls[k] or PCR(1),ev) end return g end }
 pmods.resource_multiply={ fgen=function(g,ev) for k,v in pairs(ev)do g.autoplace_controls[k]=PCRMul(g.autoplace_controls[k] or PCR(1),v) end return g end }
@@ -370,6 +380,7 @@ end
 
 function warptorio.GeneratePlanetSurface(p,g,chart)
 	local f=game.create_surface("warpsurf_"..gwarptorio.warpzone,g)
+	warptorio.SetPlanetBySurface(f,p)
 
 	if(p.modifiers)then for k,v in ipairs(p.modifiers)do
 		local mod=warptorio.PlanetModifiers[v[1]]
