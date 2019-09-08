@@ -1485,9 +1485,9 @@ function warptorio.Warpout(vplanet)
 
 	-- Recreate teleporter gate
 	if(gwarptorio.Teleporters.offworld)then warptorio.Teleporters.offworld:Warpin() end
-	for k,v in pairs(game.players)do if(v and v.valid)then local iv=v.get_main_inventory() for i,x in pairs(iv.get_contents())do
+	for k,v in pairs(game.players)do if(v and v.valid)then local iv=v.get_main_inventory() if(iv) then for i,x in pairs(iv.get_contents())do
 		if(i:sub(1,25)=="warptorio-teleporter-gate")then iv.remove{name=i,count=x} end
-	end end end
+	end end end end
 
 	--// cleanup past entities
 	
