@@ -24,12 +24,17 @@ upcs["platform-size"]=function(lv,f) local n=f(lv) local m=gwarptorio.floor.main
 upcs["factory-size"]=function(lv,f) local n=f(lv) local m=gwarptorio.floor.b1 m.size=n warptorio.BuildB1() end
 upcs["boiler-size"]=function(lv,f) local n=f(lv) local m=gwarptorio.floor.b2 m.size=n warptorio.BuildB2() end
 upcs["harvester-size"]=function(lv,f) local n=f(lv) local m=gwarptorio.floor.b3 m.ovalsize=n warptorio.BuildB3() end
+upcs["harvester-east-size"]=function(lv,f) local n=f(lv) 
+local m=gwarptorio.floor.b3 m.harvest_east=n warptorio.BuildB3() 
+warptorio.Harvesters.east:Warpin() end
+upcs["harvester-west-size"]=function(lv,f) local n=f(lv) local m=gwarptorio.floor.b3 m.harvest_west=n warptorio.BuildB3() warptorio.Harvesters.west:Warpin() end
 
 upcs["teleporter-energy"]=function(lv) if(not gwarptorio.Teleporters.offworld)then warptorio.BuildPlatform() warptorio.Teleporters.offworld:Warpin() else warptorio.BuildPlatform() gwarptorio.Teleporters.offworld:UpgradeEnergy() end end
 upcs["factory-logistics"]=function(lv) warptorio.RebuildFloors() for k,v in pairs(gwarptorio.Teleporters)do v:UpgradeLogistics() end for k,v in pairs(gwarptorio.Rails)do v:DoMakes(true) end end
 upcs["factory-energy"]=function(lv) local m=gwarptorio.Teleporters
-	if(m.b1)then m.b1:UpgradeEnergy() end if(m.b2)then m.b2:UpgradeEnergy() end
+	if(m.b1)then m.b1:UpgradeEnergy() end if(m.b2)then m.b2:UpgradeEnergy() end if(m.b3)then m.b3:UpgradeEnergy() end
 	for k,v in pairs({"nw","ne","sw","se"}) do if(m[v])then m[v]:UpgradeEnergy() end end
+	for k,v in pairs({"nw","ne","sw","se","harvest_east","harvest_west"})do if(m[v])then m[v]:UpgradeEnergy() end end
 end
 
 upcs["factory-beacon"]=function(lv,f) local m=gwarptorio.floor.b1 local inv={}
@@ -107,13 +112,26 @@ ups["warptorio-boiler-6"] = {"boiler-size",function() return 64 end}
 ups["warptorio-boiler-7"] = {"boiler-size",function() return 72 end}
 
 ups["warptorio-harvester-floor"] = function() warptorio.BuildB2() warptorio.BuildB3() warptorio.Teleporters.b3:Warpin() end -- default {19,17}, max {vector(128+8,64+4)}
-ups["warptorio-harvester-size-1"] = {"harvester-size",function() return {x=24,y=20} end}
+ups["warptorio-harvester-size-1"] = {"harvester-size",function() return {x=28,y=22} end}
 ups["warptorio-harvester-size-2"] = {"harvester-size",function() return {x=36,y=26} end}
 ups["warptorio-harvester-size-3"] = {"harvester-size",function() return {x=48,y=32} end}
-ups["warptorio-harvester-size-4"] = {"harvester-size",function() return {x=68,y=40} end}
-ups["warptorio-harvester-size-5"] = {"harvester-size",function() return {x=88,y=48} end}
+ups["warptorio-harvester-size-4"] = {"harvester-size",function() return {x=74,y=40} end}
+ups["warptorio-harvester-size-5"] = {"harvester-size",function() return {x=92,y=48} end}
 ups["warptorio-harvester-size-6"] = {"harvester-size",function() return {x=112,y=56} end}
 ups["warptorio-harvester-size-7"] = {"harvester-size",function() return {x=128+8,y=64} end}
+
+ups["warptorio-harvester-west-1"] = {"harvester-west-size",function() return 16 end}
+ups["warptorio-harvester-west-2"] = {"harvester-west-size",function() return 22 end}
+ups["warptorio-harvester-west-3"] = {"harvester-west-size",function() return 28 end}
+ups["warptorio-harvester-west-4"] = {"harvester-west-size",function() return 32 end}
+ups["warptorio-harvester-west-5"] = {"harvester-west-size",function() return 38 end}
+
+ups["warptorio-harvester-east-1"] = {"harvester-east-size",function() return 16 end}
+ups["warptorio-harvester-east-2"] = {"harvester-east-size",function() return 22 end}
+ups["warptorio-harvester-east-3"] = {"harvester-east-size",function() return 28 end}
+ups["warptorio-harvester-east-4"] = {"harvester-east-size",function() return 32 end}
+ups["warptorio-harvester-east-5"] = {"harvester-east-size",function() return 38 end}
+
 
 ups["warptorio-boiler-station"] = {"boiler-station"}
 

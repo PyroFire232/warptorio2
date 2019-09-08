@@ -29,10 +29,13 @@ Code Index:
 Environment setup, variables and useful helper functions
 
 -- Warptorio Environment
--- Offsets
+Environment setup, variables and useful helper functions specifically used with warptorio
 
-Environment setup for warptorio and useful helper functions.
-Many offsets.
+-- Offsets
+I hate offsets
+
+-- Warptorio Cache Manager
+Manages scripted entities and entity events
 
 -- Warp Rails
 -- Warp Rail Logistics
@@ -168,10 +171,6 @@ function research.has(n,f) return research.get(n,f).researched end
 function research.can(n,f) local r=research.get(n,f) if(r.researched)then return true end local x=table_size(r.prerequisites) for k,v in pairs(r.prerequisites)do if(v.researched)then x=x-1 end end return (x==0) end
 function research.level(n,f) f=f or game.forces.player local ft=f.technologies local r=ft[n.."-0"] or ft[n.."-1"] local i=0 while(r)do if(r.researched)then i=r.level r=ft[n.."-".. i+1] else r=nil end end return i end
 
--- --------
--- Helper functions
-
-
 
 --[[ Warptorio Environment ]]--
 
@@ -292,8 +291,14 @@ warptorio.cache["warptorio-underground"]={
 	clone=function(e,ev) for k,v in pairs(gwarptorio.Teleporters)do if(v.a==ev.source)then v.a=e v:ConnectCircuit() return elseif(v.b==ev.source)then v.b=e v:ConnectCircuit() return end end end,
 	destroy=function(e,ev) warptorio.RemoveCache("power",e) end,
 }
+for k,v in pairs{"warptorio-teleporter-gate","warptorio-teleporter","warptorio-underground"}do
+	for i=0,8,1 do warptorio.cache[v.."-"..i]=warptorio.cache[v] end
+end
 
-for k,v in pairs{"warptorio-teleporter-gate","warptorio-teleporter","warptorio-underground"}do for i=0,10,1 do warptorio.cache[v.."-"..i]=warptorio.cache[v] end end
+
+
+
+
 
 
 
@@ -314,10 +319,10 @@ function warptorio.on_gui_closed.cache(ev) local e=ev.entity warptorio.CallCache
 
 function warptorio.migrate.cache()
 	for k,v in pairs{"heat","power","loaderinput","loaderoutput","ldinputf","ldoutputf"}do gwarptorio.cache[v]=gwarptorio.cache[v] or {} end
-	for n,t in pairs(gwarptorio.cache)do for k,v in pairs(t)do if(not v.name)then for x,y in pairs(v)do if(not isvalid(y))then v[x]=nil end end elseif(not isvalid(v))then t[k]=nil end end end
+	for n,t in pairs(gwarptorio.cache)do for k,v in pairs(t)do if(v.valid==false)then t[k]=nil elseif(not v.name)then for x,y in pairs(v)do if(not isvalid(y))then v[x]=nil end end end end end
 end
 
-function warptorio.on_entity_cloned.cache_types(ev) local e=ev.source local d=ev.destination
+function warptorio.on_entity_cloned.cache_types(ev) local e=ev.source local d=ev.destination if(not e or not e.valid or not d or not d.valid)then return end
 	if(e.type=="offshore-pump" or e.type=="resource")then entity.destroy(e)
 	elseif(e.type=="loader")then for k,v in pairs(gwarptorio.Teleporters)do for a,t in pairs(v.loaders)do for i,w in pairs(t)do if(e==w)then
 		gwarptorio.Teleporters[k].loaders[a][i]=d end end end end
@@ -346,7 +351,7 @@ end
 --[[ Platform Offsets ]]--
 
 
-local platform={} warptorio.platform={}
+local platform={} warptorio.platform=platform
 platform.railCorner={nw=vector(-35,-35),ne=vector(34,-35),sw=vector(-35,34),se=vector(34,34)}
 platform.railOffset={nw=vector(0,0),ne=vector(-1,0),sw=vector(0,-1),se=vector(-1,-1)} --{nw=vector(-1,-1),ne=vector(0,-1),sw=vector(-1,0),se=vector(0,0)}
 platform.railLoader={nw=vector.area(vector(2,0),vector(0,2)),sw=vector.area(vector(2,0),vector(0,-2)),ne=vector.area(vector(-2,0),vector(0,2)),se=vector.area(vector(-2,0),vector(0,-2))}
@@ -362,6 +367,22 @@ platform.railLoaderPos={
 
 platform.corner={nw=vector(-52,-52),ne=vector(50,-52),sw=vector(-52,50),se=vector(50,50)}
 platform.side={north=vector(0,-52),south=vector(0,50),east=vector(50,0),west=vector(-52,0)}
+--[[
+local cirMaxWidth=128+8
+local cirHeight=17 --64+4 --17 --
+local vz=cirMaxWidth
+--local ez=m.harvestSize or 10 -- harvester size max 47
+local hvMax=47
+local vzx=vz/2 local hvx=hvMax/2 local hvy=hvMax/8
+
+local westPos=warptorio.platform.harvester.west --vector(-(vzx+(hvx-hvy))+0.5,-0.5)
+local eastPos=warptorio.platform.harvester.east --vector(vzx+(hvx-hvy),-0.5)
+]]
+local hvSize=(128+8)/2
+local hvMax=47
+platform.harvester={}
+platform.harvester.east=vector(85.5,-0.5) --hvSize+((hvMax/2)-(hvMax/8)),-0.5) -- 85.625
+platform.harvester.west=vector(-85.5,-0.5) -- -(hvSize+((hvMax/2)-(hvMax/8)))+0.5,-0.5) -- -85.125
 
 
 warptorio.corn={}
@@ -382,7 +403,6 @@ function warptorio.GetTeleporterHazard(bMain,a,b,c)
 	local lv,dl,tl=research[a and "has" or "can"]("warptorio-logistics-1"),research[b and "has" or "can"]("warptorio-dualloader-1"),research[c and "has" or "can"]("warptorio-triloader")
 	local x=(lv and 2 or 0)+((bMain and dl) and 1 or 0)+(tl and 1 or 0) return vector((x*2)+2,2)
 end
-
 
 
 
@@ -422,7 +442,7 @@ end
 function trail:DoMakes() self:MakeRails() self:MakeChests() self:MakeLoaders() end
 
 
---[[ Warp Rail Logistics ]]--
+-- Warp Rail Logistics
 
 function trail:SplitItem(u,n) local c=n local cx=0 local cinv={} local ui={name=k,count=n}
 	for k,v in pairs(self.chests)do local iv=v.get_inventory(defines.inventory.chest) if(iv.can_insert(u))then cinv[k]=iv end end local tcn=table_size(cinv)
@@ -447,7 +467,7 @@ function trail:BalanceChests() local inv={} for k,v in pairs(self.chests)do inv[
 	local ci for a,b in pairs(ct)do local g=b ci=#inv for k,v in pairs(inv)do local gci=math.ceil(g/ci) if(gci>0)then local w=v.insert{name=a,count=math.ceil(g/ci)} ci=ci-1 g=g-w end end end
 end
 
---[[ Warp Rail Constructor ]]--
+-- Warp Rail Constructor
 
 function warptorio.BuildRailCorner(cn) local r=gwarptorio.Rails[cn] if(true) then return end
 	if(not r)then r=warptorio.Telerail(cn)
@@ -559,7 +579,7 @@ function tell:SpawnLogsB() return self:SpawnLogsPoint("b") end
 function tell:SpawnLogs() self:SpawnLogsA() self:SpawnLogsB() end
 function tell:UpgradeLogistics() self:DestroyLogs() self:SpawnLogs() end
 function tell:UpgradeEnergy() warptorio.Teleporters[self.name]:Warpin() end
-
+function tell:Warpin() warptorio.Teleporters[self.name]:Warpin() end
 function tell:GetLogisticsArea(o) return vector.square(warptorio.Teleporters[self.name].position,warptorio.GetTeleporterSize(self.main)) end
 
 function tell:SpawnLogistics()
@@ -569,7 +589,6 @@ function tell:SpawnLogistics()
 		else self:SpawnLogisticsPoint("b") end
 	end else self:SpawnLogisticsPoint("b") end end
 end
-
 
 
 
@@ -586,18 +605,22 @@ function t:Warpin() if(not research.has("warptorio-teleporter-portal"))then retu
 	local tpc,clsA,clsB,f,desA,desB=warptorio.Teleporters(self.name,false,false),"warptorio-teleporter-"..lvEnergy,"warptorio-teleporter-gate-"..lvEnergy,warptorio.GetPlanetSurface()
 	local size=warptorio.GetTeleporterSize(tpc.main)
 	local aPos=self.position -- vector(-2-lvTri-(lvLogs>0 and 2 or 0),y)
-	if(tpc:ValidA())then if(tpc.a.surface~=f)then tpc:DestroyA() tpc:DestroyLogsA() elseif(tpc.a.name~=clsA)then tpc:DestroyA() desA=true game.print("dbg: warpin destroyed A") end end
+	if(tpc:ValidA())then if(tpc.a.surface~=f)then tpc:DestroyA() tpc:DestroyLogsA() elseif(tpc.a.name~=clsA)then tpc:DestroyA() desA=true end end
 	if(not tpc:ValidA())then if(not desA)then vector.clean(f,vector.square(aPos,size)) end tpc:MakeA(clsA,f,aPos) tpc:SpawnLogsA() end
 	local bPos=vector(-1,8)
 	if(tpc:ValidB())then if(tpc.b.surface~=f)then tpc:DestroyB() tpc:DestroyLogsB() elseif(tpc.b.name~=clsB)then bPos=tpc.b.position tpc:DestroyB() end end
 	if(not tpc:ValidB())then tpc:MakeB(clsB,f,f.find_non_colliding_position(clsB,bPos,0,1,1),true) end --tpc:SpawnLogsB() end
 	players.playsound("warp_in",f)
 end
+
+
+
+
 local t={name="b1",position=vector(-1,-7)} warptorio.Teleporters[t.name]=t
 function t:Warpin() local lvEnergy,lvLogs,lvDual,lvTri=research.level("warptorio-energy"),research.level("warptorio-logistics"),research.has("warptorio-dualloader-1") and 2 or 0,research.has("warptorio-triloader") and 2 or 0
 	local tpc,cls,fa,fb,desA,desB=warptorio.Teleporters(self.name,true,true),"warptorio-underground-"..lvEnergy,warptorio.GetPlanetSurface(),warptorio.GetFactorySurface()
-	if(tpc:ValidA())then if(tpc.a.name~=cls)then x:DestroyA() desA=true elseif(tpc.a.surface~=fa)then x:DestroyA() x:DestroyLogsA() end end
-	if(tpc:ValidB())then if(tpc.b.name~=cls)then x:DestroyB() desB=true elseif(tpc.b.surface~=fb)then x:DestroyB() x:DestroyLogsB() end end
+	if(tpc:ValidA())then if(tpc.a.name~=cls)then tpc:DestroyA() desA=true elseif(tpc.a.surface~=fa)then tpc:DestroyA() tpc:DestroyLogsA() end end
+	if(tpc:ValidB())then if(tpc.b.name~=cls)then tpc:DestroyB() desB=true elseif(tpc.b.surface~=fb)then tpc:DestroyB() tpc:DestroyLogsB() end end
 	local pos=vector(-1,-7)
 	local size=warptorio.GetTeleporterSize(tpc.main)
 	if(not tpc:ValidA())then if(not desA)then vector.clean(fa,vector.square(pos,size)) end tpc:MakeA(cls,fa,pos) tpc:SpawnLogsA() end
@@ -630,6 +653,7 @@ function t:Warpin() local lvEnergy,lvLogs,lvDual,lvTri=research.level("warptorio
 	tpc:ConnectCircuit()
 	players.playsound("warp_in",fa) players.playsound("warp_in",fb)
 end
+
 
 
 local t={name="nw",position=platform.corner.nw} warptorio.Teleporters[t.name]=t
@@ -684,8 +708,173 @@ function t:Warpin() local lvEnergy,lvLogs,lvDual,lvTri=research.level("warptorio
 end
 
 
+--[[ Harvester Pads ]]--
+
+warptorio.cache["warptorio-harvestportal"]={
+	create=function(e) warptorio.InsertCache("power",e) end,
+	mined=function(e,ev) for k,v in pairs(gwarptorio.Harvesters)do
+		if(v.a==e)then
+			for x,y in pairs(ev.buffer.get_contents())do ev.buffer.remove({name=x,count=y}) end
+			v.a=nil v:Warpin() ev.buffer.insert{name="warptorio-harvestpad-"..k.."-"..research.level("warptorio-harvester-"..k),count=1}
+			return
+		elseif(v.b==e)then
+			for x,y in pairs(ev.buffer.get_contents())do ev.buffer.remove({name=x,count=y}) end
+			v.b=nil ev.buffer.insert{name="warptorio-harvestpad-"..k.."-"..research.level("warptorio-harvester-"..k),count=1}
+			local hv=gwarptorio.Harvesters[k] if(hv)then hv:Recall() end
+			return
+		end
+	end end,
+	clone=function(e,ev) -- should probably remove power from the cloned accumulator
+		for k,v in pairs(gwarptorio.Harvesters)do if(v.a==ev.source)then v.b=e v.a=nil v:Warpin() return elseif(v.b==ev.source)then v.b=e return end end
+	end,
+	destroy=function(e,ev) warptorio.RemoveCache("power",e) end,
+}
+
+warptorio.cache["warptorio-harvestpad-west"]={
+	built=function(e,ev)
+		local f=e.surface if(f~=warptorio.GetPlanetSurface())then return end
+		local pos=e.position
+		entity.destroy(e)
+		local hv=gwarptorio.Harvesters["west"] if(hv)then hv:Deploy(f,pos) end
+	end,
+}
+warptorio.cache["warptorio-harvestpad-east"]={
+	built=function(e,ev)
+		local f=e.surface if(f~=warptorio.GetPlanetSurface())then return end
+		local pos=e.position
+		entity.destroy(e)
+		local hv=gwarptorio.Harvesters["east"] if(hv)then hv:Deploy(f,pos) end
+
+	end,
+}
+
+for k,v in pairs{"warptorio-harvestportal","warptorio-harvestpad-west","warptorio-harvestpad-east"}do
+	for i=0,8,1 do warptorio.cache[v.."-"..i]=warptorio.cache[v] end
+end
 
 
+
+
+HARV={} HARV.__index=HARV warptorio.HarvesterMeta=HARV setmetatable(HARV,{__index=tell}) 
+function HARV.__init(self,n,pos) self.name=n self.position=pos
+	self.deployed=false
+	self.deploy_position=nil
+	
+	gwarptorio.Harvesters[n]=self
+end
+function HARV:UpgradeEnergy() warptorio.Harvesters[self.name]:Warpin() end
+function HARV:Warpin() warptorio.Harvesters[self.name]:Warpin() end
+function HARV:GetSize() return gwarptorio.floor.b3["harvest_"..self.name] end
+function HARV:GetBaseArea(z) z=z or self:GetSize()-1 return vector.square(self.position,vector(z,z)) end
+function HARV:GetDeployArea(z) z=z or self:GetSize()-2 return vector.square(self.deploy_position,vector(z,z)) end
+function HARV:Recall() -- recall after portal is mined
+	if(not self.deployed)then return false end
+
+
+	local f=warptorio.GetPlanetSurface()
+	local ebs={} for k,v in pairs(f.find_entities_filtered{type="character",invert=true,area=self:GetDeployArea()})do if(not v.name:match("warptorio"))then table.insert(ebs,v) end end
+
+	local hf=warptorio.GetHarvesterSurface()
+	local harvArea=self:GetBaseArea()
+
+	local tbs={}
+	local tcs={} for k,v in pairs(hf.find_tiles_filtered{area=harvArea})do
+		local vpos=vector.add(vector.sub(v.position,self.position),self.deploy_position)
+		table.insert(tcs,{name=v.name,position=vpos})
+		table.insert(tbs,{name="warptorio-red-concrete",position=v.position})
+	end
+	local dcs={} for k,v in pairs(hf.find_decoratives_filtered{area=self:GetBaseArea()})do
+		local vpos=vector.add(vector.sub(v.position,self.position),self.deploy_position)
+		table.insert(dcs,{name=v.decorative.name,position=vpos,amount=v.amount})
+	end
+
+	local ecs={} for k,v in pairs(hf.find_entities_filtered{area=harvArea,type="character",invert=true})do if(not v.name:match("warptorio"))then table.insert(ecs,v) end end
+
+	f.set_tiles(tcs,true)
+	f.create_decoratives{decoratives=dcs}
+	hf.clone_entities{entities=ecs,destination_surface=f,destination_offset=vector.add(vector.mul(self.position,-1),self.deploy_position),snap_to_grid=false}
+
+	f.clone_entities{entities=ebs,destination_surface=hf,destination_offset=vector.add(vector.mul(self.deploy_position,-1),self.position),snap_to_grid=false}
+
+	for k,v in pairs(ecs)do entity.destroy(v) end
+	for k,v in pairs(ebs)do entity.destroy(v) end
+
+	hf.destroy_decoratives{area=harvArea}
+
+	--vector.LayTiles("warp-tile-concrete",hf,self:GetBaseArea(self:GetSize()+2))
+	--vector.LayTiles("warptorio-red-concrete",hf,self:GetBaseArea())
+	hf.set_tiles(tbs,true)
+	self.deployed=false
+end
+function HARV:Deploy(surf,pos) -- deploy over a harvester pad
+	if(self.deployed)then return false end
+	local f=surf if(f~=warptorio.GetPlanetSurface())then game.print("Harvesters can only be placed on the planet") return false end
+	game.print("deployed at: " .. serpent.line(pos))
+	self.deploy_position=vector.pos(pos)
+	local hf=gwarptorio.floor.b3.surface
+
+	local ebs=hf.find_entities_filtered{type="character",invert=true,area=self:GetBaseArea()}
+
+	local planetArea=self:GetDeployArea()
+
+	local tcs={} for x=planetArea[1][1],planetArea[2][1] do for y=planetArea[1][2],planetArea[2][2]do local v=f.get_tile(x,y)
+		local vpos=vector.add(vector.sub(vector(x,y),self.deploy_position),self.position)
+		table.insert(tcs,{name=v.name,position=vpos})
+	end end
+	local dcs={} for k,v in pairs(f.find_decoratives_filtered{area=self:GetDeployArea(self:GetSize()-3)})do
+		local vpos=vector.add(vector.sub(v.position,self.deploy_position),self.position)
+		table.insert(dcs,{name=v.decorative.name,position=vpos,amount=v.amount})
+	end
+	local ecs={} for k,v in pairs(f.find_entities_filtered{area=planetArea,type="character",invert=true})do if(not v.name:find("warptorio"))then table.insert(ecs,v) end end
+
+	hf.set_tiles(tcs,true)
+	hf.create_decoratives{decoratives=dcs}
+	f.clone_entities{entities=ecs,destination_surface=hf,destination_offset=vector.mul(vector.sub(self.deploy_position,self.position),-1),snap_to_grid=true}
+
+	vector.LayTiles("warptorio-red-concrete",f,self:GetDeployArea())
+
+	hf.clone_entities{entities=ebs,destination_surface=f,destination_offset=vector.add(vector.mul(self.position,-1),self.deploy_position),snap_to_grid=true}
+
+	for k,v in pairs(ecs)do entity.destroy(v) end
+	for k,v in pairs(ebs)do entity.destroy(v) end
+
+
+
+	self.deployed=true
+end
+
+--[[ Harvester Registers ]]--
+
+warptorio.Harvesters={} setmetatable(warptorio.Harvesters,{__index=warptorio.Harvesters,
+	__call=function(t,n,j,m) if(not gwarptorio.Harvesters[n])then new(HARV,n,j,m) end return gwarptorio.Harvesters[n] end,
+})
+
+local t={name="west",position=warptorio.platform.harvester.west} warptorio.Harvesters[t.name]=t
+function t:Warpin() local lvEnergy,lvLogs,lvDual,lvTri=research.level("warptorio-energy")
+	local tpc,cls,fa,fb,desA,desB=warptorio.Harvesters(self.name,self.position),"warptorio-harvestportal-"..lvEnergy,warptorio.GetHarvesterSurface()
+	local apos=self.position local bpos=self.position
+	if(tpc:ValidA())then if(tpc.a.name~=cls)then tpc:DestroyA() desA=true elseif(tpc.a.surface~=fa)then tpc:DestroyA() end end
+	if(tpc:ValidB())then if(tpc.b.name~=cls)then fb=tpc.b.surface bpos = tpc.b.position tpc:DestroyB() desB=true end end
+	local size=vector(2,2)
+	if(not tpc:ValidA())then if(not desA)then vector.clean(fa,vector.square(apos,size)) end tpc:MakeA(cls,fa,apos,true) end
+	if(desB)then tpc:MakeB(cls,fb,bpos,true) end
+	--tpc:ConnectCircuit()
+	players.playsound("warp_in",fa) players.playsound("warp_in",fb)
+end
+
+
+local t={name="east",position=warptorio.platform.harvester.east} warptorio.Harvesters[t.name]=t
+function t:Warpin() local lvEnergy,lvLogs,lvDual,lvTri=research.level("warptorio-energy")
+	local tpc,cls,fa,fb,desA,desB=warptorio.Harvesters(self.name,self.position),"warptorio-harvestportal-"..lvEnergy,warptorio.GetHarvesterSurface()
+	local apos=self.position local bpos=self.position
+	if(tpc:ValidA())then if(tpc.a.name~=cls)then tpc:DestroyA() desA=true elseif(tpc.a.surface~=fa)then tpc:DestroyA() end end
+	if(tpc:ValidB())then if(tpc.b.name~=cls)then fb=tpc.b.surface bpos = tpc.b.position tpc:DestroyB() desB=true end end
+	local size=vector(2,2)
+	if(not tpc:ValidA())then if(not desA)then vector.clean(fa,vector.square(apos,size)) end tpc:MakeA(cls,fa,apos,true) end
+	if(desB)then tpc:MakeB(cls,fb,bpos,true) end
+	--tpc:ConnectCircuit()
+	players.playsound("warp_in",fa) players.playsound("warp_in",fb)
+end
 
 
 --[[ Surface Platforms ]]--
@@ -756,9 +945,9 @@ function warptorio.BuildB1()
 	vector.LayTiles("hazard-concrete-left",f,vector.square(warptorio.Teleporters.b2.position,((not rBoiler and rLogs==0) and ltp==vector(3,3) or warptorio.GetTeleporterHazard(true)))) -- Boiler
 	vector.LayTiles("hazard-concrete-left",f,vector.square(warptorio.Teleporters.b1.position,warptorio.GetTeleporterHazard(true))) -- factory entrance
 	vector.LayTiles("hazard-concrete-left",f,vector.square(vector(-0.5,-0.5),vector(2,2))) -- beacon
-	local rc={} for k in pairs(platform.corner)do local rclv=research.level("warptorio-turret-"..k) if(rclv>0)then rc[k]=rclv end end
+	local rc={} for k in pairs(platform.corner)do local rclv=research.level("warptorio-turret-"..k) if(rclv>0 or research.has("warptorio-turret-"..k.."-0"))then rc[k]=rclv end end
 	local zMainWidth=10+rBridge*2
-	local zMainHeight=59+rBridge*2
+	local zMainHeight=59+rBridge*2-2
 	local zLeg=6+rBridge*4
 	local whas=(rc.nw or rc.sw) local nhas=(rc.nw or rc.ne) local ehas=(rc.ne or rc.se) local shas=(rc.sw or rc.se)
 	if(nhas)then vector.LayTiles("warp-tile-concrete",f,vector.square(vector(-1,platform.side.north.y/2),vector(zMainWidth,zMainHeight))) end
@@ -821,10 +1010,10 @@ function warptorio.BuildB2() local m=gwarptorio.floor.b2 local f=m.surface local
 
 	if(rWater>0)then
 		local zx=2+rWater
-		vector.LayTiles("deepwater",f,vector.square(vector(z/3+((zx/2)+1)-1,z/3+((zx/2)+1)-1),vector(zx,zx)))
-		vector.LayTiles("deepwater",f,vector.square(vector(-z/3-((zx/2)+1)-1,-z/3-((zx/2)+1)-1),vector(zx,zx)))
-		vector.LayTiles("deepwater",f,vector.square(vector(-z/3-((zx/2)+1)-1,z/3+((zx/2)+1)-1),vector(zx,zx)))
-		vector.LayTiles("deepwater",f,vector.square(vector(z/3+((zx/2)+1)-1,-z/3-((zx/2)+1)-1),vector(zx,zx)))
+		vector.LayTiles("deepwater",f,vector.square(vector(z/3+((zx/2)+1)-0.5,z/3+((zx/2)+1)-0.5),vector(zx,zx)))
+		vector.LayTiles("deepwater",f,vector.square(vector(-z/3-((zx/2)+1)-0.5,-z/3-((zx/2)+1)-0.5),vector(zx,zx)))
+		vector.LayTiles("deepwater",f,vector.square(vector(-z/3-((zx/2)+1)-0.5,z/3+((zx/2)+1)-0.5),vector(zx,zx)))
+		vector.LayTiles("deepwater",f,vector.square(vector(z/3+((zx/2)+1)-0.5,-z/3-((zx/2)+1)-0.5),vector(zx,zx)))
 	end
 	local rgNorth=research.has("warptorio-boiler-n")
 	local rgSouth=research.has("warptorio-boiler-s")
@@ -863,6 +1052,15 @@ function warptorio.BuildB2() local m=gwarptorio.floor.b2 local f=m.surface local
 	players.playsound("warp_in",f.name)
 end
 
+function warptorio.BuildHarvestCorner(cz,k,v)
+	if(research.has("warptorio-harvester-"..k.."-gate"))then
+		vector.LayTiles("warp-tile-concrete",f,vector.square(v/3*2,vector(cz*1.25,cz*1.25)))
+		vector.LayTiles("warptorio-red-concrete",f,vector.square(v/3*2,vector(cz,cz)))
+		vector.LayTiles("hazard-concrete-left",f,vector.square((v/3*2),vector(2,2)))
+	end 
+end
+
+
 function warptorio.BuildB3()
 	local m=gwarptorio.floor.b3 local f=m.surface local z=m.size
 
@@ -875,30 +1073,47 @@ function warptorio.BuildB3()
 
 	vector.LayCircle("warp-tile-concrete",f,vector.oval(vector(-1,-1),ovSize))
 
-	vector.LayTiles("warp-tile-concrete",f,vector.square(vector(platform.side.east.x/3*2,-1),vector(6,platform.side.south.y+3)))
-	vector.LayTiles("warp-tile-concrete",f,vector.square(vector(platform.side.west.x/3*2,-1),vector(6,platform.side.south.y+3)))
 
+--[[ for 4 corners
+
+	--local zx=(platform.side.east.x+platform.side.west.x)/3*2
+	--vector.LayTiles("warp-tile-concrete",f,vector.square(vector(platform.side.east.x/3*2,-1),vector(6,platform.side.south.y+3)))
+	--vector.LayTiles("warp-tile-concrete",f,vector.square(vector(platform.side.west.x/3*2,-1),vector(6,platform.side.south.y+3)))
 	local cz=16
-	for k,v in pairs(platform.corner)do
-		vector.LayTiles("warp-tile-concrete",f,vector.square(v/3*2,vector(cz*1.25,cz*1.25)))
-		vector.LayTiles("warptorio-red-concrete",f,vector.square(v/3*2,vector(cz,cz)))
-		vector.LayTiles("hazard-concrete-left",f,vector.square((v/3*2),vector(2,2)))
+	for k,v in pairs(platform.corner)do warptorio.BuildHarvestCorner(cz,k,v) end
+]]
+
+--[[ for 2 sides ]]
+	local vz=cirMaxWidth
+	--local ez=m.harvestSize or 10 -- harvester size max 47
+	local hvMax=47
+	local vzx=vz/2 local hvx=hvMax/2 local hvy=hvMax/8
+
+	if(research.has("warptorio-harvester-west-1"))then
+		local ez=m.harvest_west or 10
+		vector.LayTiles("warp-tile-concrete",f,vector.square(vector(-1-vz/4,-1),vector(vz/2+hvMax/2,4)))
+		local westPos=warptorio.platform.harvester.west --vector(-(vzx+(hvx-hvy))+0.5,-0.5)
+		local hve=gwarptorio.Harvesters.west
+		if(not hve or not hve.deployed)then
+			vector.LayTiles("warp-tile-concrete",f,vector.square(westPos,vector(ez+2,ez+2)))
+			vector.LayTiles("warptorio-red-concrete",f,vector.square(westPos,vector(ez-2,ez-2)))
+		end
+	end if(research.has("warptorio-harvester-east-1"))then
+		local ez=m.harvest_east or 10
+		vector.LayTiles("warp-tile-concrete",f,vector.square(vector(-1+vz/4,-1),vector(vz/2+hvMax/2,4)))
+		local eastPos=warptorio.platform.harvester.east --vector(vzx+(hvx-hvy),-0.5)
+		local hve=gwarptorio.Harvesters.east
+		if(not hve or not hve.deployed)then
+			vector.LayTiles("warp-tile-concrete",f,vector.square(eastPos,vector(ez+2,ez+2)))
+			vector.LayTiles("warptorio-red-concrete",f,vector.square(eastPos,vector(ez-2,ez-2)))
+		end
 	end
 
-	local ez=47
-	local vz=MaxcirWidth 
+--[[ ]]
 
-
-	--vector.LayTiles("warp-tile-concrete",f,vector.square(vector(-1-vz/2-ez/2+ez/8,-1),vector(ez,ez)))
-	--vector.LayTiles("warptorio-red-concrete",f,vector.square(vector(-1-vz/2-ez/2+ez/8,-1),vector(ez/3*2,ez/3*2)))
-
-	--vector.LayTiles("warp-tile-concrete",f,vector.square(vector(-1+vz/2+ez/2-ez/8,-1),vector(ez,ez)))
-	--vector.LayTiles("warptorio-red-concrete",f,vector.square(vector(-1+vz/2+ez/2-ez/8,-1),vector(ez/3*2,ez/3*2)))
-
-	vector.LayTiles("hazard-concrete-left",f,vector.square(warptorio.Teleporters.b2.position,warptorio.GetTeleporterHazard(true))) -- Boiler
-	vector.LayTiles("hazard-concrete-left",f,vector.square(warptorio.Teleporters.b1.position,warptorio.GetTeleporterHazard(true))) -- factory entrance
+	vector.LayTiles("hazard-concrete-left",f,vector.square(warptorio.Teleporters.b3.position,warptorio.GetTeleporterHazard(true))) -- entry
+	vector.LayTiles("hazard-concrete-left",f,vector.square(warptorio.Teleporters.b2.position,warptorio.GetTeleporterHazard(true))) -- b4 ??
 	vector.LayTiles("hazard-concrete-left",f,vector.square(vector(-1,-1),vector(2,2))) -- beacon
-
 end
 
 -- --------
@@ -944,9 +1159,7 @@ function warptorio.BalanceLogistics(a,b,bal) if(not a or not b or not a.valid or
 end
 
 
-
-warptorio.teleDir={[0]={0,-1},[1]={1,-1},[2]={1,0},[3]={1,1},[4]={0,1},[5]={-1,1},[6]={-1,0},[7]={-1,-1}}
-function warptorio.on_tick.Teleporters(e) for k,v in pairs(gwarptorio.Teleporters)do if(v:ValidA() and v:ValidB())then
+function warptorio.DoTeleporterTick(k,v)
 	for i,e in pairs({v.a,v.b})do
 		local o=(i==1 and v.b or v.a) local x=e.position local xxx=math.abs(x.x) local xxy=math.abs(x.y) local p={}
 		for idx,ply in pairs(game.players)do
@@ -964,7 +1177,12 @@ function warptorio.on_tick.Teleporters(e) for k,v in pairs(gwarptorio.Teleporter
 			else local td=warptorio.teleDir[w.direction] entity.safeteleport(b,o.surface,vector(ox.x+td[1]*mp,ox.y+td[2]*mp)) end
 		end
 	end
-end end end
+end
+warptorio.teleDir={[0]={0,-1},[1]={1,-1},[2]={1,0},[3]={1,1},[4]={0,1},[5]={-1,1},[6]={-1,0},[7]={-1,-1}}
+function warptorio.on_tick.Teleporters(e)
+	for k,v in pairs(gwarptorio.Teleporters)do if(v:ValidA() and v:ValidB())then warptorio.DoTeleporterTick(k,v) end end
+	for k,v in pairs(gwarptorio.Harvesters)do if(v:ValidA() and v:ValidB())then warptorio.DoTeleporterTick(k,v) end end
+end
 
 
 
@@ -1280,8 +1498,11 @@ function warptorio.OnPlayerRespawned(event) -- teleport to warp platform on resp
 	if(gp.surface~=cf)then local pos=cf.find_non_colliding_position("character",{0,-5},0,1,1) gp.teleport(pos,cf) end
 end script.on_event(defines.events.on_player_respawned,warptorio.OnPlayerRespawned)
 
-
-function warptorio.on_built_entity.planet(ev) local p=warptorio.GetPlanetBySurface(getEventEnt(ev).surface.index) if(p)then warptorio.CallPlanetEvent(p,"on_built_entity",ev) end end
+for k,v in pairs{"on_built_entity","on_robot_built_entity","script_raised_built","script_raised_revive","on_player_mined_entity","on_entity_died","on_entity_cloned","on_chunk_deleted","on_chunk_generated"}do
+	warptorio[v].planet=function(ev) local e=getEventEnt(ev) if(e and e.valid)then local p=warptorio.GetPlanetBySurface(e.surface.index) if(p)then warptorio.CallPlanetEvent(p,v,ev) end end end
+end
+--[[
+function warptorio.on_built_entity.planet(ev) local e=getEventEnt(ev) if(e.valid)then local p=warptorio.GetPlanetBySurface(e.surface.index) if(p)then warptorio.CallPlanetEvent(p,"on_built_entity",ev) end end end
 function warptorio.on_robot_built_entity.planet(ev) local p=warptorio.GetPlanetBySurface(getEventEnt(ev).surface.index) if(p)then warptorio.CallPlanetEvent(p,"on_robot_built_entity",ev) end end
 
 function warptorio.script_raised_built.planet(ev) local p=warptorio.GetPlanetBySurface(getEventEnt(ev).surface.index)  if(p)then warptorio.CallPlanetEvent(p,"script_raised_built",ev) end end
@@ -1293,6 +1514,7 @@ function warptorio.on_entity_cloned.planet(ev) local p=warptorio.GetPlanetBySurf
 
 function warptorio.on_chunk_deleted.planet(ev) local p=warptorio.GetPlanetBySurface(ev.surface.index) if(p)then warptorio.CallPlanetEvent(p,"on_chunk_deleted",ev) end end
 function warptorio.on_chunk_generated.planet(ev) local p=warptorio.GetPlanetBySurface(ev.surface.index) if(p)then warptorio.CallPlanetEvent(p,"on_chunk_generated",ev) end end
+]]
 
 function warptorio.on_tick.planet(tick) for k,v in pairs(game.surfaces)do
 	local p=warptorio.GetPlanetBySurface(v.index) if(p)then warptorio.CallPlanetEvent(p,"on_tick",{tick=tick,surface=v}) end
@@ -1613,11 +1835,12 @@ end script.on_init(warptorio.Initialize)
 
 
 function warptorio.OnLoad()
-	if(not global.warptorio or gwarptorio)then return end
+	--if(not global.warptorio or gwarptorio)then return end
 	gwarptorio=global.warptorio
 	for k,v in pairs(gwarptorio.floor)do setmetatable(v,warptorio.FloorMeta) end
 	for k,v in pairs(gwarptorio.Teleporters)do setmetatable(v,warptorio.TeleporterMeta) end
 	for k,v in pairs(gwarptorio.Rails)do setmetatable(v,warptorio.TelerailMeta) end
+	for k,v in pairs(gwarptorio.Harvesters)do setmetatable(v,warptorio.HarvesterMeta) end
 end script.on_load(warptorio.OnLoad)
 
 function warptorio.OnModSettingChanged(ev) local p=ev.player_index local s=ev.setting local st=ev.setting_type
@@ -1685,7 +1908,7 @@ function warptorio.Migrate() if(warptorio.Loaded)then return end
 	gwarptorio.Research=gwarptorio.Research or {}
 	gwarptorio.Turrets=gwarptorio.Turrets or {}
 	gwarptorio.Rails=gwarptorio.Rails or {}
-
+	gwarptorio.Harvesters=gwarptorio.Harvesters or {}
 
 	if(not gwarptorio.floor)then warptorio.init.floors() end--warptorio.InitFloors() end
 
@@ -1705,7 +1928,7 @@ end
 
 
 local lootItems={
-["roboport"]=10,
+["roboport"]=4,
 ["construction-robot"]=10,
 ["logistic-chest-passive-provider"]=10,
 ["logistic-chest-requester"]=10,
