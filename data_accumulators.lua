@@ -45,7 +45,7 @@ local t={
       repair_sound = {filename = "__base__/sound/manual-repair-simple.ogg"},
 	maximum_wire_distance=7.5,
 	supply_area_distance=2.5,
-	
+	minable={mining_time=10,result="warptorio-teleporter-0"},
 
 
 	picture={ layers={
