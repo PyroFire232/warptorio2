@@ -1,0 +1,60 @@
+
+if(global.warptorio)then
+	local gwarptorio=global.warptorio
+	if(gwarptorio.Floors)then gwarptorio.floor=gwarptorio.Floors gwarptorio.Floors=nil
+		for k,v in pairs(gwarptorio.floor)do
+			local adx=0
+			if((k=="main" or k=="b1" or k=="b2") and v.z)then v.z=v.z-1 end
+			v.surface=v.f v.f=nil
+			v.size=v.z v.z=nil
+		end
+	end
+
+
+	if(gwarptorio.Teleporters)then
+		local ht={}
+		local hasOffworld=game.forces.player.technologies["warptorio-teleporter-portal"].researched
+		for k,v in pairs(gwarptorio.Teleporters)do if(k~="offworld" or (k=="offworld" and hasOffworld))then table.insert(ht,k) end
+			if(v.logs)then for x,y in pairs(v.logs)do y.destroy() end end
+			if(v.PointA and v.PointA.valid)then v.PointA.destroy() end
+			if(v.PointB and v.PointB.valid)then v.PointB.destroy() end
+		end
+		gwarptorio.Teleporters={}
+		for k,v in pairs(ht)do warptorio.Teleporters[v]:Warpin() end
+	end
+
+
+	if(gwarptorio.Rails)then
+		local rt={}
+		for k,v in pairs(gwarptorio.Rails)do
+			table.insert(rt,v.name)
+		end
+		for k,v in pairs(gwarptorio.floor.main.surface.find_entities_filtered{name="straight-rail"})do if(v.destructible==false)then v.destroy() end end
+
+		gwarptorio.Rails={}
+		for k,v in pairs(rt)do warptorio.BuildRailCorner(v) end
+	end
+
+	warptorio.OnLoad()
+	warptorio.Migrate()
+	warptorio.CheckReactor()
+
+	warptorio.RebuildFloors()
+
+	if(research.has("warptorio-charting"))then local gf=gwarptorio.floor if(gf)then
+		if(gf.b1)then gf.b1:CheckRadar() end
+		if(gf.b2)then gf.b2:CheckRadar() end
+		--if(gf.b3)then gf.b3:CheckRadar() end -- disabled for now ?
+	end end
+
+
+	for k,v in pairs(game.players)do if(v.valid and v.gui and v.gui.valid and v.gui.left.warptorio_frame)then v.gui.left.warptorio_frame.destroy() end end
+
+	warptorio.ResetGui()
+
+end
+
+game.print("Applied Warptorio Migration 0.8.8")
+
+--warptorio.OnLoad()
+--warptorio.Migrate()

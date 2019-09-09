@@ -8,6 +8,10 @@ Date: 26.08.2019
     - New Harvester Floor and a new relating gameplay mechanic.
     - Made a bunch of things use locale for translation later
     - Fixed the teleporter logistics blocked message on warp
+    - Moved first boiler room water research to blue science
+    - Fixed water placement bugs
+    - Made platform "turrets" research a bit cheaper, and moved the first level to green science.
+    - Broke Warp Loaders
 
 
 ---------------------------------------------------------------------------------------------------

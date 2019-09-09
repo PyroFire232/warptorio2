@@ -283,7 +283,7 @@ warptorio.cache["warptorio-teleporter-gate"]={
 		t:SpawnLogsB()
 	end,
 	destroy=function(e,ev) warptorio.RemoveCache("power",e)
-		local t=gwarptorio.Teleporters.offworld t:DestroyLogsB()
+		local t=gwarptorio.Teleporters.offworld if(t)then t:DestroyLogsB() end
 	end,
 }
 warptorio.cache["warptorio-underground"]={
@@ -355,12 +355,11 @@ local platform={} warptorio.platform=platform
 platform.railCorner={nw=vector(-35,-35),ne=vector(34,-35),sw=vector(-35,34),se=vector(34,34)}
 platform.railOffset={nw=vector(0,0),ne=vector(-1,0),sw=vector(0,-1),se=vector(-1,-1)} --{nw=vector(-1,-1),ne=vector(0,-1),sw=vector(-1,0),se=vector(0,0)}
 platform.railLoader={nw=vector.area(vector(2,0),vector(0,2)),sw=vector.area(vector(2,0),vector(0,-2)),ne=vector.area(vector(-2,0),vector(0,2)),se=vector.area(vector(-2,0),vector(0,-2))}
-platform.railChest={} for k,v in pairs(platform.railCorner)do platform.railChest[k]=v+platform.railOffset[k] end
 
 platform.letterOpposite={n=defines.direction.south,s=defines.direction.north,e=defines.direction.west,w=defines.direction.east}
 platform.railLoaderPos={
 	nw={vector(2,0),vector(2,-1),vector(0,2),vector(-1,2)},
-	sw={vector(2,0),vector(2,-1),vector(0,-2),vector(-1,-1)},
+	sw={vector(2,0),vector(2,-1),vector(0,-2),vector(-1,-2)},
 	ne={vector(-2,0),vector(-2,-1),vector(0,2),vector(-1,2)},
 	se={vector(-2,0),vector(-2,-1),vector(0,-2),vector(-1,-2)},
 }
@@ -408,35 +407,38 @@ end
 
 --[[ Warp Rails ]]--
 
+
 local trail={} trail.__index=trail setmetatable(trail,trail) warptorio.TelerailMeta=trail
-function trail.__call(t,n) if(warptorio.Rails[n])then return warptorio.Rails[n] else return new(trail,n) end end
-function trail.__init(self,n) self.name=n self.chests={} self.rails={} self.loaders={} gwarptorio.Rails[n]=self self.dir="output" self:DoMakes() end
+function trail.__call(t,n) if(gwarptorio.Rails[n])then return gwarptorio.Rails[n] else return new(trail,n) end end
+function trail.__init(self,n) self.name=n self.chests={} self.rails={} self.loaders={} gwarptorio.Rails[n]=self self.dir="output" end
 
 function trail:MakeRails()
 	local f=warptorio.GetPlanetSurface()
 	local c=platform.railCorner[self.name]+platform.railOffset[self.name]
-	if(not isvalid(self.rails[1]))then self.rails[1]=entity.protect(entity.spawn(f,"straight-rail",c,{direction=defines.direction.south}),false,false) end
-	if(not isvalid(self.rails[2]))then self.rails[2]=entity.protect(entity.spawn(f,"straight-rail",c,{direction=defines.direction.east}),false,false) end
+	if(not isvalid(self.rails[1]))then self.rails[1]=entity.protect(entity.spawn(f,"straight-rail",c,defines.direction.south),false,false) end
+	if(not isvalid(self.rails[2]))then self.rails[2]=entity.protect(entity.spawn(f,"straight-rail",c,defines.direction.east),false,false) end
 end
 function trail:MakeChestAt(f,chest,i,pos,req)
 	local r=self.chests[i] local rx if(isvalid(r) and r.name~=chest)then rx=r r=nil end
 	if(not r or not r.valid)then r=entity.protect(entity.spawn(f,chest,pos),false,false) self.chests[i]=r if(req)then entity.ChestRequestMode(r) end end
 	if(rx)then entity.copy.chest(rx,r) entity.destroy(rx) end
 end
-function trail:MakeChests() local chest=warptorio.GetChest(self.dir) local f=warptorio.GetFactorySurface() local req=(self.dir=="input") for k,v in pairs(platform.railChest)do self:MakeChestAt(f,chest,k,v,req) end end
+function trail:MakeChests() local chest=warptorio.GetChest(self.dir) local f=warptorio.GetFactorySurface() local req=(self.dir=="input")
+	for k,v in pairs(platform.railOffset)do self:MakeChestAt(f,chest,k,platform.railCorner[self.name]+v,req) end
+end
 function trail:RotateChests() local c=warptorio.GetChest(self.dir) self:MakeChests(c) end
 function trail:RotateLoaders() for k,v in pairs(self.loaders)do v.loader_type=self.dir end end
 function trail:CheckLoaders() for k,v in pairs(self.loaders)do if(v.loader_type~=self.dir)then self.dir=v.loader_type return self:RotateLoaders(),self:RotateChests() end end end
 function trail:MakeLoaderAt(f,belt,i,pos,dir,type)
-	local r=self.loaders[i]
+	local r=self.loaders[i] --game.print(serpent.line({f.name,belt,i,pos,dir,type}))
 	if(isvalid(r) and r.name~=belt)then entity.destroy(r) r=nil end
-	if(not isvalid(r))then r=entity.protect(entity.spawn(f,belt,pos,{direction=dir,type="output"}),false,false) self.loaders[i]=r end
+	if(not isvalid(r))then r=entity.create(f,belt,pos,dir,{type="output"}) if(not r)then return end r=entity.protect(r,false,false) self.loaders[i]=r end
 	if(isvalid(r) and r.loader_type~=type)then r.loader_type=type end
 	return r
 end
 function trail:MakeLoaders() local belt=warptorio.GetBelt(self.dir) local f=warptorio.GetFactorySurface() local c=self.name
-	for i=1,2 do self:MakeLoaderAt(f,belt,i,platform.railLoaderPos[c][i]+platform.railCorner[c],platform.letterOpposite[c[1]],self.dir) end
-	for i=3,4 do self:MakeLoaderAt(f,belt,i,platform.railLoaderPos[c][i]+platform.railCorner[c],platform.letterOpposite[c[2]],self.dir) end
+	for i=1,2 do self:MakeLoaderAt(f,belt,i,platform.railLoaderPos[c][i]+platform.railCorner[c],platform.letterOpposite[c:sub(2,2)],self.dir) end
+	for i=3,4 do self:MakeLoaderAt(f,belt,i,platform.railLoaderPos[c][i]+platform.railCorner[c],platform.letterOpposite[c:sub(1,1)],self.dir) end
 end
 
 function trail:DoMakes() self:MakeRails() self:MakeChests() self:MakeLoaders() end
@@ -458,19 +460,19 @@ end
 function trail:UnloadLogistics(e) for _,r in pairs(e)do
 		local inv=r.get_inventory(defines.inventory.cargo_wagon) for k,v in pairs(inv.get_contents())do local ct=self:SplitItem(k,v) if(ct>0)then inv.remove({name=k,count=ct}) end end
 end end
-function trail:BalanceLogistics() local f=gwarptorio.Floors.main:GetSurface() if(not f.valid)then return end local c=warptorio.railCorn[self.name]
+function trail:TickLogistics() local f=gwarptorio.floor.main.surface if(not f.valid)then return end local c=warptorio.platform.railCorner[self.name]
 	local e=f.find_entities_filtered{name="cargo-wagon",area={{c.x-1,c.y-1},{c.x+1,c.y+1}} }
 	if(table_size(e)>0)then if(self.dir=="output")then self:UnloadLogistics(e) self:BalanceChests() else self:LoadLogistics(e) end else self:BalanceChests() end
 end
-function trail:BalanceChests() local inv={} for k,v in pairs(self.chests)do inv[k]=v.get_inventory(defines.inventory.chest) end
+function trail:BalanceChests() local inv={} for k,v in pairs(self.chests)do inv[k]=v.get_inventory(defines.inventory.chest) end if(table_size(inv)>0)then
 	local ct={} for k,v in pairs(inv)do for a,b in pairs(v.get_contents())do ct[a]=(ct[a] or 0)+b end v.clear() end
-	local ci for a,b in pairs(ct)do local g=b ci=#inv for k,v in pairs(inv)do local gci=math.ceil(g/ci) if(gci>0)then local w=v.insert{name=a,count=math.ceil(g/ci)} ci=ci-1 g=g-w end end end
-end
+	local ci for a,b in pairs(ct)do local g=b ci=table_size(inv) for k,v in pairs(inv)do local gci=math.ceil(g/ci) if(gci>0)then local w=v.insert{name=a,count=math.ceil(g/ci)} ci=ci-1 g=g-w end end end
+end end
 
 -- Warp Rail Constructor
 
-function warptorio.BuildRailCorner(cn) local r=gwarptorio.Rails[cn] if(true) then return end
-	if(not r)then r=warptorio.Telerail(cn)
+function warptorio.BuildRailCorner(cn) local r=gwarptorio.Rails[cn] --if(true) then return end
+	if(not r)then r=trail(cn)
 		local f,fp=warptorio.GetFactorySurface(),warptorio.GetPlanetSurface() local c,co,cl=platform.railCorner[cn],platform.railOffset[cn],platform.railLoader[cn]
 		local vec,cx=vector(2,2),c+co
 		local sq=vector.square(cx,vec)
@@ -482,12 +484,14 @@ end
 function warptorio.BuildRails() warptorio.BuildRailCorner("nw") warptorio.BuildRailCorner("sw") warptorio.BuildRailCorner("ne") warptorio.BuildRailCorner("se") end --for k,v in pairs(warptorio.railCorn)do warptorio.BuildRailCorner(k) end end
 
 
+function warptorio.on_tick.logistics_telerails(ev) for k,v in pairs(gwarptorio.Rails)do v:TickLogistics() end end
+
 
 
 --[[ Warp Teleporters ]]--
 
 
-
+function warptorio.on_tick.logistics_teleporters(ev) for k,v in pairs(gwarptorio.Teleporters)do v:TickLogistics() end end
 
 local tell={} tell.__index=tell warptorio.TeleporterMeta=tell --setmetatable(tell,tell)
 --function tell.__call(self,n,j,m) if(gwarptorio.Teleporters[n])then return gwarptorio.Teleporters[n] else return new(tell,n,j,m) end end
@@ -496,9 +500,16 @@ function tell.__init(self,n,j,m) self.name=n self.top=j self.main=m self.chestco
 	self.pipes={a={},b={}}
 	self.loaders={a={},b={}}
 	self.dir={a={},b={}} for i=1,6,1 do self.dir.a[i]="input" self.dir.b[i]="output" end
+	game.print("Init'd " .. tostring(n))
 	gwarptorio.Teleporters[n]=self
 end
-function tell:TickLogistics()
+function tell:TickLogistics() 
+	for k,v in pairs(self.chests.a)do if(isvalid(self.chests.b[k]))then
+		if(self.dir.a[k]=="input")then warptorio.BalanceLogistics(v,self.chests.b[k]) else warptorio.BalanceLogistics(self.chests.b[k],v) end
+	end end
+	for k,v in pairs(self.pipes.a)do if(isvalid(self.pipes.b[k]))then
+		warptorio.BalanceLogistics(v,self.pipes.b[k])
+	end end
 end
 
 function tell:SetA(e) self.a=e if(self.AEnergy)then self.a.energy=self.AEnergy self.AEnergy=nil end end
@@ -513,7 +524,7 @@ function tell:Destroy() self:DestroyA() self:DestroyB() end
 function tell:ConnectCircuit() self.a.connect_neighbour({target_entity=self.b,wire=defines.wire_type.red}) self.a.connect_neighbour({target_entity=self.b,wire=defines.wire_type.green}) end
 
 function tell:MakeChest(o,k) local e=self.chests[o][k] local ex=warptorio.GetChest(self.dir[o][k])
-	if(e and e.name~=ex)then local v=entity.protect(entity.create(e.surface,ex,e.position)) entity.copy.chest(e,v) entity.destroy(e) self.chests[o][k]=v if(self.dir[o][k]=="input")then entity.ChestRequestMode(v) end end
+	if(e and e.name~=ex)then local v=entity.protect(entity.create(e.surface,ex,e.position),false,false) entity.copy.chest(e,v) entity.destroy(e) self.chests[o][k]=v if(self.dir[o][k]=="input")then entity.ChestRequestMode(v) end end
 end
 function tell:SwapLoaderChests(k) self:MakeChest("a",k) self:MakeChest("b",k) end
 function tell:UpgradeChests() for i=1,6,1 do self:SwapLoaderChests(i) end end
@@ -772,7 +783,7 @@ function HARV:Recall() -- recall after portal is mined
 
 
 	local f=warptorio.GetPlanetSurface()
-	local ebs={} for k,v in pairs(f.find_entities_filtered{type="character",invert=true,area=self:GetDeployArea()})do if(not v.name:match("warptorio"))then table.insert(ebs,v) end end
+	local ebs={} for k,v in pairs(f.find_entities_filtered{type="character",invert=true,area=self:GetDeployArea()})do if(v~=self.b and not v.name:match("warptorio"))then table.insert(ebs,v) end end
 
 	local hf=warptorio.GetHarvesterSurface()
 	local harvArea=self:GetBaseArea()
@@ -809,7 +820,7 @@ end
 function HARV:Deploy(surf,pos) -- deploy over a harvester pad
 	if(self.deployed)then return false end
 	local f=surf if(f~=warptorio.GetPlanetSurface())then game.print("Harvesters can only be placed on the planet") return false end
-	game.print("deployed at: " .. serpent.line(pos))
+	--game.print("deployed at: " .. serpent.line(pos))
 	self.deploy_position=vector.pos(pos)
 	local hf=gwarptorio.floor.b3.surface
 
@@ -1074,7 +1085,7 @@ function warptorio.BuildB3()
 	vector.LayCircle("warp-tile-concrete",f,vector.oval(vector(-1,-1),ovSize))
 
 
---[[ for 4 corners
+--[[ for 4 corners -- unfinished
 
 	--local zx=(platform.side.east.x+platform.side.west.x)/3*2
 	--vector.LayTiles("warp-tile-concrete",f,vector.square(vector(platform.side.east.x/3*2,-1),vector(6,platform.side.south.y+3)))
@@ -1091,7 +1102,7 @@ function warptorio.BuildB3()
 
 	if(research.has("warptorio-harvester-west-1"))then
 		local ez=m.harvest_west or 10
-		vector.LayTiles("warp-tile-concrete",f,vector.square(vector(-1-vz/4,-1),vector(vz/2+hvMax/2,4)))
+		vector.LayTiles("warp-tile-concrete",f,vector.square(vector(-1-vz/4,-1),vector(vz/2+(hvMax/2.5),4+(research.level("warptorio-harvester-west")-1)*2 )))
 		local westPos=warptorio.platform.harvester.west --vector(-(vzx+(hvx-hvy))+0.5,-0.5)
 		local hve=gwarptorio.Harvesters.west
 		if(not hve or not hve.deployed)then
@@ -1100,7 +1111,7 @@ function warptorio.BuildB3()
 		end
 	end if(research.has("warptorio-harvester-east-1"))then
 		local ez=m.harvest_east or 10
-		vector.LayTiles("warp-tile-concrete",f,vector.square(vector(-1+vz/4,-1),vector(vz/2+hvMax/2,4)))
+		vector.LayTiles("warp-tile-concrete",f,vector.square(vector(-1+vz/3,-1),vector(vz/2+((hvMax/2.5)),4+(research.level("warptorio-harvester-east")-1)*2 )))
 		local eastPos=warptorio.platform.harvester.east --vector(vzx+(hvx-hvy),-0.5)
 		local hve=gwarptorio.Harvesters.east
 		if(not hve or not hve.deployed)then
@@ -1195,14 +1206,14 @@ end
 -- Gui
 
 
-function warptorio.on_gui_selection_state_changed.gui(ev) local p,dm=game.players[event.player_index],derma.getderma(ev.element.name) if(dm and dm.changed)then dm:changed(p,ev) end end
+function warptorio.on_gui_selection_state_changed.gui(ev) local p,dm=game.players[ev.player_index],derma.getderma(ev.element.name) if(dm and dm.changed)then dm:changed(p,ev) end end
 
 function warptorio.IncrementAbility(c,m) c=c or 2.5 m=m or 5 local n=(gwarptorio.ability_uses or 0)+1 gwarptorio.ability_uses=n gwarptorio.ability_next=game.tick+60*60*(m+(n)*c)
 	warptorio.derma.uses() warptorio.derma.cooldown()
 end
 
 function warptorio.PlayerCanStartWarp(p) for k,v in pairs(gwarptorio.floor)do if(v.surface==p.surface)then return true end end return false end
-function warptorio.on_gui_click.gui(ev) local derm=derma.getderma(ev.element.name) if(derm and derm.click)then return derm:click(game.players[ev.player_index]) end end
+function warptorio.on_gui_click.gui(ev) local derm=derma.getderma(ev.element.name) if(derm and derm.click)then derm:click(game.players[ev.player_index]) end end
 
 derma={}
 derma.frame="warptorio_frame"
@@ -1216,7 +1227,7 @@ function derma.control(h,n,y,dft) local r=h[n] if(not r)then dft=dft or {} dft.n
 function derma.update(wname,...) local c=warptorio.derma[wname] if(c)then c(nil,...) end end
 function derma.getderma(cname,...) for k,v in pairs(warptorio.derma)do if(v.name==cname)then return v end end end
 function derma.GuiControl(name,type) local t={name=name,type=type}
-	return setmetatable(t,{__index=t,__call=function(self,p,...) if(not p)then for k,v in pairs(game.players)do self:update(v,...) end else self:update(p,...) end end})
+	return setmetatable(t,{__call=function(self,p,...) if(not p)then for k,v in pairs(game.players)do self:update(v,...) end else self:update(p,...) end end})
 end
 
 
@@ -1225,6 +1236,7 @@ function warptorio.ResetGui(p) if(not p)then for k,v in pairs(game.players)do wa
 function warptorio.MakeGui(p)
 	derma.getrow(p,1).clear()
 	warptorio.derma.warpbtn(p)
+	warptorio.derma.warptgt(p)
 	warptorio.derma.time_passed(p)
 	warptorio.derma.charge_time(p)
 	warptorio.derma.warpzone(p)
@@ -1276,7 +1288,7 @@ end
 wderma.warptgt=derma.GuiControl("warptorio_warptarget","drop-down")
 function wderma.warptgt:get(p) return derma.control(derma.getrow(p,1),self.name,self.type) end
 function wderma.warptgt:update(p) local r=self:get(p) local tgl={"(Random)"}
-	if(gwarptorio.homeworld)then table.insert(tgl,"(Homeworld)") end if(research.has("charting"))then for k,v in pairs(warptorio.Planets)do table.insert(tgl,v.key) end end r.items=tgl
+	if(gwarptorio.homeworld)then table.insert(tgl,"(Homeworld)") end if(research.has("warptorio-charting"))then for k,v in pairs(warptorio.Planets)do table.insert(tgl,v.key) end end r.items=tgl
 end
 function wderma.warptgt:changed(p,ev) local r=self:get(p)
 	local s=r.items[r.selected_index] if(not s)then return end local sx=s:lower()
@@ -1606,7 +1618,7 @@ function warptorio.Warpout(vplanet)
 	warptorio.derma.warpzone()
 	warptorio.derma.warpbtn()
 	local m=gwarptorio.floor.main local c=m.surface
-	local marea=vector.square(vector.pos(m.position),vector(m.size,m.size))
+	local marea=vector.square(vector.pos(m.position or {-1,-1}),vector(m.size,m.size))
 	gwarptorio.votewarp=0
 
 	-- charge time
@@ -1648,6 +1660,8 @@ function warptorio.Warpout(vplanet)
 
 	-- packup old teleporter gate
 	local tp=gwarptorio.Teleporters.offworld if(tp and tp:ValidB())then tp:DestroyB() tp:DestroyLogsB() end
+	-- Recall harvester plates
+	for k,v in pairs(gwarptorio.Harvesters)do v:Recall() end
 
 	-- Clean and prepare new surface
 	for k,v in pairs(f.find_entities_filtered{type="character",invert=true,area=marea})do v.destroy() end
@@ -1707,9 +1721,12 @@ function warptorio.Warpout(vplanet)
 
 	-- Recreate teleporter gate
 	if(gwarptorio.Teleporters.offworld)then warptorio.Teleporters.offworld:Warpin() end
-	for k,v in pairs(game.players)do if(v and v.valid)then local iv=v.get_main_inventory() for i,x in pairs(iv.get_contents())do
+	for k,v in pairs(game.players)do if(v and v.valid)then local iv=v.get_main_inventory() if(iv)then for i,x in pairs(iv.get_contents())do
 		if(i:sub(1,25)=="warptorio-teleporter-gate")then iv.remove{name=i,count=x} end
-	end end end
+		if(i:sub(1,23)=="warptorio-harvestportal")then iv.remove{name=i,count=x} end
+	end end end end
+
+
 
 	--// cleanup past entities
 	
@@ -1835,12 +1852,12 @@ end script.on_init(warptorio.Initialize)
 
 
 function warptorio.OnLoad()
-	--if(not global.warptorio or gwarptorio)then return end
+	if(not global.warptorio)then return end
 	gwarptorio=global.warptorio
-	for k,v in pairs(gwarptorio.floor)do setmetatable(v,warptorio.FloorMeta) end
-	for k,v in pairs(gwarptorio.Teleporters)do setmetatable(v,warptorio.TeleporterMeta) end
-	for k,v in pairs(gwarptorio.Rails)do setmetatable(v,warptorio.TelerailMeta) end
-	for k,v in pairs(gwarptorio.Harvesters)do setmetatable(v,warptorio.HarvesterMeta) end
+	if(gwarptorio.floor)then for k,v in pairs(gwarptorio.floor)do setmetatable(v,warptorio.FloorMeta) end end
+	if(gwarptorio.Teleporters)then for k,v in pairs(gwarptorio.Teleporters)do setmetatable(v,warptorio.TeleporterMeta) end end
+	if(gwarptorio.Rails)then for k,v in pairs(gwarptorio.Rails)do setmetatable(v,warptorio.TelerailMeta) end end
+	if(gwarptorio.Harvesters)then for k,v in pairs(gwarptorio.Harvesters)do setmetatable(v,warptorio.HarvesterMeta) end end
 end script.on_load(warptorio.OnLoad)
 
 function warptorio.OnModSettingChanged(ev) local p=ev.player_index local s=ev.setting local st=ev.setting_type
@@ -1859,11 +1876,11 @@ function warptorio.OnConfigChanged(ev)
 	warptorio.OnLoad()
 	warptorio.Migrate()
 
-	local fb=warptorio.GetFastestLoader()
+--[[	local fb=warptorio.GetFastestLoader()
 	if(gwarptorio.fastest_loader ~= fb)then
 		for k,v in pairs(gwarptorio.Teleporters)do v:UpgradeLogistics() end for k,v in pairs(gwarptorio.Rails)do v:DoMakes(true) end
 		gwarptorio.fastest_loader=fb
-	end
+	end]]
 	warptorio.ValidateWarpBlacklist()
 	--warptorio.OverrideNauvis()
 

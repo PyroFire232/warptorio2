@@ -1,3 +1,4 @@
+--[[ disabled in 0.8.8
 warptorio.OnLoad()
 warptorio.Migrate()
 if(global.warptorio)then
@@ -14,3 +15,4 @@ if(global.warptorio)then
 end
 
 game.print("Applied Warptorio Migration 0.3.7_0")
+]]

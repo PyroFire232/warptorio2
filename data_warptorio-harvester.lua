@@ -23,9 +23,10 @@ local function ExtendTech(t,d,s) local x=table.merge(t,d) if(s)then x.unit.ingre
 
 
 --for k,v in pairs{"nw","sw","se","ne","west","east"}do
-
+local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{name="warptorio-harvestportal-0",
+	minable={mining_time=5,result="warptorio-harvestportal-0"},energy_source={buffer_capacity="5MJ",input_flow_limit="500kW",output_flow_limit="500kW"}},true)
 local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{name="warptorio-harvestportal-1",
-	minable={result="warptorio-harvestportal-1"},energy_source={buffer_capacity="10MJ",input_flow_limit="500MW",output_flow_limit="500MW"}},true)
+	minable={mining_time=5,result="warptorio-harvestportal-1"},energy_source={buffer_capacity="10MJ",input_flow_limit="500MW",output_flow_limit="500MW"}},true)
 local t=ExtendDataCopy("accumulator","warptorio-harvestportal-1",{name="warptorio-harvestportal-2",energy_source={buffer_capacity="50MJ",input_flow_limit="1GW",output_flow_limit="1GW"}},true)
 local t=ExtendDataCopy("accumulator","warptorio-harvestportal-1",{name="warptorio-harvestportal-3",energy_source={buffer_capacity="100MJ",input_flow_limit="2GW",output_flow_limit="2GW"}},true)
 local t=ExtendDataCopy("accumulator","warptorio-harvestportal-1",{name="warptorio-harvestportal-4",energy_source={buffer_capacity="500MJ",input_flow_limit="5GW",output_flow_limit="5GW"}},true)
@@ -137,15 +138,15 @@ data:extend(makePortal("se",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2
 
 
 
-data:extend(makePortal("west-1",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",8.5))
-data:extend(makePortal("west-2",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(22-1)/2))
-data:extend(makePortal("west-3",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(28-1)/2))
+data:extend(makePortal("west-1",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(12-1)/2))
+data:extend(makePortal("west-2",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(20-1)/2))
+data:extend(makePortal("west-3",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(26-1)/2))
 data:extend(makePortal("west-4",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(32-1)/2))
 data:extend(makePortal("west-5",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(38-1)/2))
 
-data:extend(makePortal("east-1",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",8.5))
-data:extend(makePortal("east-2",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(22-1)/2))
-data:extend(makePortal("east-3",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(28-1)/2))
+data:extend(makePortal("east-1",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(12-1)/2))
+data:extend(makePortal("east-2",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(20-1)/2))
+data:extend(makePortal("east-3",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(26-1)/2))
 data:extend(makePortal("east-4",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(32-1)/2))
 data:extend(makePortal("east-5",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(38-1)/2))
 

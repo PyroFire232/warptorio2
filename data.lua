@@ -558,27 +558,30 @@ ExtendTech(t,{name="warptorio-harvester-size-5",unit={count=300,time=30}, prereq
 ExtendTech(t,{name="warptorio-harvester-size-6",unit={count=350,time=30}, prerequisites={"warptorio-harvester-size-5","nuclear-fuel-reprocessing"}}, {red=2,green=2,blue=1,purple=1,})
 ExtendTech(t,{name="warptorio-harvester-size-7",unit={count=400,time=30}, prerequisites={"warptorio-harvester-size-6","utility-science-pack","mining-productivity-3"}}, {red=2,green=2,blue=1,purple=1,yellow=1})
 
-for v,w in pairs({east={-32,0},west={32,0}})do
+
+for v,w in pairs({east={32,0},west={-32,0}})do
 local t={type="technology",upgrade=true,icon_size=128,icons={
 	{icon="__base__/graphics/technology/tanks.png",tint={r=0.3,g=0.3,b=1,a=1},priority="low"},
 	{icon="__base__/graphics/technology/concrete.png",tint={r=1,g=0.7,b=0.4,a=0.9},shift={w[1],w[2]},scale=0.45,priority="high"},
 }, }
-ExtendTech(t,{name="warptorio-harvester-"..v.."-gate",upgrade=false, unit={count=150,time=25}, prerequisites={"warptorio-harvester-floor"}}, {red=1,green=1} )
-ExtendTech(t,{name="warptorio-harvester-"..v.."-1", unit={count=200,time=25}, prerequisites={"warptorio-harvester-"..v.."-gate","mining-productivity-1"}}, {red=2,green=1,black=1,} )
-ExtendTech(t,{name="warptorio-harvester-"..v.."-2", unit={count=250,time=25}, prerequisites={"warptorio-harvester-"..v.."-1","chemical-science-pack"}}, {red=2,green=1,black=1,blue=1} )
-ExtendTech(t,{name="warptorio-harvester-"..v.."-3", unit={count=300,time=25}, prerequisites={"warptorio-harvester-"..v.."-2","production-science-pack","mining-productivity-2"}}, {red=2,green=2,black=1,blue=1} )
-ExtendTech(t,{name="warptorio-harvester-"..v.."-4", unit={count=400,time=25}, prerequisites={"warptorio-harvester-"..v.."-3","nuclear-fuel-reprocessing"}}, {red=2,green=2,black=1,blue=1,purple=1} )
-ExtendTech(t,{name="warptorio-harvester-"..v.."-5", unit={count=500,time=25}, prerequisites={"warptorio-harvester-"..v.."-4","utility-science-pack","mining-productivity-3"}}, {red=2,green=2,black=1,blue=1,purple=1,yellow=1} )
+--ExtendTech(t,{name="warptorio-harvester-"..v.."-gate",upgrade=false, unit={count=150,time=25}, prerequisites={"warptorio-harvester-floor"}}, {red=1,green=1} )
 
+ExtendTech(t,{name="warptorio-harvester-"..v.."-1", unit={count=150,time=25}, prerequisites={"warptorio-harvester-floor"},localised_description="technology-description.warptorio-harvester-"..v.."-gate"}, {red=1,green=1,} )
+ExtendTech(t,{name="warptorio-harvester-"..v.."-2", unit={count=200,time=25}, prerequisites={"warptorio-harvester-"..v.."-1","mining-productivity-1","military-science-pack"}}, {red=2,green=1,black=1} )
+ExtendTech(t,{name="warptorio-harvester-"..v.."-3", unit={count=300,time=25}, prerequisites={"warptorio-harvester-"..v.."-2","mining-productivity-2"}}, {red=2,green=2,black=1,blue=1} )
+ExtendTech(t,{name="warptorio-harvester-"..v.."-4", unit={count=400,time=25}, prerequisites={"warptorio-harvester-"..v.."-3","nuclear-fuel-reprocessing"}}, {red=2,green=2,black=1,blue=1,purple=1} )
+ExtendTech(t,{name="warptorio-harvester-"..v.."-5", unit={count=500,time=25}, prerequisites={"warptorio-harvester-"..v.."-4","mining-productivity-3"}}, {red=2,green=2,black=1,blue=1,purple=1,yellow=1} )
 end
 
+--[[ todo
 for v,w in pairs({nw={-38,-38},ne={38,-38},se={38,38},sw={-38,38}})do
 local t={type="technology",upgrade=true,icon_size=128,icons={
 	{icon="__base__/graphics/technology/tanks.png",tint={r=0.3,g=0.3,b=1,a=1},priority="low"},
 	{icon="__base__/graphics/technology/concrete.png",tint={r=1,g=0.7,b=0.4,a=0.9},shift={w[1],w[2]},scale=0.45,priority="high"},
 }, }
-ExtendTech(t,{name="warptorio-harvester-"..v.."-gate",upgrade=false, unit={count=1000,time=40}, prerequisites={"warptorio-harvester-size-7","warptorio-reactor-8","space-science-pack"}}, {red=1,green=1,black=1,blue=1,purple=1,yellow=1,white=1} )
+ExtendTech(t,{name="warptorio-harvester-"..v.."",upgrade=false, unit={count=1000,time=40}, prerequisites={"warptorio-harvester-size-7","warptorio-reactor-8","space-science-pack"}}, {red=1,green=1,black=1,blue=1,purple=1,yellow=1,white=1} )
 end
+]]
 
 -- ----
 -- Logistics

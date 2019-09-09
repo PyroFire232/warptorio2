@@ -1,4 +1,4 @@
-
+--[[ disabled in 0.8.8
 if(global.warptorio)then
 warptorio.OnLoad()
 warptorio.Migrate()
@@ -9,3 +9,5 @@ if(gwarptorio.charting)then gwarptorio.Floors.b1:CheckRadar() gwarptorio.Floors.
 end
 
 game.print("Applied Warptorio Migration 0.4.0")
+
+]]

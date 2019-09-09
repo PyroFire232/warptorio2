@@ -13,6 +13,9 @@ Add emissions to all entities
 ]]
 
 
+require("data_accumulators") -- include accumulator data AFTER factorioextended ruins the data.raw.accumulator tables, so that it doesn't break our mcnuggets.
+require("data_warptorio-harvester") -- include accumulator data AFTER factorioextended ruins the data.raw.accumulator tables, so that it doesn't break our mcnuggets.
+
 
 local entTbl={
 "accumulator",
@@ -87,5 +90,4 @@ for u,n in pairs(entTbl)do
 	end
 end
 --error(s)
-
 
