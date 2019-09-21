@@ -92,7 +92,7 @@ function makePortal(suffix, visible, sprite,size)
 			pictures = {
 				picture = {
 					sheet = {
-						filename = sprite,
+						filename = sprite, tint={r=1,g=1,b=1,a=0.3},
 						frames = 1,
 						width = 32,
 						height = 32,scale=size*2,

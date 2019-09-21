@@ -300,13 +300,15 @@ end
 function warptorio.EntityIsPlatform(e) local r --=(e.name:sub(1,9)=="warptorio") if(r)then return true end
 	for k,v in pairs(gwarptorio.Rails)do if(table.HasValue(v.rails,e))then return true end end
 	for k,v in pairs(gwarptorio.Teleporters)do if(v:ManagesEntity(e))then return true end end
-	--for k,v in pairs(gwarptorio.Harvesters)do if(v:ManagesEntity(e))then return true end end
+	for k,v in pairs(gwarptorio.Harvesters)do if(v:ManagesEntity(e))then return true end end
+	for k,v in pairs(gwarptorio.floor)do if(v:ManagesEntity(e))then return true end end
 end
 
 
 function warptorio.on_player_setup_blueprint.generic(ev) local bpe=ev.mapping.get() local cst=game.players[ev.player_index].cursor_stack
 	if(not settings.global.warptorio_no_blueprint.value and cst and cst.valid)then
-		local ents=cst.get_blueprint_entities() for k,v in pairs(ents)do if(warptorio.EntityIsPlatform(bpe[v.entity_number]))then ents[k]=nil end end cst.set_blueprint_entities(ents)
+		local ents=cst.get_blueprint_entities()
+		if(ents)then for k,v in pairs(ents)do if(warptorio.EntityIsPlatform(bpe[v.entity_number]))then ents[k]=nil end end cst.set_blueprint_entities(ents) end
 	end
 end
 
@@ -641,12 +643,12 @@ function tell:MakeLoaders(o,id)
 
 	local v=self.loaders[o][id] if(isvalid(v) and v.name~=belt)then entity.destroy(v) v=nil end
 	if(not isvalid(v))then v=entity.protect(entity.create(f,belt,vector.add(pos,vector(-1-id,belty)),lddir),false,false) v.loader_type=self.dir[o][id] self.loaders[o][id]=v
-		local inv=self.loaderFilter[o][id] if(inv)then for k,v in pairs(inv)do v.set_filter(k,v) end end
+		local inv=self.loaderFilter[o][id] if(inv)then for invx,invy in pairs(inv)do v.set_filter(invx,invy) end end
 	end
 
 	local v=self.loaders[o][id+3] if(isvalid(v) and v.name~=belt)then entity.destroy(v) v=nil end
 	if(not isvalid(v))then v=entity.protect(entity.create(f,belt,vector.add(pos,vector(1+id,belty)),lddir),false,false) v.loader_type=self.dir[o][id+3] self.loaders[o][id+3]=v
-		local inv=self.loaderFilter[o][id] if(inv)then for k,v in pairs(inv)do v.set_filter(k,v) end end
+		local inv=self.loaderFilter[o][id] if(inv)then for invx,invy in pairs(inv)do v.set_filter(invx,invy) end end
 	end
 
 	local v=self.chests[o][id] local chest=warptorio.GetChest(self.dir[o][id])
@@ -931,7 +933,7 @@ function HARV:MakeLoaders(id)
 		vector.clean(fa,vector.square(vector.pos(facPos)+vector((est and 1 or 0),belty),vector(2,0.5)))
 		v=entity.protect(entity.create(fa,belt,vector.add(facPos,vector(0,belty)),lddir),false,false)
 		v.loader_type=self.dir[o][id] self.loaders[o][id]=v
-		local inv=self.loaderFilter[o][id] if(inv)then for k,v in pairs(inv)do v.set_filter(k,v) end end
+		local inv=self.loaderFilter[o][id] if(inv)then for kx,kv in pairs(inv)do v.set_filter(kx,kv) end end
 
 	end
 	o="b" local v=self.loaders[o][id] if(isvalid(v) and v.name~=belt)then entity.destroy(v) v=nil end
@@ -939,7 +941,7 @@ function HARV:MakeLoaders(id)
 		vector.clean(fb,vector.square(vector.pos(hrvPos)+vector((est and -1 or 0),belty),vector(1,0.5)))
 		v=entity.protect(entity.create(fb,belt,vector.add(hrvPos,vector((est and -2 or 0),belty)),oppositeDir(lddir)),false,false)
 		v.loader_type=self.dir[o][id] self.loaders[o][id]=v
-		local inv=self.loaderFilter[o][id] if(inv)then for k,v in pairs(inv)do v.set_filter(k,v) end end
+		local inv=self.loaderFilter[o][id] if(inv)then for kx,kv in pairs(inv)do v.set_filter(kx,kv) end end
 	end
 end
 
@@ -962,6 +964,9 @@ function HARV:CheckLoaders() for i,t in pairs(self.loaders)do local o=(i=="a" an
 	self.dir[i][k]=v.loader_type self.dir[o][k]=oppositeOutput(v.loader_type) if(self.loaders[o][k])then self.loaders[o][k].loader_type=self.dir[o][k] end
 end end end end
 
+function HARV:ManagesEntity(e) if(e==self.a or e==self.b)then return true end
+	for a,b in pairs(self.loaders)do for c,d in pairs(b)do if(d==e)then return true end end end
+end
 
 function HARV:Recall(bply) -- recall after portal is mined
 	if(not self.deployed)then return false end
@@ -1177,6 +1182,9 @@ function FLOOR:CheckSpecial()
 
 	vector.cleanplayers(f,area)
 	players.playsound("warp_in",f)
+end
+function FLOOR:ManagesEntity(e)
+	if(e==self.SpecialEnt or e==self.radar)then return true end
 end
 
 
