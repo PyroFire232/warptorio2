@@ -25,18 +25,30 @@ upcs["factory-size"]=function(lv,f) local n=f(lv) local m=gwarptorio.floor.b1 m.
 upcs["boiler-size"]=function(lv,f) local n=f(lv) local m=gwarptorio.floor.b2 m.size=n warptorio.BuildB2() end
 upcs["harvester-size"]=function(lv,f) local n=f(lv) local m=gwarptorio.floor.b3 m.ovalsize=n warptorio.BuildB3() end
 upcs["harvester-east-size"]=function(lv,f) local n=f(lv) local m=gwarptorio.floor.b3 local hv=gwarptorio.Harvesters.east
-	local brc=false if(hv and hv.deployed)then brc=hv.deploy_position hv:Recall() end
-	m.harvest_east=n warptorio.BuildB3() warptorio.Harvesters.east:Warpin()
-	if(brc)then hv:Deploy(warptorio.GetPlanetSurface(),brc) end
+	if(not hv)then warptorio.Harvesters.east:Warpin() end hv=gwarptorio.Harvesters.east
+	hv.next_size=n hv:Upgrade() --m.harvest_east=n
+	
+--[[	local brc=false if(hv and hv.deployed)then brc=hv.deploy_position hv:Recall() end
+	warptorio.BuildB3() warptorio.Harvesters.east:Warpin()
+	if(brc)then hv:Deploy(warptorio.GetPlanetSurface(),brc) end]]
 end
 upcs["harvester-west-size"]=function(lv,f) local n=f(lv) local m=gwarptorio.floor.b3 local hv=gwarptorio.Harvesters.west
-	local brc=false if(hv and hv.deployed)then brc=hv.deploy_position hv:Recall() end
-	m.harvest_west=n warptorio.BuildB3() warptorio.Harvesters.west:Warpin()
-	if(brc)then hv:Deploy(warptorio.GetPlanetSurface(),brc) end
+	if(not hv)then warptorio.Harvesters.west:Warpin() end hv=gwarptorio.Harvesters.west
+	hv.next_size=n hv:Upgrade() -- m.harvest_west=n
+--[[	local brc=false if(hv and hv.deployed)then brc=hv.deploy_position hv:Recall() end
+	warptorio.BuildB3() warptorio.Harvesters.west:Warpin()
+	if(brc)then hv:Deploy(warptorio.GetPlanetSurface(),brc) end]]
 end
 
+--upcs["harvester-west-loader"]=function(lv,f) local hv=gwarptorio.Harvesters.west if(hv)then hv:SpawnLogs() end end
+--upcs["harvester-east-loader"]=function(lv,f) local hv=gwarptorio.Harvesters.east if(hv)then hv:SpawnLogs() end end
+
 upcs["teleporter-energy"]=function(lv) if(not gwarptorio.Teleporters.offworld)then warptorio.BuildPlatform() warptorio.Teleporters.offworld:Warpin() else warptorio.BuildPlatform() gwarptorio.Teleporters.offworld:UpgradeEnergy() end end
-upcs["factory-logistics"]=function(lv) warptorio.RebuildFloors() for k,v in pairs(gwarptorio.Teleporters)do v:UpgradeLogistics() end for k,v in pairs(gwarptorio.Rails)do v:DoMakes(true) end end
+upcs["factory-logistics"]=function(lv) warptorio.RebuildFloors()
+	for k,v in pairs(gwarptorio.Teleporters)do v:UpgradeLogistics() end
+	for k,v in pairs(gwarptorio.Rails)do v:DoMakes(true) end
+	for k,v in pairs(gwarptorio.Harvesters)do v:UpgradeLogistics() end
+end
 upcs["factory-energy"]=function(lv) local m=gwarptorio.Teleporters
 	if(m.b1)then m.b1:UpgradeEnergy() end if(m.b2)then m.b2:UpgradeEnergy() end if(m.b3)then m.b3:UpgradeEnergy() end
 	for k,v in pairs({"nw","ne","sw","se"}) do if(m[v])then m[v]:UpgradeEnergy() end end
@@ -44,30 +56,33 @@ upcs["factory-energy"]=function(lv) local m=gwarptorio.Teleporters
 	for k,v in pairs(gwarptorio.Harvesters)do v:UpgradeEnergy() end
 end
 
-upcs["factory-beacon"]=function(lv,f) local m=gwarptorio.floor.b1 local inv={}
+upcs["factory-beacon"]=function(lv,f) local m=gwarptorio.floor.b1
+	m:CheckSpecial()
+--[[	local inv={}
 	if(m.beacon and m.beacon.valid)then inv=m.beacon.get_module_inventory().get_contents() end
 	vector.clean(m.surface,vector.area(vector(-2,-2),vector(3,3))) m.beacon=entity.protect(entity.create(m.surface,"warptorio-beacon-"..lv,vector(-1,-1)))
 	for k,v in pairs(inv)do m.beacon.get_module_inventory().insert({name=k,count=v}) end
-	players.playsound("warp_in",m.surface)
+	players.playsound("warp_in",m.surface)]]
 end
 
 upcs["boiler-station"]=function(lv,f) local m=gwarptorio.floor.b2
-	if(m.station and m.station.valid)then return end
+	m:CheckSpecial()
+--[[	if(m.station and m.station.valid)then return end
 	vector.clean(m.surface,vector.area(vector(-2,-2),vector(1,1))) m.station=entity.protect(entity.create(m.surface,"warptorio-warpstation",vector(-1,-1)))
-	players.playsound("warp_in",m.surface)
+	players.playsound("warp_in",m.surface)]]
 end
 
 
 
 upcs["reactor"]=function(lv) local m=gwarptorio.floor.main players.playsound("warp_in",m.surface)
 	for i=1,3,1 do for x,ply in pairs(game.players)do ply.print{"warptorio_lore."..lv.."_"..i} end end
-	if(lv>=6 and not gwarptorio.warp_reactor)then
-		local f=m.surface
-		vector.clean(f,vector.area(vector(-3,-3),vector(5,5)))
-		local e=gwarptorio.floor.main.surface.create_entity{name="warptorio-reactor",position={-1,-1},force=game.forces.player,player=game.players[1]}
-		vector.cleanplayers(f,vector.area(vector(-3,-3),vector(5,5)))
-		gwarptorio.warp_reactor=e
-		e.minable=false
+	if(lv>=6 and not gwarptorio.warp_reactor)then warptorio.CheckReactor()
+		--local f=m.surface
+		--vector.clean(f,vector.area(vector(-3,-3),vector(5,5)))
+		--local e=gwarptorio.floor.main.surface.create_entity{name="warptorio-reactor",position={-1,-1},force=game.forces.player,player=game.players[1]}
+		--vector.cleanplayers(f,vector.area(vector(-3,-3),vector(5,5)))
+		--gwarptorio.warp_reactor=e
+		--e.minable=false
 	end
 	if(lv<6)then
 		gwarptorio.warp_auto_time=gwarptorio.warp_auto_time+60*10
@@ -81,8 +96,11 @@ upcs["accelerator"]=function(lv) local m=gwarptorio.floor.main
 	warptorio.cleanbbox(m.surface,-3,-3,2,2) local e=warptorio.SpawnEntity(m.surface,"warptorio-accelerator-"..lv,4,-1) e.minable=false
 end]]
 
-upcs["dualloader"]=function(lv) warptorio.RebuildFloors() local m=gwarptorio.Teleporters.b1 if(m)then m:UpgradeLogistics() end local m=gwarptorio.Teleporters.b2 if(m)then m:UpgradeLogistics() end end
-upcs["triloader"]=function(lv) warptorio.RebuildFloors() for k,m in pairs(gwarptorio.Teleporters)do m:UpgradeLogistics() end end
+upcs["dualloader"]=function(lv) warptorio.RebuildFloors()
+	for k,v in pairs(gwarptorio.Teleporters)do if(k=="b1" or k=="b2" or k=="b3")then v:UpgradeLogistics() end end
+	for k,v in pairs(gwarptorio.Harvesters)do v:UpgradeLogistics() end
+end
+upcs["triloader"]=function(lv) warptorio.RebuildFloors() for k,m in pairs(gwarptorio.Teleporters)do m:UpgradeLogistics() end for k,v in pairs(gwarptorio.Harvesters)do v:UpgradeLogistics() end end
 upcs["bridgesize"]=function(lv) warptorio.BuildB1() end
 
 
@@ -139,6 +157,8 @@ ups["warptorio-harvester-east-3"] = {"harvester-east-size",function() return 26 
 ups["warptorio-harvester-east-4"] = {"harvester-east-size",function() return 32 end}
 ups["warptorio-harvester-east-5"] = {"harvester-east-size",function() return 38 end}
 
+ups["warptorio-harvester-east-loader"] = {"harvester-east-loader"}
+ups["warptorio-harvester-west-loader"] = {"harvester-west-loader"}
 
 ups["warptorio-boiler-station"] = {"boiler-station"}
 
@@ -174,6 +194,11 @@ ups["warptorio-beacon-2"] = {"factory-beacon"}
 ups["warptorio-beacon-3"] = {"factory-beacon"}
 ups["warptorio-beacon-4"] = {"factory-beacon"}
 ups["warptorio-beacon-5"] = {"factory-beacon"}
+ups["warptorio-beacon-6"] = {"factory-beacon"}
+ups["warptorio-beacon-7"] = {"factory-beacon"}
+ups["warptorio-beacon-8"] = {"factory-beacon"}
+ups["warptorio-beacon-9"] = {"factory-beacon"}
+ups["warptorio-beacon-10"] = {"factory-beacon"}
 
 ups["warptorio-stabilizer-1"] = {"stabilizer"}
 ups["warptorio-stabilizer-2"] = {"stabilizer"}

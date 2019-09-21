@@ -4,7 +4,7 @@ if(global.warptorio)then
 	if(gwarptorio.Floors)then gwarptorio.floor=gwarptorio.Floors gwarptorio.Floors=nil
 		for k,v in pairs(gwarptorio.floor)do
 			local adx=0
-			if((k=="main" or k=="b1" or k=="b2") and v.z)then v.z=v.z-1 end
+			if((k=="main" or k=="b1" or k=="b2") and v.z)then v.z=v.z-1 if(v.z>40 and k=="main")then v.z=v.z+4 end end
 			v.surface=v.f v.f=nil
 			v.size=v.z v.z=nil
 		end
@@ -16,6 +16,10 @@ if(global.warptorio)then
 		local hasOffworld=game.forces.player.technologies["warptorio-teleporter-portal"].researched
 		for k,v in pairs(gwarptorio.Teleporters)do if(k~="offworld" or (k=="offworld" and hasOffworld))then table.insert(ht,k) end
 			if(v.logs)then for x,y in pairs(v.logs)do y.destroy() end end
+			if(v.pipes)then for a,b in pairs(v.pipes)do for x,y in pairs(b)do y.destroy() end end end
+			if(v.chests)then for a,b in pairs(v.chests)do for x,y in pairs(b)do y.destroy() end end end
+			if(v.loaders)then for a,b in pairs(v.loaders)do for x,y in pairs(b)do y.destroy() end end end
+
 			if(v.PointA and v.PointA.valid)then v.PointA.destroy() end
 			if(v.PointB and v.PointB.valid)then v.PointB.destroy() end
 		end
@@ -54,7 +58,4 @@ if(global.warptorio)then
 
 end
 
-game.print("Applied Warptorio Migration 0.8.8")
-
---warptorio.OnLoad()
---warptorio.Migrate()
+game.print("Warptorio Migration 0.8.8")

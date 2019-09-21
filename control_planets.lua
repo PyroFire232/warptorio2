@@ -65,7 +65,7 @@ nauvis.entities={ -- game.entity_prototypes (with autoplace)
 "crude-oil","coal","copper-ore","iron-ore","stone","uranium-ore",
 }
 
-local ab={} nauvis.alienbiome=ab
+local ab={} nauvis.alienbiome=ab nauvis.ab=ab
 ab.tile={ -- tile-alias.lua -- mod compatability -_-
     ["grass-1"] = "vegetation-green-grass-1" ,
     ["grass-2"] = "vegetation-green-grass-2" ,
@@ -109,12 +109,12 @@ function warptorio.GetModResources() if(warptorio.ModResources)then return warpt
 	for k,v in pairs(pt)do if(v.category=="resource" and not table.HasValue(nauvis.resource,v.name))then table.insert(at,v.name) end end warptorio.ModResources=at return at end
 
 function warptorio.CacheModTiles() if(warptorio.ModTiles)then return warptorio.ModTiles end local pt=game.tile_prototypes local at={}
-	for k,v in pairs(pt)do if(v.autoplace_specification and not table.HasValue(nauvis.tile,v.name) and not table.HasValue(nauvis.ab.tile,v.name) )then table.insert(at,v.name) end end warptorio.ModTiles=at return at end
+	for k,v in pairs(pt)do if(v.autoplace_specification and not table.HasValue(nauvis.tile,v.name) and not table.HasValue(nauvis.alienbiome.tile,v.name) )then table.insert(at,v.name) end end warptorio.ModTiles=at return at end
 function warptorio.CacheAllTiles() if(warptorio.AllTiles)then return warptorio.AllTiles end local pt=game.tile_prototypes local at={}
 	for k,v in pairs(pt)do if(v.autoplace_specification)then table.insert(at,v.name) end end warptorio.AllTiles=at return at end
 
 function warptorio.GetModTiles(n) local t=warptorio.CacheModTiles() if(not n or n==true)then return t else return table.GetMatchTable(t,n) end end
-function warptorio.GetNauvisTiles(n) local t,tn=nauvis.tile if(game.active_mods["alien-biomes"])then tn=t t=nauvis.ab.tile end if(not n or n==true)then return t end
+function warptorio.GetNauvisTiles(n) local t,tn=nauvis.tile if(game.active_mods["alien-biomes"])then tn=t t=nauvis.alienbiome.tile end if(not n or n==true)then return t end
 	if(tn)then
 		local y,x={},table.GetMatchTable(tn,n)
 		for k,v in pairs(x)do if(t[v])then table.insertExclusive(y,t[v]) end end
@@ -135,7 +135,7 @@ function warptorio.GetNauvisAutoplacers(n) local t=nauvis.autoplace if(not n or 
 function warptorio.GetAutoplacers(n) local t=warptorio.CacheAllAutoplacers() if(not n or n==true)then return t else return table.GetMatchTable(t,n) end end
 
 function warptorio.CacheModDecoratives() if(warptorio.ModDecoratives)then return warptorio.ModDecoratives end local pt=game.decorative_prototypes local at={}
-	for k,v in pairs(pt)do if(v.autoplace_specification and not table.HasValue(nauvis.decor,v.name) and not table.HasValue(nauvis.ab.decor,v.name) )then
+	for k,v in pairs(pt)do if(v.autoplace_specification and not table.HasValue(nauvis.decor,v.name) and not table.HasValue(nauvis.alienbiome.decor,v.name) )then
 	table.insert(at,v.name) end end warptorio.ModDecoratives=at return at end
 function warptorio.CacheAllDecoratives() if(warptorio.AllDecoratives)then return warptorio.AllDecoratives end local pt=game.decorative_prototypes local at={}
 	for k,v in pairs(pt)do if(v.autoplace_specification)then table.insert(at,v.name) end end warptorio.AllDecoratives=at return at end
@@ -361,7 +361,7 @@ end
 
 function warptorio.RegisterPlanet(p)
 	warptorio.Planets[p.key]=table.deepcopy(p)
-	if(game and warptorio.Loaded)then for k,v in pairs(game.players)do warptorio.BuildGui(v) end end
+	if(game and warptorio.Loaded)then warptorio.ResetGui() end
 end
 
 function warptorio.CallPlanetEvent(p,n,ev,...)
@@ -392,7 +392,7 @@ function warptorio.GeneratePlanetSurface(p,g,chart)
 	elseif(p.spawn)then p.spawn(f,g,chart)
 	end
 
-	f.request_to_generate_chunks({0,0},5) f.force_generate_chunk_requests()
+	if(not p.no_first_chunks)then f.request_to_generate_chunks({0,0},5) f.force_generate_chunk_requests() end
 
 	return f
 end

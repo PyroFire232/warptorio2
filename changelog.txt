@@ -1,17 +1,155 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.0.4
+Date: 22.09.2019
+  Changes:
+    - Fixed bug with teleporter gate not receiving power upgrades if logistics is blocked when it's placed
+    - Planet teleporter gate must now be rebuilt for logistics and loader upgrades to apply (prevents problems related to clearing space)
+    - Added fix for loader filters being lost between logistics and loader upgrades
+    - Fixed bug with players being moved between warps
+    - Fixed clearing bug with platform turrets
+    - Platform Structures are now removed from blueprints. This is potentially conflicting so there is a setting to disable this.
+    - New warptorio event handling. See remote.get_events() and remote.get_event(name).
+
+
+---------------------------------------------------------------------------------------------------
+Version: 1.0.3
+Date: 21.09.2019
+  Changes:
+    - Added a bunch of remote api events for future implementation and slightly adjusted naming of existing ones.
+    - Fixed harvester logistics research crash
+    - Fixed boiler floor, water and giga alignment issues + tile migration.
+    - Mod Compatability bugfix for ModMash
+    - Fixed tile migrations clearing harvesters
+    
+
+---------------------------------------------------------------------------------------------------
+Version: 1.0.2
+Date: 18.09.2019
+  Changes:
+    - Fixed west harvester bugs
+    - Fixed east harvester loaders research bug
+    - Fixed boiler giga floor bridge alignment bugs
+    - Fixed bug with level 0 (entry) platform turret research not placing tiles on planet
+    - Fixed bug with harvester logistics not clearing space for loaders correctly
+    - Fixed boiler water alignment bugs
+    - Added tile migration. Saves may take a while to load.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.0.1
+Date: 17.09.2019
+  Changes:
+    - Fixed beacon issues
+    - Fixed carebear chest
+    - Attempted fix of logistics research occasional crash
+    - New thumbnail.png
+
+---------------------------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 15.09.2019
+  Changes:
+    - Fixed clearing alignment bug of platform circles
+    - Added migration to recall harvesters aiming to fix loader and alignment issues
+
+---------------------------------------------------------------------------------------------------
+Version: 0.9.9
+Date: 15.09.2019
+  Changes:
+    - Fixed issue with reactor upgrade destroying teleporter
+    - Fixed bug with planet teleporter gate not using energy upgrades
+
+---------------------------------------------------------------------------------------------------
+Version: 0.9.8
+Date: 15.09.2019
+  Changes:
+    - Fixed sizing bug for platform circles
+
+---------------------------------------------------------------------------------------------------
+Version: 0.9.7
+Date: 15.09.2019
+  Changes:
+    - Fixed typos with carebear chest
+    - Adjusted size of harvester platform borders
+    - Added (up to) 3 loaders to the harvester platforms which are always connected to harvester floor.
+    - Harvesters are now recalled when the interior portal is mined (if deployed)
+
+---------------------------------------------------------------------------------------------------
+Version: 0.9.6
+Date: 13.09.2019
+  Changes:
+    - Fixed harvester pickup portal bug
+    - More typos
+
+---------------------------------------------------------------------------------------------------
+Version: 0.9.5
+Date: 12.09.2019
+  Changes:
+    - More typos
+    - Attempted fix of harvester recall crash
+
+---------------------------------------------------------------------------------------------------
+Version: 0.9.4
+Date: 12.09.2019
+  Changes:
+    - Fixed typos with pipe logistics and warpout
+
+---------------------------------------------------------------------------------------------------
+Version: 0.9.3
+Date: 12.09.2019
+  Changes:
+    - More typos
+
+
+---------------------------------------------------------------------------------------------------
+Version: 0.9.2
+Date: 11.09.2019
+  Changes:
+    - Fix for pipe logistics issue
+    - More typo fixes
+
+
+---------------------------------------------------------------------------------------------------
+Version: 0.9.1
+Date: 11.09.2019
+  Changes:
+    - (Hopefully) fixed a crash relating to fluids
+    - Added fix for migration bug relating to power between floors
+
+
+---------------------------------------------------------------------------------------------------
+Version: 0.9.0
+Date: 11.09.2019
+  Changes:
+    - Harvester Platforms now spawn on top of resources instead of transferring them to the harvester floor
+    - Harvester Platforms will now recall players on them if they're deployed when warping.
+
+
+---------------------------------------------------------------------------------------------------
+Version: 0.8.9
+Date: 11.09.2019
+  Changes:
+    - Fixed typos breaking planet packs and alien biomes.
+    - Fixed typo with boiler research
+    - Fixed typo with autowarp timer
+    - Added a bunch of various functions to the remote interface.
+    - Attempted fixes to votewarp for multiplayer (untested)
+    - Fixed homeworld button
+
+---------------------------------------------------------------------------------------------------
 Version: 0.8.8
-Date: 26.08.2019
+Date: 10.09.2019
   Changes:
     - Massive re-write and code cleanup
     - Fixed bugs related to multiple planets (eg. homeworld plus platform) with special chunk generation functions interfering with eachother, particularly for multiplayer.
     - Tri-loader now adds an extra belt pair to ALL stairs, making the central stairs have 6 belts instead of 4.
-    - New Harvester Floor and a new relating gameplay mechanic.
+    - New Harvester Floor below the boiler and a new relating gameplay mechanic.
     - Made a bunch of things use locale for translation later
     - Fixed the teleporter logistics blocked message on warp
     - Moved first boiler room water research to blue science
     - Fixed water placement bugs
     - Made platform "turrets" research a bit cheaper, and moved the first level to green science.
     - Broke Warp Loaders
+    - Slightly adjusted alignment of warp rails
+    - Made warp charge timer (entity counter thing) ignore surface/planet entities
 
 
 ---------------------------------------------------------------------------------------------------

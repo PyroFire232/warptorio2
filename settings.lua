@@ -1,5 +1,8 @@
 data:extend(
 {
+	{type="bool-setting",name="warptorio_no_blueprint",order="11b",
+	setting_type="runtime-global",default_value=false,},
+
 
 	{type="double-setting",name="warptorio_votewarp_multi",order="1a",
 	setting_type="runtime-global",default_value=0.5,
