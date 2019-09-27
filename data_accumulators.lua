@@ -100,7 +100,9 @@ local t=ExtendDataCopy("accumulator","warptorio-teleporter-gate-0",{name="warpto
 -- ----
 -- Stairways
 
-local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{name="warptorio-underground-0",energy_source={buffer_capacity="2MJ",input_flow_limit="5MW",output_flow_limit="5MW"},},{
+local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{
+	name="warptorio-underground-0",
+	energy_source={buffer_capacity="2MJ",input_flow_limit="5MW",output_flow_limit="5MW"},
 	minable=nil,
 	order="warptorio",
 	picture={layers={
