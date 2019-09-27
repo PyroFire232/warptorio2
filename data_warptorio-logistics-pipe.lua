@@ -180,7 +180,7 @@ data:extend{
       max_health = 150,
       minable = nil,
       order = "warptorio",
-      items_to_place_this = {"underground-pipe"},
+      placeable_by = {item="pipe-to-ground", count=1},
       name = "warptorio-logistics-pipe",
       pictures = {
         down = { tint=rctint,
