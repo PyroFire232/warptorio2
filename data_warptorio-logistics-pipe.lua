@@ -3,16 +3,16 @@ local rctint=rtint --{r=0.39,g=0,b=0,a=1}
 
 data:extend{
 
-    {
-      icons = {{icon="__base__/graphics/icons/pipe-to-ground.png",tint=rtint}},
-      icon_size = 32,
-      name = "warptorio-logistics-pipe",
-      order = "a[pipe]-b[pipe-to-ground]",
-      place_result = "warptorio-logistics-pipe",
-      stack_size = 50,
-      subgroup = "energy-pipe-distribution",
-      type = "item"
-    },
+    -- {
+    --   icons = {{icon="__base__/graphics/icons/pipe-to-ground.png",tint=rtint}},
+    --   icon_size = 32,
+    --   name = "warptorio-logistics-pipe",
+    --   order = "a[pipe]-b[pipe-to-ground]",
+    --   place_result = "warptorio-logistics-pipe",
+    --   stack_size = 50,
+    --   subgroup = "energy-pipe-distribution",
+    --   type = "item"
+    -- },
 
 
 {
@@ -178,10 +178,9 @@ data:extend{
       icon = "__base__/graphics/icons/pipe-to-ground.png",
       icon_size = 32,
       max_health = 150,
-      minable = {
-        mining_time = 0.1,
-        result = "pipe-to-ground"
-      },
+      minable = nil,
+      order = "warptorio",
+      items_to_place_this = {"underground-pipe"},
       name = "warptorio-logistics-pipe",
       pictures = {
         down = { tint=rctint,

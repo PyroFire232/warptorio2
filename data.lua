@@ -67,8 +67,12 @@ local t=ExtendDataCopy("tile","tutorial-grid",{name="warptorio-red-concrete",tin
 local rtint={r=0.4,g=0.4,b=1,a=1}
 local rvtint={scale=1/3,shift={0.03125/3,-0.5/3},tint={r=1,g=1,b=1,a=0},hr_version={scale=0.5/3,tint={r=1,g=1,b=1,a=0},shift={0.03125/3,-0.5/3}}}
 local r=ExtendDataCopy("radar","radar",{name="warptorio-invisradar",
-	icon=false,icons={{icon="__base__/graphics/icons/radar.png",tint=rtint}},integration_patch=rvtint,pictures={layers={rvtint,rvtint}},
-},true,{energy_per_nearby_scan="10kJ",energy_per_sector="200kJ",energy_usage="1kW",
+	icons={{icon="__base__/graphics/icons/radar.png",tint=rtint}},
+	integration_patch=rvtint,
+	pictures={layers={rvtint,rvtint}},
+	minable=nil,
+	order="warptorio"
+},{energy_per_nearby_scan="10kJ",energy_per_sector="200kJ",energy_usage="1kW",
 	max_distance_of_nearby_sector_revealed=5,max_distance_of_sector_revealed=18,
 	collision_box={{-1.2/3,-1.2/3},{1.2/3,1.2/3}},selection_box={{-1.5/3,-1.5/3},{1.5/3,1.5/3}},
 })

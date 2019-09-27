@@ -72,31 +72,37 @@ local t={
 data:extend{t}
 ExtendRecipeItem(t)
 
-local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{name="warptorio-teleporter-1",energy_source={buffer_capacity="4MJ",input_flow_limit="2MW",output_flow_limit="2MW"}},true)
-local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{name="warptorio-teleporter-2",energy_source={buffer_capacity="8MJ",input_flow_limit="20MW",output_flow_limit="20MW"}},true)
-local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{name="warptorio-teleporter-3",energy_source={buffer_capacity="16MJ",input_flow_limit="200MW",output_flow_limit="200MW"}},true)
-local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{name="warptorio-teleporter-4",energy_source={buffer_capacity="32MJ",input_flow_limit="2000MW",output_flow_limit="2000MW"}},true)
-local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{name="warptorio-teleporter-5",energy_source={buffer_capacity="64MJ",input_flow_limit="20000MW",output_flow_limit="20000MW"}},true)
+local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{name="warptorio-teleporter-1",energy_source={buffer_capacity="4MJ",input_flow_limit="2MW",output_flow_limit="2MW"}})
+local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{name="warptorio-teleporter-2",energy_source={buffer_capacity="8MJ",input_flow_limit="20MW",output_flow_limit="20MW"}})
+local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{name="warptorio-teleporter-3",energy_source={buffer_capacity="16MJ",input_flow_limit="200MW",output_flow_limit="200MW"}})
+local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{name="warptorio-teleporter-4",energy_source={buffer_capacity="32MJ",input_flow_limit="2000MW",output_flow_limit="2000MW"}})
+local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{name="warptorio-teleporter-5",energy_source={buffer_capacity="64MJ",input_flow_limit="20000MW",output_flow_limit="20000MW"}})
 
 -- --------
 -- Teleporter Gate
 
-local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{name="warptorio-teleporter-gate-0",minable={mining_time=2,result="warptorio-teleporter-gate-0"},
-	picture={layers={[1]={ tint={r=1,g=0.8,b=0.8,a=0.6}, hr_version={tint={r=1,g=0.8,b=0.8,a=0.6}}, } }}, })
-local t=ExtendDataCopy("recipe","lab",{name="warptorio-teleporter-gate-0",enabled=false})
+local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{
+	name="warptorio-teleporter-gate-0",
+	minable={mining_time=2,result="warptorio-teleporter-gate-0"},
+	order="warptorio",
+	picture={layers={[1]={ tint={r=1,g=0.8,b=0.8,a=0.6}, hr_version={tint={r=1,g=0.8,b=0.8,a=0.6}}} }},
+ })
+--local t=ExtendDataCopy("recipe","lab",{name="warptorio-teleporter-gate-0",enabled=false})
 local t=ExtendDataCopy("item","lab",{name="warptorio-teleporter-gate-0",place_result="warptorio-teleporter-gate-0",
 	icons={{ icon="__base__/graphics/icons/lab.png", tint={r=1,g=0.6,b=0.6,a=0.6}, }}, })
 
-local t=ExtendDataCopy("accumulator","warptorio-teleporter-gate-0",{name="warptorio-teleporter-gate-1",energy_source={buffer_capacity="4MJ",input_flow_limit="2MW",output_flow_limit="2MW"}},true)
-local t=ExtendDataCopy("accumulator","warptorio-teleporter-gate-0",{name="warptorio-teleporter-gate-2",energy_source={buffer_capacity="8MJ",input_flow_limit="20MW",output_flow_limit="20MW"}},true)
-local t=ExtendDataCopy("accumulator","warptorio-teleporter-gate-0",{name="warptorio-teleporter-gate-3",energy_source={buffer_capacity="16MJ",input_flow_limit="200MW",output_flow_limit="200MW"}},true)
-local t=ExtendDataCopy("accumulator","warptorio-teleporter-gate-0",{name="warptorio-teleporter-gate-4",energy_source={buffer_capacity="32MJ",input_flow_limit="2GW",output_flow_limit="2GW"}},true)
-local t=ExtendDataCopy("accumulator","warptorio-teleporter-gate-0",{name="warptorio-teleporter-gate-5",energy_source={buffer_capacity="64MJ",input_flow_limit="20GW",output_flow_limit="20GW"}},true)
+local t=ExtendDataCopy("accumulator","warptorio-teleporter-gate-0",{name="warptorio-teleporter-gate-1",energy_source={buffer_capacity="4MJ",input_flow_limit="2MW",output_flow_limit="2MW"}})
+local t=ExtendDataCopy("accumulator","warptorio-teleporter-gate-0",{name="warptorio-teleporter-gate-2",energy_source={buffer_capacity="8MJ",input_flow_limit="20MW",output_flow_limit="20MW"}})
+local t=ExtendDataCopy("accumulator","warptorio-teleporter-gate-0",{name="warptorio-teleporter-gate-3",energy_source={buffer_capacity="16MJ",input_flow_limit="200MW",output_flow_limit="200MW"}})
+local t=ExtendDataCopy("accumulator","warptorio-teleporter-gate-0",{name="warptorio-teleporter-gate-4",energy_source={buffer_capacity="32MJ",input_flow_limit="2GW",output_flow_limit="2GW"}})
+local t=ExtendDataCopy("accumulator","warptorio-teleporter-gate-0",{name="warptorio-teleporter-gate-5",energy_source={buffer_capacity="64MJ",input_flow_limit="20GW",output_flow_limit="20GW"}})
 
 -- ----
 -- Stairways
 
-local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{name="warptorio-underground-0",energy_source={buffer_capacity="2MJ",input_flow_limit="5MW",output_flow_limit="5MW"},},true,{
+local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{name="warptorio-underground-0",energy_source={buffer_capacity="2MJ",input_flow_limit="5MW",output_flow_limit="5MW"},},{
+	minable=nil,
+	order="warptorio",
 	picture={layers={
 		[1]={ tint={r=0.8,g=0.8,b=1,a=1}, scale=0.9,
 			filename="__base__/graphics/entity/electric-furnace/electric-furnace-base.png", priority="high", width=129, height=100, frame_count=1, shift={0.421875/2, 0},
@@ -114,11 +120,11 @@ local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{name="warptorio-u
 	}},
 })
 
-local t=ExtendDataCopy("accumulator","warptorio-underground-0",{name="warptorio-underground-1",energy_source={buffer_capacity="10MJ",input_flow_limit="500MW",output_flow_limit="500MW"},},true)
-local t=ExtendDataCopy("accumulator","warptorio-underground-0",{name="warptorio-underground-2",energy_source={buffer_capacity="50MJ",input_flow_limit="1GW",output_flow_limit="1GW"},},true)
-local t=ExtendDataCopy("accumulator","warptorio-underground-0",{name="warptorio-underground-3",energy_source={buffer_capacity="100MJ",input_flow_limit="2GW",output_flow_limit="2GW"},},true)
-local t=ExtendDataCopy("accumulator","warptorio-underground-0",{name="warptorio-underground-4",energy_source={buffer_capacity="500MJ",input_flow_limit="5GW",output_flow_limit="5GW"},},true)
-local t=ExtendDataCopy("accumulator","warptorio-underground-0",{name="warptorio-underground-5",energy_source={buffer_capacity="1GJ",input_flow_limit="20GW",output_flow_limit="20GW"},},true)
+local t=ExtendDataCopy("accumulator","warptorio-underground-0",{name="warptorio-underground-1",energy_source={buffer_capacity="10MJ",input_flow_limit="500MW",output_flow_limit="500MW"}})
+local t=ExtendDataCopy("accumulator","warptorio-underground-0",{name="warptorio-underground-2",energy_source={buffer_capacity="50MJ",input_flow_limit="1GW",output_flow_limit="1GW"}})
+local t=ExtendDataCopy("accumulator","warptorio-underground-0",{name="warptorio-underground-3",energy_source={buffer_capacity="100MJ",input_flow_limit="2GW",output_flow_limit="2GW"}})
+local t=ExtendDataCopy("accumulator","warptorio-underground-0",{name="warptorio-underground-4",energy_source={buffer_capacity="500MJ",input_flow_limit="5GW",output_flow_limit="5GW"}})
+local t=ExtendDataCopy("accumulator","warptorio-underground-0",{name="warptorio-underground-5",energy_source={buffer_capacity="1GJ",input_flow_limit="20GW",output_flow_limit="20GW"}})
 
 -- ----
 -- Warp Beacon
@@ -127,8 +133,10 @@ local t=ExtendDataCopy("beacon","beacon",{name="warptorio-beacon-1",supply_area_
 	base_picture={ tint={r=0.5,g=0.7,b=1,a=1}, }, animation={ tint={r=1,g=0.2,b=0.2,a=1}, },
 	allowed_effects={"consumption","speed","pollution","productivity"},
 	distribution_effectivity=1,
-},true)
-for i=2,10,1 do local xt=table.deepcopy(t) xt.name="warptorio-beacon-"..i xt.supply_area_distance=math.min(16+8*i,64) xt.module_specification.module_slots=i data:extend{xt} ExtendRecipeItem(xt) end
+	minable=nil,
+	order="warptorio"
+})
+for i=2,10,1 do local xt=table.deepcopy(t) xt.name="warptorio-beacon-"..i xt.supply_area_distance=math.min(16+8*i,64) xt.module_specification.module_slots=i data:extend{xt} end
 
 
 -- ----
