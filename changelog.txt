@@ -1,4 +1,181 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.2.3
+Date: 31.10.2019
+  Changes:
+    - Made "invisible" radars unminable
+
+---------------------------------------------------------------------------------------------------
+Version: 1.2.2
+Date: 31.10.2019
+  Changes:
+    - Added ability_used and ticktime to remote events
+    - Added remote functions to recall the harvesters and teleporter gate
+    - Added robots outside of platform carry between warps difficulty setting (disabled by default).
+    - Fix for harvesters being permanently lost
+    - Added Home Portal item that teleports you to homeworld
+    - Buffed warp module productivity bonus for consistency
+    - Added new remotes for mod managed tables
+    - Warp pipes are now automatically emptied if neither side is connected to another pipe
+    - Added sprite overlays to stairs to reduce confusion on where it will send you (alt-mode only)
+
+---------------------------------------------------------------------------------------------------
+Version: 1.2.1
+Date: 10.10.2019
+  Changes:
+    - Harvesters now prevent players getting stuck when being deployed.
+    - Another loot chest typo
+
+---------------------------------------------------------------------------------------------------
+Version: 1.2.0
+Date: 10.10.2019
+  Changes:
+    - Typos with loot chests
+    - Fixed harvesters "moving" players when recalled on warp
+    - Attempted fixes of harvester deploy bug
+
+---------------------------------------------------------------------------------------------------
+Version: 1.1.9
+Date: 10.10.2019
+  Changes:
+    - Fixed votewarp bug
+    - Updated logistics research descriptions
+    - Fixed warp pipe temperature bug
+    - Added SpawnLootChest to remote interface
+    - Added setting to turn on/off loot chests
+    - Fixed a crash related to clearing mod composite entities (eg. mini-loaders)
+    - Added some missing modifiers to the reach distance research
+    - Added Warp Striders research
+    - Made a few early researches require the reactor reassembly project
+    - Made a few other small research tweaks
+    - Added steel chest to Requester chest type settings
+
+---------------------------------------------------------------------------------------------------
+Version: 1.1.8
+Date: 2.10.2019
+  Changes:
+    - Attempted fixes of sound stacking problem
+    - Fixed platform turret warping alignment x2
+
+---------------------------------------------------------------------------------------------------
+Version: 1.1.7
+Date: 30.09.2019
+  Changes:
+    - Reduced cost of Warponium Fuel Cells
+    - Fixed teleporter sounds
+    - Fixed warp beacon (?)
+    - Changed warp pipe pipette
+    - Fixed player leave/join affecting votewarp
+    - Increased default votewarp fraction to 0.51 and now rounds up. (2 players in MP requires both players to vote before warping)
+    - Fixed platform turret warping alignment issue
+    - Fixed factory floor early research tile alignment issue
+
+
+---------------------------------------------------------------------------------------------------
+Version: 1.1.6
+Date: 30.09.2019
+  Changes:
+    - Fixed nauvis map gen settings not applying to uncharted planets and added copy_nauvis planet modifier.
+    - Fixed hazard tile indicator accuracy for stairs
+    - Fixed a bug with harvester recall and overlapping belts/entities being destroyed
+
+---------------------------------------------------------------------------------------------------
+Version: 1.1.5
+Date: 30.09.2019
+  Changes:
+    - Made rotation checks more efficient
+    - Fixed Warp Rail logistics not being removed from blueprints.
+    - Fixed blueprints created from hotbar not being affected by blueprint checks.
+    - Mod Compatability attempted AAI Vehicles fixes
+    - Added toolbar and relating research for easy harvester and mobile gate pickup by popular demand
+
+---------------------------------------------------------------------------------------------------
+Version: 1.1.4
+Date: 29.09.2019
+  Changes:
+    - Added "P" Planet Clock timer to Warp Combinator
+    - Added separate setting to disable biter waves (previously disabled under base expansion rate tickbox)
+    - Fix for harvester migration issue x3
+
+
+---------------------------------------------------------------------------------------------------
+Version: 1.1.3
+Date: 29.09.2019
+  Changes:
+    - Fixed red X's in power statistics
+    - Made factory beacon research a bit more expensive
+    - Nerfed platform solar power by popular demand and added a difficulty setting
+    - Fix for harvester migration issue x2
+
+---------------------------------------------------------------------------------------------------
+Version: 1.1.2
+Date: 29.09.2019
+  Changes:
+    - Fixed bug with abilities not resetting on warp
+    - Attempted more fixes of multiplayer votewarp
+    - Added some locale to Warp Reactor research level 6 and 8
+    - Fixed planet target dropdown unlocking early.
+    - Fix of harvester loaders migration issue
+    - Picking up harvesters now prevents inventory duplicates
+    - Tweaked sorting of harvester items and research (left is now on the left)
+
+
+---------------------------------------------------------------------------------------------------
+Version: 1.1.1
+Date: 29.09.2019
+  Changes:
+    - Migration error x2
+
+---------------------------------------------------------------------------------------------------
+Version: 1.1.0
+Date: 28.09.2019
+  Changes:
+    - Migration error
+
+---------------------------------------------------------------------------------------------------
+Version: 1.0.9
+Date: 28.09.2019
+  Changes:
+    - Attempted fix of loader and boiler floor access migration issues
+
+---------------------------------------------------------------------------------------------------
+Version: 1.0.8
+Date: 27.09.2019
+  Changes:
+    - Cleaned entity spam from circuit signals menu
+    - Mod compatability with Spell Pack
+    - Fixed Warp Loaders (old saves may need to rotate them to refresh/update)
+
+---------------------------------------------------------------------------------------------------
+Version: 1.0.7
+Date: 26.09.2019
+  Changes:
+    - Planet API bugfix
+    - Removed some debug code
+    - Fixed migration power bug
+    - Fixed Warp Combinator alignments and bug with offset setting not applying
+    - Fixed Harvester alignment bug + tile migration
+    - Fixed bug with Harvester Combinators not moving for size upgrades
+
+---------------------------------------------------------------------------------------------------
+Version: 1.0.6
+Date: 25.09.2019
+  Changes:
+    - Removed unused hazard tiles
+    - Moved Harvester Floor between boiler and factory, and adjusted research to match.
+    - Fixed Warp Accumulator recipe and item
+    - Fixed "Invisible" Radar being hidden by factory beacon/boiler substation upgrades
+    - Fixed minor factory floor misalignments + tile migration
+
+---------------------------------------------------------------------------------------------------
+Version: 1.0.5
+Date: 22.09.2019
+  Changes:
+    - Fixed crash related to new blueprints thing
+    - Added Warp Combinators and related research
+    - Added Harvester Combinators and related research
+    - Fixed factory giga floors alignments + tile migration
+
+---------------------------------------------------------------------------------------------------
 Version: 1.0.4
 Date: 22.09.2019
   Changes:

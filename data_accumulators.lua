@@ -11,7 +11,8 @@ local function ExtendRecipeItem(t)
 	i.name=t.name i.place_result=t.name
 	data:extend{i,r}
 end
-local function ExtendDataCopy(a,b,x,ri,tx) local t=MakeDataCopy(a,b,x) if(tx)then for k,v in pairs(tx)do t[k]=v end end data:extend{t} if(ri)then ExtendRecipeItem(t) end return t end
+local function ExtendRecipeItemFix(t) t.order=t.order or "warptorio" end
+local function ExtendDataCopy(a,b,x,ri,tx) local t=MakeDataCopy(a,b,x) if(tx)then for k,v in pairs(tx)do if(v==false)then t[k]=nil else t[k]=v end end end if(ri)then ExtendRecipeItemFix(t) end data:extend{t} return t end
 
 
 local techPacks={red="automation-science-pack",green="logistic-science-pack",blue="chemical-science-pack",black="military-science-pack",
@@ -33,6 +34,8 @@ local t={
 	type="accumulator",
 	max_health=500,
 	energy_source={type="electric",usage_priority="tertiary",buffer_capacity="2MJ",input_flow_limit="200kW",output_flow_limit="200kW"},
+	icon_size=32,
+	icons={{icon="__base__/graphics/icons/lab.png",tint={r=0.6,g=0.6,b=1,a=0.6}}},
 
 	collision_box={{-1.01/0.9,-1.01/0.9}, {1.01/0.9,1.01/0.9}}, selection_box={{-1.5/0.9,-1.5/0.9}, {1.5/0.9,1.5/0.9}},
 	charge_cooldown=30, charge_light={intensity=0.3,size=7,color={r=1.0,g=1.0,b=1.0}},
@@ -45,8 +48,7 @@ local t={
       repair_sound = {filename = "__base__/sound/manual-repair-simple.ogg"},
 	maximum_wire_distance=7.5,
 	supply_area_distance=2.5,
-	minable={mining_time=10,result="warptorio-teleporter-0"},
-
+	--minable={mining_time=10,result="warptorio-teleporter-0"},
 
 	picture={ layers={
 		[1]={	filename="__base__/graphics/entity/lab/lab.png", tint={r=0.6,g=0.6,b=1,a=0.6},
@@ -69,8 +71,9 @@ local t={
 		},
 	}},		
 }
+ExtendRecipeItemFix(t)
 data:extend{t}
-ExtendRecipeItem(t)
+
 
 local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{name="warptorio-teleporter-1",energy_source={buffer_capacity="4MJ",input_flow_limit="2MW",output_flow_limit="2MW"}},true)
 local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{name="warptorio-teleporter-2",energy_source={buffer_capacity="8MJ",input_flow_limit="20MW",output_flow_limit="20MW"}},true)
@@ -112,6 +115,9 @@ local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{name="warptorio-u
 			},
 		},
 	}},
+	icon_size=32,
+	icons={{icon="__base__/graphics/icons/electric-furnace.png",tint={r=0.8,g=0.8,b=1,a=1}}},
+	icon=false,
 })
 
 local t=ExtendDataCopy("accumulator","warptorio-underground-0",{name="warptorio-underground-1",energy_source={buffer_capacity="10MJ",input_flow_limit="500MW",output_flow_limit="500MW"},},true)
@@ -120,15 +126,12 @@ local t=ExtendDataCopy("accumulator","warptorio-underground-0",{name="warptorio-
 local t=ExtendDataCopy("accumulator","warptorio-underground-0",{name="warptorio-underground-4",energy_source={buffer_capacity="500MJ",input_flow_limit="5GW",output_flow_limit="5GW"},},true)
 local t=ExtendDataCopy("accumulator","warptorio-underground-0",{name="warptorio-underground-5",energy_source={buffer_capacity="1GJ",input_flow_limit="20GW",output_flow_limit="20GW"},},true)
 
--- ----
--- Warp Beacon
 
-local t=ExtendDataCopy("beacon","beacon",{name="warptorio-beacon-1",supply_area_distance=16,module_specification={module_slots=1},
-	base_picture={ tint={r=0.5,g=0.7,b=1,a=1}, }, animation={ tint={r=1,g=0.2,b=0.2,a=1}, },
-	allowed_effects={"consumption","speed","pollution","productivity"},
-	distribution_effectivity=1,
-},true)
-for i=2,10,1 do local xt=table.deepcopy(t) xt.name="warptorio-beacon-"..i xt.supply_area_distance=math.min(16+8*i,64) xt.module_specification.module_slots=i data:extend{xt} ExtendRecipeItem(xt) end
+
+-- Do icon based stairs
+
+
+
 
 
 -- ----
@@ -141,7 +144,17 @@ local t=ExtendDataCopy("accumulator","accumulator",{name="warptorio-accumulator"
 	},
 	picture={layers={ {tint=rtint,hr_version={tint=rtint}} }},
 	minable={mining_time=2,result="warptorio-accumulator"},
-},true)
+	icons={{icon="__base__/graphics/icons/accumulator.png",tint=rtint}}, icon_size=32,
+},false,{icon=false})
+local name="warptorio-accumulator"
+local item=table.deepcopy( data.raw.item.accumulator )
+item.name=name item.place_result=name
+item.icons={{icon="__base__/graphics/icons/accumulator.png",tint=rtint}}
+item.icon=nil
+local recipe=table.deepcopy( data.raw.recipe["accumulator"] )
+recipe.enabled=false recipe.name=name recipe.result=name
+recipe.ingredients={{"accumulator",10},{"solar-panel",10},{"advanced-circuit",20},{"processing-unit",50},{"battery",50},{"nuclear-reactor",1}}
+data:extend{item,recipe}
 
 local t={type="technology",upgrade=true,icon_size=128,icons={
 	{icon="__base__/graphics/technology/electric-energy-acumulators.png",tint={r=0.3,g=0.3,b=1,a=1},priority="low"},
@@ -150,54 +163,12 @@ ExtendTech(t,{name="warptorio-accumulator",unit={count=1000,time=5},effects={{re
 	prerequisites={"warptorio-energy-4","warptorio-teleporter-4","production-science-pack"}}, {red=1,green=1,blue=1,purple=1})
 
 
---[[ unused
-local entity=table.deepcopy(data.raw.accumulator["accumulator"]) entity.name="warptorio-stabilizer-1"
-entity.picture.layers[1].tint={r=0.8, g=0.8, b=1, a=1}
-entity.picture.layers[1].hr_version.tint={r=0.8, g=0.8, b=1, a=1}
-entity.energy_source={
-	type="electric",
-	buffer_capacity="500MJ",
-	usage_priority="tertiary",
-	input_flow_limit="500kW",
-	output_flow_limit="0kW",
-	emissions_per_minute=5
-}
-recipe_item_entity_extend(entity)
 
-local entity=table.deepcopy(data.raw.accumulator["warptorio-stabilizer-1"]) entity.name="warptorio-stabilizer-2"
-entity.energy_source.buffer_capacity="5GJ"
-entity.energy_source.input_flow_limit="1000kW"
-recipe_item_entity_extend(entity)
 
-local entity=table.deepcopy(data.raw.accumulator["warptorio-stabilizer-1"]) entity.name="warptorio-stabilizer-3"
-entity.energy_source.buffer_capacity="50GJ"
-entity.energy_source.input_flow_limit="2500kW"
-recipe_item_entity_extend(entity)
 
-local entity=table.deepcopy(data.raw.accumulator["warptorio-stabilizer-1"]) entity.name="warptorio-stabilizer-4"
-entity.energy_source.buffer_capacity="500GJ"
-entity.energy_source.input_flow_limit="5000kW"
-recipe_item_entity_extend(entity)
 
-]]
 
--- ----
--- Warp Accelerator
---[[ unused
 
---warp accelerator
-local entity=table.deepcopy(data.raw.accumulator["accumulator"])
-entity.name="warptorio-accelerator-0"
-entity.picture.layers[1].tint={r=1, g=0.8, b=0.8, a=1}
-entity.picture.layers[1].hr_version.tint={r=1, g=0.8, b=0.8, a=1}
-entity.energy_source =
-{
-  type="electric",
-  buffer_capacity="5MJ",
-  usage_priority="tertiary",
-  input_flow_limit="5GW",
-  output_flow_limit="0GW"
-}
 
-recipe_item_entity_extend(entity)
-]]
+
+

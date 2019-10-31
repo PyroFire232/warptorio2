@@ -329,7 +329,7 @@ pmods.tile_expr={ fgen=function(g,ev) for k,v in pairs(warptorio.GetTiles(ev[1])
 
 --[[ Nauvis Modifier -- Remove all other tiles, decorations, entities and autoplacers except nauvis ones ]]
 
-
+pmods.copy_nauvis={ fgen=function(g,ev) ev=ev or {} local gx=game.surfaces["nauvis"].map_gen_settings for k,v in pairs(gx)do if(k~="seed" and ev[k]~=false)then g[k]=v end end return g end }
 pmods.nauvis={ -- remove mod tiles, decoratives and autoplacements
 	fgen=function(g,ev) ev=ev or {}
 		--[[if(ev.tiles~=false)then for k,v in pairs(warptorio.GetModTiles())do g.autoplace_settings.tile.settings[v]=g.autoplace_settings.tile.settings[v] or PCR(0) end end
@@ -418,6 +418,7 @@ function mapgen.MergeSettings(g,gx)
 	return table.deepmerge(g,gx)
 end
 function mapgen.ApplyModifiers(p,g,chart)
+	if(p.gen)then mapgen.MergeSettings(g,p.gen) end
 	if(p.modifiers)then for k,v in ipairs(p.modifiers)do
 		local mod=warptorio.PlanetModifiers[v[1]]
 		if(not mod)then error("Warptorio Planet Error (" .. p.key .. "): \"" .. v[1] .. "\" Modifier not found.") return g end
@@ -438,6 +439,7 @@ function mapgen.ApplyModifiers(p,g,chart)
 		if(g.starting_area)then g.starting_area=g.starting_area*(nvs.starting_area or 1) end
 		if(g.water)then g.water=g.water*(nvs.water or 1) end
 	end
+	if(p.fgen)then mapgen.MergeSettings(g,p.fgen(g)) end
 	if(p.fgen_call)then
 		mapgen.MergeSettings(g,remote.call(p.fgen_call[1],p.fgen_call[2],g))
 	end
@@ -452,6 +454,7 @@ warptorio.RegisterPlanet({
 	desc="This world reminds you of home.",
 	modifiers={{"nauvis"}},
 	gen=nil, -- The base planet map_gen_settings table
+	nauvis_multiply=nil, -- Set to false to disable inheriting initial map settings resource settings.
 
 	tick_speed=nil, -- =(60*60*minutes) -- runs the tick calls every X ticks
 	required_controls=nil, -- {"iron-ore"} -- Mod compatability: This planet REQUIRES a certain autoplace_control.
@@ -485,6 +488,10 @@ warptorio.RegisterPlanet({
 
 warptorio.RegisterPlanet({ key="uncharted", name="An Uncharted Planet", zone=1, rng=PlanetRNG("uncharted"), -- default nauvis generation (modded)
 	desc="You prospect your surroundings and gaze at the stars, and you wonder if this world has ever had a name.",
+	nauvis_multiply=false,
+	modifiers={
+		{"copy_nauvis"},
+	},
 })
 
 

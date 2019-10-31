@@ -1,12 +1,18 @@
 data:extend(
 {
-	{type="bool-setting",name="warptorio_no_blueprint",order="11b",
+
+	{type="double-setting",name="warptorio_votewarp_multi",order="11b",
+	setting_type="runtime-global",default_value=0.51,
+	minimum_value=0,maximum_value=1},
+
+	{type="bool-setting",name="warptorio_no_blueprint",order="1a",
 	setting_type="runtime-global",default_value=false,},
 
 
-	{type="double-setting",name="warptorio_votewarp_multi",order="1a",
-	setting_type="runtime-global",default_value=0.5,
-	minimum_value=0,maximum_value=1},
+
+	{type="bool-setting",name="warptorio_combinator_offset",order="1e",
+	setting_type="runtime-global",default_value=false,},
+
 
 	{type="string-setting",name="warptorio_loader_top",order="aaaa",
 	setting_type="runtime-global",default_value="up",
@@ -23,12 +29,20 @@ data:extend(
 
 	{type="string-setting",name="warptorio_loaderchest_requester",order="aaad",
 	setting_type="runtime-global",default_value="logistic-chest-requester",
-	allowed_values={"logistic-chest-requester","logistic-chest-buffer"},
+	allowed_values={"logistic-chest-requester","logistic-chest-buffer","steel-chest"},
 	},
 
 	{type="int-setting",name="warptorio_warpchance",order="aab3a",
 	setting_type="runtime-global",default_value=30,
 	minimum_value=1,maximum_value=100},
+
+	{type="double-setting",name="warptorio_solar_multiplier",order="aab4a",
+	setting_type="runtime-global",default_value=0.5,
+	minimum_value=0,maximum_value=10},
+
+	{type="bool-setting",name="warptorio_no_lootchest",order="aab4c",
+	setting_type="runtime-global",default_value=false,},
+
 
 	{type="bool-setting",name="warptorio_autowarp_always",order="aaba",
 	setting_type="runtime-global",default_value=false,},
@@ -44,6 +58,9 @@ data:extend(
 	setting_type="runtime-global",default_value=false},
 
 	{type="bool-setting",name="warptorio_water",order="aad",
+	setting_type="runtime-global",default_value=false},
+
+	{type="bool-setting",name="warptorio_robot_warping",order="aae",
 	setting_type="runtime-global",default_value=false},
 
 
@@ -84,8 +101,10 @@ data:extend(
 	minimum_value = 3},
 
 
+	{type = "bool-setting", name = "warptorio_biter_wave_disable",order="aea1a",
+	setting_type = "runtime-global",default_value =false},
 
-	{type = "double-setting", name = "warptorio_biter_wavestart",order="aea1",
+	{type = "double-setting", name = "warptorio_biter_wavestart",order="aea1b",
 	setting_type = "runtime-global",default_value = 5,
 	minimum_value = 1,maximum_value=10},
 

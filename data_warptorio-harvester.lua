@@ -4,6 +4,7 @@ local function rgb(r,g,b,a) a=a or 255 return {r=r/255,g=g/255,b=b/255,a=a/255} 
 function table.deepmerge(s,t) for k,v in pairs(t)do if(istable(v) and s[k] and istable(s[k]))then table.deepmerge(s[k],v) else s[k]=v end end end
 function table.merge(s,t) local x={} for k,v in pairs(s)do x[k]=v end for k,v in pairs(t)do x[k]=v end return x end
 local function MakeDataCopy(a,b,x) local t=table.deepcopy(data.raw[a][b]) if(x)then table.deepmerge(t,x) end return t end
+
 local function ExtendRecipeItem(t)
 	local r=table.deepcopy(data.raw.recipe["nuclear-reactor"])
 	r.enabled=false r.name=t.name r.ingredients={{"steel-plate",1}} r.result=t.name
@@ -11,7 +12,11 @@ local function ExtendRecipeItem(t)
 	i.name=t.name i.place_result=t.name
 	data:extend{i,r}
 end
-local function ExtendDataCopy(a,b,x,ri,tx) local t=MakeDataCopy(a,b,x) if(tx)then for k,v in pairs(tx)do t[k]=v end end data:extend{t} if(ri)then ExtendRecipeItem(t) end return t end
+
+local function ExtendDataCopy(a,b,x,ri,tx) local t=MakeDataCopy(a,b,x) if(tx)then for k,v in pairs(tx)do if(v==false)then t[k]=nil else t[k]=v end end end
+	if(ri)then ExtendRecipeItem(t) elseif(ri==false)then t.order=t.order or "warptorio" end
+	data:extend{t} return t
+end
 
 
 local techPacks={red="automation-science-pack",green="logistic-science-pack",blue="chemical-science-pack",black="military-science-pack",
@@ -24,19 +29,20 @@ local function ExtendTech(t,d,s) local x=table.merge(t,d) if(s)then x.unit.ingre
 
 --for k,v in pairs{"nw","sw","se","ne","west","east"}do
 local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{name="warptorio-harvestportal-0",
-	minable={mining_time=5,result="warptorio-harvestportal-0"},energy_source={buffer_capacity="5MJ",input_flow_limit="500kW",output_flow_limit="500kW"}},true)
+	minable={mining_time=5,result="warptorio-harvestportal-1"},energy_source={buffer_capacity="5MJ",input_flow_limit="500kW",output_flow_limit="500kW"}},false)
+
 local t=ExtendDataCopy("accumulator","warptorio-teleporter-0",{name="warptorio-harvestportal-1",
 	minable={mining_time=5,result="warptorio-harvestportal-1"},energy_source={buffer_capacity="10MJ",input_flow_limit="500MW",output_flow_limit="500MW"}},true)
-local t=ExtendDataCopy("accumulator","warptorio-harvestportal-1",{name="warptorio-harvestportal-2",energy_source={buffer_capacity="50MJ",input_flow_limit="1GW",output_flow_limit="1GW"}},true)
-local t=ExtendDataCopy("accumulator","warptorio-harvestportal-1",{name="warptorio-harvestportal-3",energy_source={buffer_capacity="100MJ",input_flow_limit="2GW",output_flow_limit="2GW"}},true)
-local t=ExtendDataCopy("accumulator","warptorio-harvestportal-1",{name="warptorio-harvestportal-4",energy_source={buffer_capacity="500MJ",input_flow_limit="5GW",output_flow_limit="5GW"}},true)
-local t=ExtendDataCopy("accumulator","warptorio-harvestportal-1",{name="warptorio-harvestportal-5",energy_source={buffer_capacity="1GJ",input_flow_limit="20GW",output_flow_limit="20GW"}},true)
+local t=ExtendDataCopy("accumulator","warptorio-harvestportal-1",{name="warptorio-harvestportal-2",energy_source={buffer_capacity="50MJ",input_flow_limit="1GW",output_flow_limit="1GW"}},false)
+local t=ExtendDataCopy("accumulator","warptorio-harvestportal-1",{name="warptorio-harvestportal-3",energy_source={buffer_capacity="100MJ",input_flow_limit="2GW",output_flow_limit="2GW"}},false)
+local t=ExtendDataCopy("accumulator","warptorio-harvestportal-1",{name="warptorio-harvestportal-4",energy_source={buffer_capacity="500MJ",input_flow_limit="5GW",output_flow_limit="5GW"}},false)
+local t=ExtendDataCopy("accumulator","warptorio-harvestportal-1",{name="warptorio-harvestportal-5",energy_source={buffer_capacity="1GJ",input_flow_limit="20GW",output_flow_limit="20GW"}},false)
 
 --end
 
 
 
--- Special thanks to factorissimo2
+-- Credit to factorissimo2
 
 local F = "__warptorio2__";
 
@@ -68,7 +74,7 @@ end
 local rtint={r=0.6,g=0.6,b=0.8,a=1}
 
 
-function makePortal(suffix, visible, sprite,size)
+local function makePortal(suffix, visible, sprite,size,vorder)
 	local name = "warptorio-harvestpad-" .. suffix
 	local localised_name = {"entity-name.warptorio-harvestpad-" .. suffix}
 	local result_name = "warptorio-harvestpad-" .. suffix
@@ -124,31 +130,31 @@ function makePortal(suffix, visible, sprite,size)
 			icon_size = 32,
 			flags = item_flags,
 			subgroup = "storage",
-			order = "a-a",
+			order = (vorder or "a-a"),
 			place_result = name,
 			stack_size = 1
 		}
 	};
 end
 
-data:extend(makePortal("nw",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",8.5))
-data:extend(makePortal("sw",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",8.5))
-data:extend(makePortal("ne",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",8.5))
-data:extend(makePortal("se",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",8.5))
+data:extend(makePortal("nw",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",8.5,"a-c"))
+data:extend(makePortal("sw",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",8.5,"a-f"))
+data:extend(makePortal("ne",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",8.5,"a-d"))
+data:extend(makePortal("se",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",8.5,"a-e"))
 
 
 
-data:extend(makePortal("west-1",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(12-1)/2))
-data:extend(makePortal("west-2",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(20-1)/2))
-data:extend(makePortal("west-3",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(26-1)/2))
-data:extend(makePortal("west-4",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(32-1)/2))
-data:extend(makePortal("west-5",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(38-1)/2))
+data:extend(makePortal("west-1",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(12-1)/2,"a-a1"))
+data:extend(makePortal("west-2",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(20-1)/2,"a-a2"))
+data:extend(makePortal("west-3",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(26-1)/2,"a-a3"))
+data:extend(makePortal("west-4",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(32-1)/2,"a-a4"))
+data:extend(makePortal("west-5",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(38-1)/2,"a-a5"))
 
-data:extend(makePortal("east-1",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(12-1)/2))
-data:extend(makePortal("east-2",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(20-1)/2))
-data:extend(makePortal("east-3",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(26-1)/2))
-data:extend(makePortal("east-4",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(32-1)/2))
-data:extend(makePortal("east-5",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(38-1)/2))
+data:extend(makePortal("east-1",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(12-1)/2,"a-b1"))
+data:extend(makePortal("east-2",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(20-1)/2,"a-b2"))
+data:extend(makePortal("east-3",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(26-1)/2,"a-b3"))
+data:extend(makePortal("east-4",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(32-1)/2,"a-b4"))
+data:extend(makePortal("east-5",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",(38-1)/2,"a-b5"))
 
 
 --data:extend(makePortal("giga-west",true,"__base__/graphics/terrain/lab-tiles/lab-dark-2.png",16.5))

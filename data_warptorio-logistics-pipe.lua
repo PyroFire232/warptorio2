@@ -27,6 +27,7 @@ data:extend{
         }
       },
       corpse = "pipe-remnants",
+      placeable_by={{item="pipe-to-ground",count=1}},
       fast_replaceable_group = "pipe",
       flags = {
         "placeable-neutral",

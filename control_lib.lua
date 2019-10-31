@@ -1,3 +1,5 @@
+-- This file isn't used at all lol, just old code / archiving
+
 function warptorio.TickLogistics(e)
 	for k,v in pairs(gwarptorio.Teleporters)do v:BalanceLogistics() end
 	for k,v in pairs(gwarptorio.Rails)do v:BalanceLogistics() end
@@ -24,39 +26,40 @@ end
 
 function warptorio.on_entity_died.planet(ev) local p=gwarptorio.planet if(p)then warptorio.CallPlanetEvent(p,"on_entity_died",ev) end end
 
-warptorio.cache["warptorio-warploader"]={
-	create=function(e) warptorio.InsertCacheLoader(e) end,
-	destroy=function(e) warptorio.RemoveCacheLoader(e) end,
-	rotate=function(e) warptorio.RemoveCacheLoader(e,true) warptorio.InsertCacheLoader(e) end,
-	cloned=function(e) warptorio.InsertCacheLoader(e) end,
-	gui_closed=function(e) warptorio.RemoveCacheLoader(e) warptorio.InsertCacheLoader(e) end,
-	pre_settings_pasted=function(e) warptorio.RemoveCacheLoader(e) end,
-	settings_pasted=function(e) warptorio.InsertCacheLoader(e) end,
-}
 
-
-function warptorio.RemoveCacheLoader(v,o) local ldt=v.loader_type if(o)then ldt=(ldt=="input" and "output" or "input") end warptorio.RemoveCache("ld"..ldt,v) if(ldt=="output")then warptorio.RemoveCacheFilter(e) end end
-function warptorio.InsertCacheLoader(v) warptorio.InsertCache("ld".. v.loader_type,v) if(v.loader_type=="output")then warptorio.InsertCacheFilter(v) end end
-function warptorio.RemoveCacheFilter(v) local ct=gwarptorio.cache["ldoutputf"]
-	for cidx,tbl in pairs(ct)do
-		local rd=false
-		for id,e in pairs(tbl)do if(e.owner==v)then table.insert(rdxt,e) end end
-		for k,v in pairs(rdxt)do table.RemoveByValue(tbl,v) end
-		if(table_size(tbl)==0)then tbl[cidx]=nil end
-	end
-end
-function warptorio.InsertCacheFilter(v) local ct=gwarptorio.cache["ldoutputf"]
-	for i=1,5,1 do local f=v.get_filter(i)
-		if(f)then ct[f]=ct[f] or {}
-			table.insertExclusive(ct[f],v.get_transport_line(1))
-			table.insertExclusive(ct[f],v.get_transport_line(2))
-		end
-	end
+function warptorio.DoOnBuiltEntity(ev) local e=ev.created_entity if(not e)then e=ev.entity end
+	if(warptorio.IsTeleporterGate(e))then warptorio.TrySpawnTeleporterGate(e)
+	elseif(warptorio.IsWarpLoader(e))then warptorio.TrySpawnWarploader(e)
+	elseif(warptorio.CacheMonitor[e.name])then warptorio.InsertCache(warptorio.CacheMonitor[e.name],e) end
 end
 
+
+function warptorio.OnBuiltEntity(ev) warptorio.DoOnBuiltEntity(ev) local p=gwarptorio.planet if(p)then warptorio.CallPlanetEvent(p,"on_built_entity",ev) end end
+function warptorio.OnRobotBuiltEntity(ev) warptorio.DoOnBuiltEntity(ev) local p=gwarptorio.planet if(p)then warptorio.CallPlanetEvent(p,"on_robot_built_entity",ev) end end
+function warptorio.OnScriptRaisedBuilt(ev) warptorio.DoOnBuiltEntity(ev) local p=gwarptorio.planet if(p)then warptorio.CallPlanetEvent(p,"script_raised_built",ev) end end
+function warptorio.OnScriptRevived(ev) warptorio.DoOnBuiltEntity(ev) local p=gwarptorio.planet if(p)then warptorio.CallPlanetEvent(p,"script_raised_revive",ev) end end
+script.on_event(defines.events.on_built_entity, warptorio.OnBuiltEntity)
+script.on_event(defines.events.on_robot_built_entity, warptorio.OnRobotBuiltEntity)
+script.on_event(defines.events.script_raised_built, warptorio.OnScriptRaisedBuilt)
+script.on_event(defines.events.script_raised_revive, warptorio.OnScriptRevived)
+
+
+
+
+
+
+
+
+---- old loader code
 
 function warptorio.on_tick.warp_loaders(ev)
-	local cin=gwarptorio.cache.ldinput
+	local cIn=gwarptorio.cache.ldinputf
+	local cOut=gwarptorio.cache.ldoutputf
+
+	for k,line in pairs(cIn)do local inv=line.get_contents() warptorio.DistributeLoaderLine(inv)
+		for item_name,item_count in pairs(inv)do
+			if(v and warptorio.OutputWarpLoader(v))then inv.remove{name=item_name
+
 	local inpool={}
 	for k,v in pairs(cin)do for i,line in ipairs{v.get_transport_line(1),v.get_transport_line(2)} do local inv=line.get_contents() for n,m in pairs(inv)do
 		inpool[n]=inpool[n] or {} table.insert(inpool[n],line)
@@ -83,9 +86,10 @@ function warptorio.on_tick.warp_loaders(ev)
 		end
 	end
 
-	local noutID=gwarptorio.nextOutputFilter if(not cout[nout])then nout=nil end
+
 
 	local fk,fv=next(cout,nout)
+	local noutID=gwarptorio.nextOutputFilter if(not cout[nout])then nout=nil end
 	local t={}
 
 
@@ -136,20 +140,3 @@ function warptorio.TickWarpLoaders()
 			if(isvalid(fl) and fl.can_insert_at_back())then fl.insert_at_back({name=k,count=1}) l.remove_item{name=k,count=1} v[l]=v[l]-1 end
 	end end end end end end
 end
-
-
-function warptorio.DoOnBuiltEntity(ev) local e=ev.created_entity if(not e)then e=ev.entity end
-	if(warptorio.IsTeleporterGate(e))then warptorio.TrySpawnTeleporterGate(e)
-	elseif(warptorio.IsWarpLoader(e))then warptorio.TrySpawnWarploader(e)
-	elseif(warptorio.CacheMonitor[e.name])then warptorio.InsertCache(warptorio.CacheMonitor[e.name],e) end
-end
-
-
-function warptorio.OnBuiltEntity(ev) warptorio.DoOnBuiltEntity(ev) local p=gwarptorio.planet if(p)then warptorio.CallPlanetEvent(p,"on_built_entity",ev) end end
-function warptorio.OnRobotBuiltEntity(ev) warptorio.DoOnBuiltEntity(ev) local p=gwarptorio.planet if(p)then warptorio.CallPlanetEvent(p,"on_robot_built_entity",ev) end end
-function warptorio.OnScriptRaisedBuilt(ev) warptorio.DoOnBuiltEntity(ev) local p=gwarptorio.planet if(p)then warptorio.CallPlanetEvent(p,"script_raised_built",ev) end end
-function warptorio.OnScriptRevived(ev) warptorio.DoOnBuiltEntity(ev) local p=gwarptorio.planet if(p)then warptorio.CallPlanetEvent(p,"script_raised_revive",ev) end end
-script.on_event(defines.events.on_built_entity, warptorio.OnBuiltEntity)
-script.on_event(defines.events.on_robot_built_entity, warptorio.OnRobotBuiltEntity)
-script.on_event(defines.events.script_raised_built, warptorio.OnScriptRaisedBuilt)
-script.on_event(defines.events.script_raised_revive, warptorio.OnScriptRevived)
