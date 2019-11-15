@@ -10,6 +10,7 @@ local function ExtendRecipeItem(t)
 	r.enabled=false r.name=t.name r.ingredients={{"steel-plate",1}} r.result=t.name
 	local i=table.deepcopy(data.raw.item["nuclear-reactor"])
 	i.name=t.name i.place_result=t.name
+	i.flags={"hidden"}
 	data:extend{i,r}
 end
 
@@ -123,6 +124,7 @@ local function makePortal(suffix, visible, sprite,size,vorder)
 			map_color = {r = 0.8, g = 0.7, b = 0.55},
 		},
 		{
+			flags={"hidden"},
 			type = "item",
 			name = name,
 			localised_name = localised_name,

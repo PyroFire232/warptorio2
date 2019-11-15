@@ -6,7 +6,7 @@ data:extend{
 
 
 
-{
+--[[{
       icons = {{tint=rtint,icon="__base__/graphics/icons/substation.png"}},
       icon_size = 32,
       name = "warptorio-warpstation",
@@ -15,7 +15,7 @@ data:extend{
       stack_size = 50,
       subgroup = "energy-pipe-distribution",
       type = "item"
-    },
+    },]]
 
 
 {
@@ -170,10 +170,11 @@ data:extend{
       icon_size = 32,
       max_health = 200,
       maximum_wire_distance = 20,
-      minable = {
+      --[[minable = {
         mining_time = 0.1,
         result = "warptorio-warpstation"
-      },
+      },]]
+      order = "a[energy]-d[substation]",
       name = "warptorio-warpstation",
       pictures = {
         layers = {

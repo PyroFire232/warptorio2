@@ -43,10 +43,12 @@ local techPacks={red="automation-science-pack",green="logistic-science-pack",blu
 local function SciencePacks(x) local t={} for k,v in pairs(x)do table.insert(t,{techPacks[k],v}) end return t end
 local function ExtendTech(t,d,s) local x=table.merge(t,d) if(s)then x.unit.ingredients=SciencePacks(s) end data:extend{x} return x end
 
-
+--[[
 local t=ExtendDataCopy("electric-pole","small-electric-pole",{name="warptorio-electric-pole",
 	pictures={layers={[1]={tint={r=0.6,g=0.6,b=1,a=1},hr_version={tint={r=0.6,g=0.6,b=1,a=1}} }, }},
 },true)
+]]
+
 
 -- --------
 -- vonNeumann compatability. It's base game stuff anyway. Perhaps expand on this later

@@ -3,7 +3,7 @@ local rctint=rtint --{r=0.39,g=0,b=0,a=1}
 
 data:extend{
 
-    {
+    --[[{
       icons = {{icon="__base__/graphics/icons/pipe-to-ground.png",tint=rtint}},
       icon_size = 32,
       name = "warptorio-logistics-pipe",
@@ -12,7 +12,7 @@ data:extend{
       stack_size = 50,
       subgroup = "energy-pipe-distribution",
       type = "item"
-    },
+    },]]
 
 
 {
@@ -179,10 +179,11 @@ data:extend{
       icon = "__base__/graphics/icons/pipe-to-ground.png",
       icon_size = 32,
       max_health = 150,
-      minable = {
+      --[[minable = {
         mining_time = 0.1,
         result = "pipe-to-ground"
-      },
+      },]]
+	      order = "a[pipe]-b[pipe-to-ground]",
       name = "warptorio-logistics-pipe",
       pictures = {
         down = { tint=rctint,

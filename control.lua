@@ -60,6 +60,7 @@ Contains some generic functions that deal with logistics between entities, such 
 
 -- GUI
 Contains some derma libraries to manage the hud interface, buttons, and timers that are updated and changed regularly.
+I hate guis too.
 
 -- Players
 Some generic functions and events and such
@@ -104,7 +105,8 @@ function math.radtodeg(x) return x*(180/math.pi) end
 function math.nroot(r,n) return n^(1/r) end
 
 vector={} vector.__index=vector setmetatable(vector,vector)
-function vector:__call(x,y) return setmetatable({[1]=x,[2]=y,x=x,y=y},vector) end
+function vector:__call(x,y) if(type(x)~="table")then return setmetatable({[1]=x,[2]=y,x=x,y=y},vector) else return vector(vector.x(x),vector.y(x)) end end
+function vector.__tostring(v) return "{"..vector.x(v) .. ", " .. vector.y(v) .."}" end
 function vector.__add(x,y) return vector.add(x,y) end
 function vector.__sub(x,y) return vector.sub(x,y) end
 function vector.__mul(x,y) return vector.mul(x,y) end
@@ -874,8 +876,8 @@ function tell:ManagesEntity(e) if(e==self.a or e==self.b)then return true end
 	for k,v in pairs{self.chests,self.pipes,self.loaders}do for a,b in pairs(v)do for x,y in pairs(b)do if(y==e)then return true end end end end
 end
 function tell:CheckEmptyPipes()
-	local ppr={} for a,b in pairs(self.pipes)do for k,v in pairs(b)do if(table_size(v.neighbours[1])>=1)then ppr[k]=true end end end
-	for a,b in pairs(self.pipes)do for k,v in pairs(b)do if(not ppr[k])then v.clear_fluid_inside() end end end
+	local ppr={} for a,b in pairs(self.pipes)do for k,v in pairs(b)do if(isvalid(v) and table_size(v.neighbours[1])>=1)then ppr[k]=true end end end
+	for a,b in pairs(self.pipes)do for k,v in pairs(b)do if(isvalid(v) and not ppr[k])then v.clear_fluid_inside() end end end
 end
 
 for k,v in pairs{"script_raised_destroy","on_post_entity_died","on_robot_mined","on_player_mined_item"}do
@@ -1252,10 +1254,18 @@ function HARV:Recall(bply) -- recall after portal is mined
 		if(v and v.valid and v~=self.a and v~=self.b and not entity.shouldClean(v) and not warptorio.PlanetEntityIsPlatform(v) and v.type~="resource")then table.insert(ecs,v) end
 	end
 
+	local blacktbl={}
+	for k,v in pairs(ebs)do if(table.HasValue(warptorio.GetWarpBlacklist(),v.name))then table.insert(blacktbl,v) ebs[k]=nil end end
+	for k,v in pairs(ebs)do if(table.HasValue(warptorio.GetModTable("harvester_blacklist"),v.name))then table.insert(blacktbl,v) ebs[k]=nil end end
+
+	for k,v in pairs(ecs)do if(table.HasValue(warptorio.GetWarpBlacklist(),v.name))then table.insert(blacktbl,v) ecs[k]=nil end end
+	for k,v in pairs(ecs)do if(table.HasValue(warptorio.GetModTable("harvester_blacklist"),v.name))then table.insert(blacktbl,v) ecs[k]=nil end end
+
 
 	warptorio.Cloned_Entities={} warptorio.IsCloning=true
 	hf.clone_entities{entities=ecs,destination_surface=f,destination_offset=vector.add(vector.mul(self.position,-1),self.deploy_position),snap_to_grid=false}
 	local hfe=warptorio.Cloned_Entities warptorio.IsCloning=false warptorio.Cloned_Entities=nil
+
 
 	if(#ebs>0)then for i=#ebs,1,-1 do if(not ebs[i] or not ebs[i].valid)then table.remove(ebs,i) end end end -- bad ents in table ?
 
@@ -1315,6 +1325,15 @@ function HARV:Deploy(surf,pos) -- deploy over a harvester platform
 
 	hf.set_tiles(tcs,true)
 	hf.create_decoratives{decoratives=dcs}
+
+	local blacktbl={}
+	for k,v in pairs(ebs)do if(table.HasValue(warptorio.GetWarpBlacklist(),v.name))then table.insert(blacktbl,v) ebs[k]=nil end end
+	for k,v in pairs(ebs)do if(table.HasValue(warptorio.GetModTable("harvester_blacklist"),v.name))then table.insert(blacktbl,v) ebs[k]=nil end end
+
+	for k,v in pairs(ecs)do if(table.HasValue(warptorio.GetWarpBlacklist(),v.name))then table.insert(blacktbl,v) ecs[k]=nil end end
+	for k,v in pairs(ecs)do if(table.HasValue(warptorio.GetModTable("harvester_blacklist"),v.name))then table.insert(blacktbl,v) ecs[k]=nil end end
+
+
 	warptorio.Cloned_Entities={} warptorio.IsCloning=true
 	f.clone_entities{entities=ecs,destination_surface=hf,destination_offset=vector.mul(vector.sub(self.deploy_position,self.position),-1),snap_to_grid=false}
 	local fe=warptorio.Cloned_Entities warptorio.IsCloning=false warptorio.Cloned_Entities=nil
@@ -1334,6 +1353,8 @@ function HARV:Deploy(surf,pos) -- deploy over a harvester platform
 
 	for k,v in pairs(fm)do entity.destroy(v) end
 	for k,v in pairs(hfm)do entity.destroy(v) end
+
+	for k,v in pairs(blacktbl)do if(v and v.valid)then v.destroy{raise_destroy=true} end end -- cleanup past entities
 
 	vector.clearplayers(f,planetArea)
 
@@ -1789,6 +1810,31 @@ function warptorio.BalanceLogistics(a,b) if(not a or not b or not a.valid or not
 end
 
 
+warptorio.teleDir={[0]={0,-1},[1]={1,-1},[2]={1,0},[3]={1,1},[4]={0,1},[5]={-1,1},[6]={-1,0},[7]={-1,-1}}
+function warptorio.TeleportTick(nm,tpg,idx,ply)
+	for i,e in pairs({tpg.a,tpg.b})do if(ply.surface==e.surface)then
+		local o=(i==1 and tpg.b or tpg.a) local x=e.position local xxx=math.abs(x.x) local xxy=math.abs(x.y)
+		if(vector.inarea(ply.position,vector.area(vector(x.x-1.5,x.y-1.5),vector(x.x+1.5,x.y+1.5)) ) )then
+			local inv=ply.get_main_inventory().get_item_count()
+			local w=ply.walking_state
+			local ox=o.position
+			local mp=2 if(not ply.character)then mp=3 end
+			if(not w.walking)then local cp=ply.position local xd,yd=(x.x-cp.x),(x.y-cp.y) entity.safeteleport(ply,o.surface,vector(ox.x+xd*mp,ox.y+yd*mp))
+			else local td=warptorio.teleDir[w.direction] entity.safeteleport(ply,o.surface,vector(ox.x+td[1]*mp,ox.y+td[2]*mp)) end
+			players.playsound("teleport",e.surface,e.position) players.playsound("teleport",o.surface,o.position)
+		end
+	end end
+end
+function warptorio.on_player_changed_position.Teleporters(ev)
+	local ply=game.players[ev.player_index]
+	if(not ply.driving)then
+		for k,v in pairs(gwarptorio.Teleporters)do if(v:ValidA() and v:ValidB())then warptorio.TeleportTick(k,v,ev.player_index,ply) end end
+		for k,v in pairs(gwarptorio.Harvesters)do if(v:ValidA() and v:ValidB())then warptorio.TeleportTick(k,v,ev.player_index,ply) end end
+	end
+end
+
+-- defines.events.on_player_changed_position -- below is old
+--[[
 function warptorio.DoTeleporterTick(k,v)
 	for i,e in pairs({v.a,v.b})do
 		local o=(i==1 and v.b or v.a) local x=e.position local xxx=math.abs(x.x) local xxy=math.abs(x.y) local p={}
@@ -1797,23 +1843,23 @@ function warptorio.DoTeleporterTick(k,v)
 		--function warptorio.isinbbox(pos,pos1,pos2) return not ( (pos.x<pos1.x or pos.y<pos1.y) or (pos.x>pos2.x or pos.y>pos2.y) ) end
 		--local p=e.surface.find_entities_filtered{area={{x.x-1.2,x.y-1.2},{x.x+1.2,x.y+1.2}},type="character"}
 		-- local dist=math.sqrt((x.x-pp.x)^2 + (x.y-pp.y)^2)
-		for a,b in pairs(p)do
-			local inv=b.get_main_inventory().get_item_count()
-			local w=b.walking_state
+		for a,ply in pairs(p)do
+			local inv=ply.get_main_inventory().get_item_count()
+			local w=ply.walking_state
 			local ox=o.position
-			local mp=2 if(not b.character)then mp=3 end
-			if(not w.walking)then local cp=b.position local xd,yd=(x.x-cp.x),(x.y-cp.y) entity.safeteleport(b,o.surface,vector(ox.x+xd*mp,ox.y+yd*mp))
-			else local td=warptorio.teleDir[w.direction] entity.safeteleport(b,o.surface,vector(ox.x+td[1]*mp,ox.y+td[2]*mp)) end
+			local mp=2 if(not ply.character)then mp=3 end
+			if(not w.walking)then local cp=ply.position local xd,yd=(x.x-cp.x),(x.y-cp.y) entity.safeteleport(ply,o.surface,vector(ox.x+xd*mp,ox.y+yd*mp))
+			else local td=warptorio.teleDir[w.direction] entity.safeteleport(ply,o.surface,vector(ox.x+td[1]*mp,ox.y+td[2]*mp)) end
 			players.playsound("teleport",e.surface,e.position) players.playsound("teleport",o.surface,o.position)
 		end
 	end
 end
-warptorio.teleDir={[0]={0,-1},[1]={1,-1},[2]={1,0},[3]={1,1},[4]={0,1},[5]={-1,1},[6]={-1,0},[7]={-1,-1}}
+
 function warptorio.on_tick.Teleporters(e)
 	for k,v in pairs(gwarptorio.Teleporters)do if(v:ValidA() and v:ValidB())then warptorio.DoTeleporterTick(k,v) end end
 	for k,v in pairs(gwarptorio.Harvesters)do if(v:ValidA() and v:ValidB())then warptorio.DoTeleporterTick(k,v) end end
 end
-
+]]
 
 
 
@@ -1889,7 +1935,7 @@ end
 function warptorio.ToolRecallHarvester(k,ply) if(not research.has("warptorio-harvester-"..k.."-1"))then return end
 	local cn=("warptorio-harvestpad-"..k.."-"..research.level("warptorio-harvester-"..k))
 	if(not ply or (ply and not ply.get_main_inventory().get_contents()[cn]))then ply.get_main_inventory().insert{name=cn,count=1} players.playsound("warp_in",ply.surface,ply.position) end
-	local hv=gwarptorio.Harvesters[k] if(hv and hv.deployed)then players.playsound("warp_in",hv.b.surface,hv.b.position) hv:Recall() hv:DestroyB() end
+	local hv=gwarptorio.Harvesters[k] if(hv and hv.deployed and isvalid(hv.b))then players.playsound("warp_in",hv.b.surface,hv.b.position) hv:Recall() hv:DestroyB() end
 end
 function warptorio.ToolRecallGate(ply) if(not research.has("warptorio-teleporter-portal"))then return end
 	local t=gwarptorio.Teleporters.offworld if(t)then
@@ -2050,7 +2096,7 @@ function wderma.stabilizer:click(p)
 	gwarptorio.pollution_expansion = 1.5
 	local f=warptorio.GetPlanetSurface()
 	f.clear_pollution()
-	if(gwarptorio.warp_reactor)then f.set_multi_command{command={type=defines.command.flee, from=gwarptorio.warp_reactor}, unit_count=1000, unit_search_distance=500} end
+	if(gwarptorio.warp_reactor and isvalid(gwarptorio.warp_reactor))then f.set_multi_command{command={type=defines.command.flee, from=gwarptorio.warp_reactor}, unit_count=1000, unit_search_distance=500} end
 	players.playsound("reactor-stabilized", f)
 	game.print("Warp Reactor Stabilized")
 end
@@ -2222,7 +2268,7 @@ for k,v in pairs{"on_built_entity","on_robot_built_entity","script_raised_built"
 	warptorio[v].planet=function(ev) local e=getEventEnt(ev) if(e and e.valid)then local p=warptorio.GetPlanetBySurface(e.surface.index) if(p)then warptorio.CallPlanetEvent(p,v,ev) end end end
 end
 for k,v in pairs{"on_chunk_deleted","on_chunk_generated"}do
-	warptorio[v].planet=function(ev) local p=warptorio.GetPlanetBySurface(ev.surface or ev.surface_index) if(p)then warptorio.CallPlanetEvent(p,v,ev) end end
+	warptorio[v].planet=function(ev) if(not global.newgaming)then local p=warptorio.GetPlanetBySurface(ev.surface or ev.surface_index) if(p)then warptorio.CallPlanetEvent(p,v,ev) end end end
 end
 
 --[[
@@ -2403,13 +2449,18 @@ function warptorio.Warpout(vplanet)
 	-- find entities and players to copy/transfer to new surface
 	local tpply={} local cx=warptorio.corn
 	local etbl={}
-	for k,v in pairs(c.find_entities_filtered{type="character",invert=true,area=marea})do
+	for k,v in pairs(c.find_entities_filtered{type={"car","character"},invert=true,area=marea})do
 	if(v.type=="item-entity" or v.type=="character-corpse" or v.last_user or v.force.name=="player" or v.force.name=="enemy")then
 		table.insert(etbl,v)
 	end end
 
 	-- find players to teleport to new platform
-	for k,v in pairs(game.players)do if(v.character==nil or (v.surface==c and vector.inarea(v.position,marea)))then
+	for k,v in pairs(game.players)do if(not v.driving)then if(v.character==nil or (v.surface==c and vector.inarea(v.position,marea)))then
+		table.insert(tpply,{v,vector.pos(v.position)})
+	end end end
+
+	-- find cars to teleport to new platform
+	for k,v in pairs(c.find_entities_filtered{type="car",area=marea})do if((v.surface==c and vector.inarea(v.position,marea)))then
 		table.insert(tpply,{v,vector.pos(v.position)})
 	end end
 
@@ -2418,9 +2469,12 @@ function warptorio.Warpout(vplanet)
 		local etc=f.find_entities_filtered{position={cx[v].x+0.5,cx[v].y+0.5},radius=math.floor(10+ug*6)/2} for a,e in pairs(etc)do e.destroy() end -- clean new platform corner
 
 		local etp=c.find_entities_filtered{type="character",position={cx[v].x+0.5,cx[v].y+0.5},radius=(10+(ug*6))/2} -- find corner players
-		for a,e in pairs(etp)do if(e.player and e.player.character~=nil)then table.insert(tpply,{e.player,{e.position.x,e.position.y}}) end end
+		for a,e in pairs(etp)do if(e.player and e.player.character~=nil and not e.driving)then table.insert(tpply,{e.player,{e.position.x,e.position.y}}) end end
 
-		local et=c.find_entities_filtered{type="character",invert=true,position={cx[v].x+0.5,cx[v].y+0.5},radius=math.floor((10+ug*6)/2)-(1e-6)} -- find corner ents
+		local etp=c.find_entities_filtered{type="car",position={cx[v].x+0.5,cx[v].y+0.5},radius=(10+(ug*6))/2} -- find corner cars
+		for a,e in pairs(etp)do table.insert(tpply,{e,{e.position.x,e.position.y}}) end
+
+		local et=c.find_entities_filtered{type={"car","character"},invert=true,position={cx[v].x+0.5,cx[v].y+0.5},radius=math.floor((10+ug*6)/2)-(1e-6)} -- find corner ents
 		for k,v in pairs(et)do if(v.last_user or v.force.name=="player" or v.force.name=="enemy")then
 			table.insertExclusive(etbl,v)
 		end end
@@ -2492,9 +2546,13 @@ function warptorio.Warpout(vplanet)
 	--for k,v in pairs(tpply)do v[1].teleport(f.find_non_colliding_position("character",{v[2][1],v[2][2]},0,1),f) end -- re-teleport players to prevent getting stuck
 
 	--// delete abandoned surfaces
-	for k,v in pairs(game.surfaces)do if(#(v.find_entities_filtered{type="character"})<1 and v.name~=f.name)then
-		local n=v.name if(n:sub(1,9)=="warpsurf_" and n~="warpsurf_"..tostring(gwarptorio.homeworld))then game.delete_surface(v) end
-	end end
+	for k,v in pairs(game.surfaces)do
+		if((not gwarptorio.floor.home or (gwarptorio.floor.home and v~=gwarptorio.floor.home.surface)) and #(v.find_entities_filtered{type="character"})<1 and v.name~=f.name)then
+			local n=v.name
+			--if(n=="nauvis" and not global.nauvis_is_clear)then global.nauvis_is_clear=true v.clear(true) else
+			if(n:sub(1,9)=="warpsurf_" and n~="warpsurf_"..tostring(gwarptorio.homeworld))then game.delete_surface(v) end
+		end
+	end
 
 	warptorio.CheckReactor()
 
@@ -2507,16 +2565,6 @@ end
 --[[c.clone_area{source_area=bbox,destination_area=bbox,destination_surface=f,destination_force=game.forces.player,expand_map=false,clone_tiles=true,
 clone_entities=true,clone_decoratives=false,clear_destination=true}]]
 
-function warptorio.OnPreSurfaceCleared(ev) local f=game.surfaces[ev.surface_index] local rds={}
---[[
-	for k,e in pairs(gwarptorio.cache.heat)do if(e.valid and e.surface==f)then table.insert(rds,e) end end
-	for k,e in pairs(gwarptorio.cache.power)do if(e.valid and e.surface==f)then table.insert(rds,e) end end
-	for k,e in pairs(gwarptorio.cache.loaderIn)do if(e.valid and e.surface==f)then table.insert(rds,e) end end
-	for k,e in pairs(gwarptorio.cache.loaderOut)do if(e.valid and e.surface==f)then table.insert(rds,e) end end
-	for k,e in pairs(rds)do e.destroy{raise_destroy=true} end
-]]
-end
-script.on_event({defines.events.on_pre_surface_cleared,defines.events.on_pre_surface_deleted},warptorio.OnPreSurfaceCleared)
 
 
 function warptorio.ApplyMapSettings()
@@ -2586,8 +2634,86 @@ function warptorio.Initialize()
 	if(settings.global["warptorio_water"].value)then game.forces.player.technologies["warptorio-boiler-water-1"].researched=true gwarptorio.waterboiler=1 end
 	warptorio.ValidateWarpBlacklist()
 	--warptorio.OverrideNauvis(true)
+	if(not warptorio.hooked)then warptorio.HookNewGamePlus() warptorio.hooked=true end
 end script.on_init(warptorio.Initialize)
 
+
+--[[
+function warptorio.OnPreSurfaceCleared(ev) local f=game.surfaces[ev.surface_index] local rds={}
+	if(f==gwarptorio.floor.main.surface)then for k,v in pairs(gwarptorio.Harvesters)do v:Recall() end end
+	for k,e in pairs(gwarptorio.cache.heat)do if(e.valid and e.surface==f)then table.insert(rds,e) end end
+	for k,e in pairs(gwarptorio.cache.power)do if(e.valid and e.surface==f)then table.insert(rds,e) end end
+	for k,e in pairs(gwarptorio.cache.loaderIn)do if(e.valid and e.surface==f)then table.insert(rds,e) end end
+	for k,e in pairs(gwarptorio.cache.loaderOut)do if(e.valid and e.surface==f)then table.insert(rds,e) end end
+	for k,e in pairs(rds)do e.destroy{raise_destroy=true} end
+end
+script.on_event({defines.events.on_pre_surface_cleared,defines.events.on_pre_surface_deleted},warptorio.OnPreSurfaceCleared)
+]]
+
+function warptorio.OnPreNewGame(ev) if(global.newgaming)then return end global.newgaming=true
+	-- Recall harvester plates and players on them.
+	for k,v in pairs(gwarptorio.Harvesters)do v:Recall(true) end
+end
+
+function warptorio.OnPostNewGame(ev) local evx=table.deepcopy(ev)
+	
+	script.on_nth_tick(game.tick+1,function() warptorio.DoPostNewGame(evx) end)
+end
+function warptorio.DoPostNewGame(ev)
+	global.newgaming=false
+	warptorio.Loaded=false
+	if(ev.tech_reset)then
+		for k,v in pairs(global)do global[k]=nil end
+		game.surfaces.nauvis.request_to_generate_chunks({0,0},3)
+		game.surfaces.nauvis.force_generate_chunk_requests()
+		warptorio.Initialize()
+		warptorio.ResetGui()
+		return
+	end
+	gwarptorio.warp_charge=0
+	gwarptorio.warpzone=0
+	gwarptorio.votewarp={}
+	warptorio.Migrate()
+
+
+
+	-- Recreate surfaces
+	local m=gwarptorio.floor.main if(not m)then m=new(FLOOR,"main",8) end m.surface=game.surfaces["nauvis"]
+	local m=gwarptorio.floor.b1 if(not m)then m=new(FLOOR,"b1",16) end m:MakeEmptySurface()
+	local m=gwarptorio.floor.b2 if(not m)then m=new(FLOOR,"b2",17) end m:MakeEmptySurface()
+	local m=gwarptorio.floor.b3 if(not m)then m=new(FLOOR,"b3",17) m.ovalsize={x=19,y=17} end m:MakeEmptySurface()
+
+	game.surfaces.nauvis.request_to_generate_chunks({0,0},3)
+	game.surfaces.nauvis.force_generate_chunk_requests()
+	warptorio.BuildPlatform()
+	warptorio.BuildB1()
+	warptorio.BuildB2()
+	warptorio.BuildB3()
+
+	if(settings.global["warptorio_carebear"].value)then warptorio.MakeCarebearChest() end
+	if(settings.global["warptorio_water"].value)then game.forces.player.technologies["warptorio-boiler-water-1"].researched=true gwarptorio.waterboiler=1 end
+
+	for k,v in pairs(warptorio.GetSurfaces(true))do v.solar_power_multiplier=settings.global.warptorio_solar_multiplier.value end
+
+	warptorio.ResetGui()
+	gwarptorio.Rails={}
+	for k,v in pairs{"nw","ne","sw","se"}do if(research.has("warptorio-rail-"..v))then warptorio.BuildRailCorner(v) end end
+	for k,v in pairs(gwarptorio.Teleporters)do v:Warpin() end
+	for k,v in pairs(gwarptorio.Harvesters)do v:Warpin() v:Upgrade() end
+	for k,v in pairs(gwarptorio.Rails)do v:DoMakes() end
+	for k,v in pairs(gwarptorio.floor)do if(v.radar and not isvalid(v.radar))then v:CheckRadar() end v:CheckSpecial() end
+	warptorio.CheckReactor()
+
+	if(gwarptorio.homeworld)then gwarptorio.floor.home.surface=nil end
+end
+
+
+function warptorio.HookNewGamePlus()
+	if(remote.interfaces["newgameplus"])then -- ngp
+		local ngp=remote.call("newgameplus","get_on_technology_reset_event") if(ngp)then script.on_event(ngp,warptorio.OnPreNewGame) end
+		local ngp=remote.call("newgameplus","get_on_post_new_game_plus_event") if(ngp)then script.on_event(ngp,warptorio.OnPostNewGame) end
+	end
+end
 
 function warptorio.OnLoad()
 	if(not global.warptorio)then return end
@@ -2596,6 +2722,8 @@ function warptorio.OnLoad()
 	if(gwarptorio.Teleporters)then for k,v in pairs(gwarptorio.Teleporters)do setmetatable(v,warptorio.TeleporterMeta) end end
 	if(gwarptorio.Rails)then for k,v in pairs(gwarptorio.Rails)do setmetatable(v,warptorio.TelerailMeta) end end
 	if(gwarptorio.Harvesters)then for k,v in pairs(gwarptorio.Harvesters)do setmetatable(v,warptorio.HarvesterMeta) end end
+
+	if(not warptorio.hooked)then warptorio.HookNewGamePlus() warptorio.hooked=true end
 end script.on_load(warptorio.OnLoad)
 
 function warptorio.OnModSettingChanged(ev) local p=ev.player_index local s=ev.setting local st=ev.setting_type
@@ -2673,6 +2801,8 @@ function warptorio.Migrate() if(warptorio.Loaded)then return end
 	for k,v in pairs(gwarptorio.Harvesters)do v.position=warptorio.platform.harvester[k] end
 	for k,v in pairs(gwarptorio.Teleporters)do v.position=warptorio.Teleporters[k].position end
 
+	for k,v in pairs(warptorio.migrations)do v() end
+
 	if(not gwarptorio.floor)then warptorio.init.floors() end--warptorio.InitFloors() end
 	for k,v in pairs(warptorio.GetSurfaces(true))do v.solar_power_multiplier=settings.global.warptorio_solar_multiplier.value end
 
@@ -2684,7 +2814,6 @@ function warptorio.Migrate() if(warptorio.Loaded)then return end
 	gwarptorio.LogisticLoaderChestRequester=settings.global['warptorio_loaderchest_requester'].value
 	gwarptorio.warp_blacklist=gwarptorio.warp_blacklist or {}
 
-	for k,v in pairs(warptorio.migrations)do v() end
 
 	warptorio.Loaded=true
 
@@ -2865,7 +2994,7 @@ function warptorio.cmdfactorysurface() return gwarptorio.floor.b1.surface end
 function warptorio.cmdboilersurface() return gwarptorio.floor.b2.surface end
 function warptorio.cmdtiledefault(n,b) warptorio.TileDefault(n,b) end
 function warptorio.cmdGetWarpzone() return gwarptorio.warpzone end
-function warptorio.cmdRecallHarvester(bply,side) if(gwarptorio.Harvesters[side])then gwarptorio.Harvesters[side]:Recall(bply) end end
+function warptorio.cmdRecallHarvester(side,bply) if(gwarptorio.Harvesters[side])then gwarptorio.Harvesters[side]:Recall(bply) end end
 function warptorio.cmdRecallTeleporterGate() local t=gwarptorio.Teleporters.offworld if(t and isvalid(t.b))then t:DestroyLogsB() t:DestroyB() end end
 
 function warptorio.cheatAutoResearch() for k,v in pairs(game.forces.player.research_queue)do v.researched=true end end
@@ -2953,7 +3082,26 @@ warptorio.remote.harvestersurface=warptorio.GetHarvesterSurface -- alias
 remote.add_interface("warptorio",warptorio.remote)
 remote.add_interface("warptorio2",warptorio.remote)
 
+-- Hook events with filters
+--[[ todo
+script.set_event_filter(defines.events.on_built_entity,{})
+script.set_event_filter(defines.events.on_cancelled_deconstruction,{})
+script.set_event_filter(defines.events.on_cancelled_upgrade,{})
+script.set_event_filter(defines.events.on_entity_damaged,{})
+script.set_event_filter(defines.events.on_entity_died,{})
+script.set_event_filter(defines.events.on_marked_for_deconstruction,{})
+script.set_event_filter(defines.events.on_marked_for_upgrade,{})
+script.set_event_filter(defines.events.on_player_mined_item,{})
+script.set_event_filter(defines.events.on_player_repaired_entity,{})
+script.set_event_filter(defines.events.on_post_entity_died,{})
+script.set_event_filter(defines.events.on_pre_ghost_deconstructed,{})
+script.set_event_filter(defines.events.on_pre_player_mined_item,{})
+script.set_event_filter(defines.events.on_robot_built_entity,{})
+script.set_event_filter(defines.events.on_robot_mined,{})
+script.set_event_filter(defines.events.on_robot_pre_mined,{})
+]]
+
+
 -- Hook events
 for k,v in pairs(defines.events)do if(k~="on_tick" and table_size(warptorio[k])>0)then script.on_event(v,function(ev,...) for x,y in pairs(warptorio[k])do y(ev,...) end end) end end
-script.on_event(defines.events.on_tick,function(ev) for k,v in pairs(warptorio.on_tick)do v(ev.tick) end end)
-
+script.on_event(defines.events.on_tick,function(ev) if(not global.newgaming)then for k,v in pairs(warptorio.on_tick)do v(ev.tick) end end end)
