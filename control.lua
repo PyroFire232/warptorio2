@@ -672,7 +672,9 @@ function trail:LoadLogistics(e)
 	local inv={} for k,v in pairs(self.chests)do inv[k]=v.get_inventory(defines.inventory.chest) end
 	local ct={} for k,v in pairs(inv)do for a,b in pairs(v.get_contents())do ct[a]=(ct[a] or 0)+b end v.clear() end
 	for _,r in pairs(e)do local tr=r.get_inventory(defines.inventory.cargo_wagon) for k,v in pairs(ct)do ct[k]=v-(tr.insert{name=k,count=v}) end end
-	local ci for a,b in pairs(ct)do local g=b ci=#inv for k,v in pairs(inv)do local gci=math.ceil(g/ci) if(gci>0)then local w=v.insert{name=a,count=math.ceil(g/ci)} ci=ci-1 g=g-w end end end
+	local ci for a,b in pairs(ct)do local g=b ci=#inv
+		for k,v in pairs(inv)do if(ci>0)then local gci=math.ceil(g/ci) if(gci>0)then local w=v.insert{name=a,count=math.ceil(g/ci)} ci=ci-1 g=g-w end end end
+	end
 end
 function trail:UnloadLogistics(e) for _,r in pairs(e)do
 		local inv=r.get_inventory(defines.inventory.cargo_wagon) for k,v in pairs(inv.get_contents())do local ct=self:SplitItem(k,v) if(ct>0)then inv.remove({name=k,count=ct}) end end
@@ -1321,25 +1323,31 @@ function HARV:Deploy(surf,pos) -- deploy over a harvester platform
 		local vpos=vector.add(vector.sub(v.position,self.deploy_position),self.position)
 		table.insert(dcs,{name=v.decorative.name,position=vpos,amount=v.amount})
 	end
-	local ecs={} for k,v in pairs(f.find_entities_filtered{area=planetArea,type="character",invert=true})do if(v.type~="resource" and v.name:sub(1,9)~=("warptorio"))then table.insert(ecs,v) end end
+	local ecs={} for k,v in pairs(f.find_entities_filtered{area=planetArea,type={"construction-robot","logistic-robot","character"},invert=true})do if(v.type~="resource" and v.name:sub(1,9)~=("warptorio"))then table.insert(ecs,v) end end
 
 	hf.set_tiles(tcs,true)
 	hf.create_decoratives{decoratives=dcs}
 
+	local ebsc=#ebs
+	local ecsc=#ecs
+
+
 	local blacktbl={}
-	for k,v in pairs(ebs)do if(table.HasValue(warptorio.GetWarpBlacklist(),v.name))then table.insert(blacktbl,v) ebs[k]=nil end end
-	for k,v in pairs(ebs)do if(table.HasValue(warptorio.GetModTable("harvester_blacklist"),v.name))then table.insert(blacktbl,v) ebs[k]=nil end end
+	for k,v in pairs(ebs)do if(isvalid(v))then if(table.HasValue(warptorio.GetWarpBlacklist(),v.name))then table.insert(blacktbl,v) ebs[k]=nil end end end
+	for k,v in pairs(ebs)do if(isvalid(v))then if(table.HasValue(warptorio.GetModTable("harvester_blacklist"),v.name))then table.insert(blacktbl,v) ebs[k]=nil end end end
 
-	for k,v in pairs(ecs)do if(table.HasValue(warptorio.GetWarpBlacklist(),v.name))then table.insert(blacktbl,v) ecs[k]=nil end end
-	for k,v in pairs(ecs)do if(table.HasValue(warptorio.GetModTable("harvester_blacklist"),v.name))then table.insert(blacktbl,v) ecs[k]=nil end end
+	for k,v in pairs(ecs)do if(isvalid(v))then if(table.HasValue(warptorio.GetWarpBlacklist(),v.name))then table.insert(blacktbl,v) ecs[k]=nil end end end
+	for k,v in pairs(ecs)do if(isvalid(v))then if(table.HasValue(warptorio.GetModTable("harvester_blacklist"),v.name))then table.insert(blacktbl,v) ecs[k]=nil end end end
 
+
+	if(ecsc>0)then for i=ecsc,1,-1 do if(not ecs[i] or not ecs[i].valid)then table.remove(ecs,i) end end end -- bad ents in table ?
 
 	warptorio.Cloned_Entities={} warptorio.IsCloning=true
 	f.clone_entities{entities=ecs,destination_surface=hf,destination_offset=vector.mul(vector.sub(self.deploy_position,self.position),-1),snap_to_grid=false}
 	local fe=warptorio.Cloned_Entities warptorio.IsCloning=false warptorio.Cloned_Entities=nil
 
 
-	if(#ebs>0)then for i=#ebs,1,-1 do if(not ebs[i] or not ebs[i].valid)then table.remove(ebs,i) end end end -- bad ents in table ?
+	if(ebsc>0)then for i=ebsc,1,-1 do if(not ebs[i] or not ebs[i].valid)then table.remove(ebs,i) end end end -- bad ents in table ?
 
 	vector.LayTiles("warptorio-red-concrete",f,self:GetDeployArea())
 
@@ -1351,8 +1359,8 @@ function HARV:Deploy(surf,pos) -- deploy over a harvester platform
 	local hfm={} for k,v in pairs(hfe)do if(isvalid(v.source) and isvalid(v.destination) and table.HasValue(ebs,v.source))then table.insert(hfm,v.source) end end
 	local fm={} for k,v in pairs(fe)do if(isvalid(v.source) and isvalid(v.destination) and table.HasValue(ecs,v.source))then table.insert(fm,v.source) end end
 
-	for k,v in pairs(fm)do entity.destroy(v) end
-	for k,v in pairs(hfm)do entity.destroy(v) end
+	for k,v in pairs(fm)do if(isvalid(v))then entity.destroy(v) end end
+	for k,v in pairs(hfm)do if(isvalid(v))then entity.destroy(v) end end
 
 	for k,v in pairs(blacktbl)do if(v and v.valid)then v.destroy{raise_destroy=true} end end -- cleanup past entities
 

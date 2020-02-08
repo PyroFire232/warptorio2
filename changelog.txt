@@ -1,8 +1,29 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.2.5
+Date: 13.11.2019
+  Changes:
+    - Harvester deploy typo x2 (?)
+    - Harvesters now ignore planet-side logistics/construction robots when deployed
+
+---------------------------------------------------------------------------------------------------
+Version: 1.2.4
+Date: 13.11.2019
+  Changes:
+    - Fixed a divide by zero error
+    - Harvester deploy typo (?)
+
+
+---------------------------------------------------------------------------------------------------
 Version: 1.2.3
-Date: 31.10.2019
+Date: 13.11.2019
   Changes:
     - Made "invisible" radars unminable
+    - Removed warpstation, warppipe and harvesters from circuit signals menu
+    - Added blacklists to harvesters
+    - Vehicles are now teleported between surfaces instead of cloned (AAI vehicles compatability). Not yet added to harvesters.
+    - Players are no longer teleported through platform teleporters if they are in a vehicle.
+    - Optimized teleporter code to save frames
+    - 10,000 Downloads Special: Compatibility with NewGamePlus courtesy of Bilka <3
 
 ---------------------------------------------------------------------------------------------------
 Version: 1.2.2
