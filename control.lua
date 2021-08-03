@@ -491,7 +491,7 @@ function warptorio.InsertCacheLoader(v) warptorio.InsertCache("ld".. v.loader_ty
 function warptorio.RemoveCacheFilter(v) local ct=gwarptorio.cache["ldoutputf"]
 	for cidx,tbl in pairs(ct)do
 		local rd=false local rdxt={}
-		for id,e in pairs(tbl)do if(not isvalid(e) or e.owner==v)then table.insert(rdxt,v) end end
+		for id,e in pairs(tbl)do if(not isvalid(e) or e.owner==v)then table.insert(rdxt,e) end end
 		for k,x in pairs(rdxt)do table.RemoveByValue(tbl,x) end
 		if(table_size(tbl)==0)then ct[cidx]=nil end
 	end
