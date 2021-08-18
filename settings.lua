@@ -32,6 +32,9 @@ data:extend(
 	allowed_values={"logistic-chest-requester","logistic-chest-buffer","steel-chest"},
 	},
 
+	{type="bool-setting",name="warptorio_carebear",order="aab2a",
+	setting_type="runtime-global",default_value=false},
+
 	{type="int-setting",name="warptorio_warpchance",order="aab3a",
 	setting_type="runtime-global",default_value=30,
 	minimum_value=1,maximum_value=100},
@@ -54,8 +57,7 @@ data:extend(
 	setting_type="runtime-global",default_value=20,
 	minimum_value=10},
 
-	{type="bool-setting",name="warptorio_carebear",order="aac",
-	setting_type="runtime-global",default_value=false},
+
 
 	{type="bool-setting",name="warptorio_water",order="aad",
 	setting_type="runtime-global",default_value=false},
@@ -63,6 +65,8 @@ data:extend(
 	{type="bool-setting",name="warptorio_robot_warping",order="aae",
 	setting_type="runtime-global",default_value=false},
 
+	{type="bool-setting",name="warptorio_biter_warping",order="aaf",
+	setting_type="runtime-global",default_value=false},
 
 	{type = "bool-setting", name = "warptorio_pollution_disable",order="abaa",
 	setting_type = "runtime-global",default_value =false},
@@ -151,9 +155,13 @@ data:extend(
 	setting_type="runtime-global",default_value=0.5},
 
 
-	{type="double-setting",name="warptorio_ability_cooldown",order="da",
+	{type="double-setting",name="warptorio_ability_cooldown",order="daa",
 	setting_type="runtime-global",default_value=5,
 	minimum_value=1,maximum_value=30},
+
+	{type="double-setting",name="warptorio_ability_drain",order="dab",
+	setting_type="runtime-global",default_value=0.00001,
+	minimum_value=0.000000001,maximum_value=0.01},
 
 	{type="double-setting",name="warptorio_ability_timegain",order="db",
 	setting_type="runtime-global",default_value=2.5,
@@ -169,59 +177,6 @@ data:extend(
 	setting_type="startup",default_value=12,
 	minimum_value=1},]]
 
-
-	{type="int-setting",name="warptorio_planet_normal",order="eaa",
-	setting_type="startup",default_value=12,
-	minimum_value=1},
-
-	{type="int-setting",name="warptorio_planet_uncharted",order="eab",
-	setting_type="startup",default_value=12,
-	minimum_value=1},
-
-
-	{type="int-setting",name="warptorio_planet_average",order="eb",
-	setting_type="startup",default_value=17,
-	minimum_value=0},
-
-	{type="int-setting",name="warptorio_planet_res",order="ec",
-	setting_type="startup",default_value=4,
-	minimum_value=0},
-
-	{type="int-setting",name="warptorio_planet_dwarf",order="ed",
-	setting_type="startup",default_value=8,
-	minimum_value=0},
-
-	{type="int-setting",name="warptorio_planet_jungle",order="ee",
-	setting_type="startup",default_value=3,
-	minimum_value=0},
-
-	{type="int-setting",name="warptorio_planet_barren",order="ef",
-	setting_type="startup",default_value=4,
-	minimum_value=0},
-
-	{type="int-setting",name="warptorio_planet_ocean",order="eg",
-	setting_type="startup",default_value=6,
-	minimum_value=0},
-
-	{type="int-setting",name="warptorio_planet_rich",order="eh",
-	setting_type="startup",default_value=2,
-	minimum_value=0},
-
-	{type="int-setting",name="warptorio_planet_midnight",order="ei",
-	setting_type="startup",default_value=5,
-	minimum_value=0},
-
-	{type="int-setting",name="warptorio_planet_polluted",order="ej",
-	setting_type="startup",default_value=4,
-	minimum_value=0},
-
-	{type="int-setting",name="warptorio_planet_biter",order="ek",
-	setting_type="startup",default_value=4,
-	minimum_value=0},
-
-	{type="int-setting",name="warptorio_planet_rogue",order="el",
-	setting_type="startup",default_value=4,
-	minimum_value=0},
 
 	--[[ {type="int-setting",name="warptorio_planet_void",order="em",
 	setting_type="startup",default_value=1,

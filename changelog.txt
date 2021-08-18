@@ -1,8 +1,136 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.3.6
+Date: 18.08.2021
+  Changes:
+    - Github updates
+    - Fixed green wire circuits not connecting between stairs + migration
+
+
+---------------------------------------------------------------------------------------------------
+Version: 1.3.5
+Date: 13.3.2021
+  Changes:
+    - Fixed multiplayer crash, missing nil check on updating ownership and connection of cloned spidertrons to the remotes in players inventories between warps.
+
+
+---------------------------------------------------------------------------------------------------
+Version: 1.3.4
+Date: 30.12.2020
+  Changes:
+    - Factorio 1.1.6
+
+
+---------------------------------------------------------------------------------------------------
+Version: 1.3.3
+Date: 3.12.2020
+  Changes:
+    - Factorio 1.1
+
+---------------------------------------------------------------------------------------------------
+Version: 1.3.2
+Date: 4.11.2020
+  Changes:
+    - Spidertron can now travel through stairs (cloning method)
+    - Fixed decoupling of spidertron remotes when warping/cloning
+    - You now remain in your spidertron when warping.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.3.1
+Date: 25.8.2020
+  Changes:
+    - Basic fixes for warp loaders
+    - Fixed spidertron being lost between warps
+    - Fixed a crash when using steel loader chests
+
+---------------------------------------------------------------------------------------------------
+Version: 1.3.0
+Date: 8.8.2020
+  Changes:
+    - Fixed rails not being affected by logistics upgrades
+    - Made hazard tiles accurate and fixed hazard clearing crash
+    - typo causing crash on warp
+
+---------------------------------------------------------------------------------------------------
+Version: 1.2.9
+Date: 2.8.2020
+  Changes:
+    - Fixed invisible radars & homeworld/platform teleport capsules
+    - e (typo)
+    - v (typo)
+    - Buffed stabilizer to 5% of regular platform pollution
+    - Fixed ability drain % texts and added setting
+    - Turned on warp blacklists for harvesters (fixes some mod compatabilities)
+    - Factorio 0.18.40
+
+
+---------------------------------------------------------------------------------------------------
+Version: 1.2.8
+Date: 12.5.2020
+  Changes:
+    - Fixed a few bugs
+
+
+---------------------------------------------------------------------------------------------------
+Version: 1.2.7
+Date: 7.5.2020
+  Changes:
+    - Warptorio Expansion Update
+    - Large changes to remote interfaces
+    - Moved planet rng settings to planetorio
+    - Fixed changing loader directions mid-game (top/bottom halves)
+    - Fixed a bunch of harvester bugs
+
+---------------------------------------------------------------------------------------------------
+Version: 1.2.6
+Date: 13.4.2020
+  Changes:
+    - Factorio 0.18
+    - Added /kill command to suicide (if you get stuck on ocean planet)
+    - Added biter warping difficulty setting
+    - Added Nauvis to warp target list
+    - Added warp pipes to the Harvesters
+    - Full rework of platform tileing/upgrading system enabling the creation of multiple platform layouts.
+    - Full rework of planets system, exported to standalone library mod Planetorio enabling other mod makers to create new planets and use the planets/surfaces system for their own mods.
+    - Reworked Abilities: All abilities now use platform electricity (kept in the stairs) to function. Abilities are toggleable and drain energy over time. The amount drained is the same for all abilities, and it increases the longer abilities remain active. The amount of energy drained, and energy drain growth is applied for all abilities active at once (1x for 1 ability active, 3x for 3 abilities active). Drain amounts are based on a % of the total electrical storage capacity.
+    - Added a Platform Energy bar to the HUD showing electricity balance to help with using the new ability mechanics.
+    - Reworked Stabilizer Ability: Platform pollution, and pollution growth reduced to 25% while active.
+    - Reworked Radar Ability: Scans an outer ring every few seconds while active (takes longer each successive scan)
+    - Fixed a bug with warpchance setting not applying to homeworld rolls
+    - Fixed a bug with pollution not being removed from harvester floor
+    - Broke warp loaders
+    - Broke the Accelerator ability (it does nothing for now)
+    - Broke the warptorio remote interface (affects cross mod compatabilities)
+    - Broke functionality related to changing loader directions (top/bottom halves) upon the settings being changed mid-game
+    - Broke "unstuck" on platform entities, e.g. you can become trapped in teleporters as you unlock them.
+    - Broke hazard tile accuracy
+    - Probably broke more things.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.2.5
+Date: 13.11.2019
+  Changes:
+    - Harvester deploy typo x2 (?)
+    - Harvesters now ignore planet-side logistics/construction robots when deployed
+
+---------------------------------------------------------------------------------------------------
+Version: 1.2.4
+Date: 13.11.2019
+  Changes:
+    - Fixed a divide by zero error
+    - Harvester deploy typo (?)
+
+
+---------------------------------------------------------------------------------------------------
 Version: 1.2.3
-Date: 31.10.2019
+Date: 13.11.2019
   Changes:
     - Made "invisible" radars unminable
+    - Removed warpstation, warppipe and harvesters from circuit signals menu
+    - Added blacklists to harvesters
+    - Vehicles are now teleported between surfaces instead of cloned (AAI vehicles compatability). Not yet added to harvesters.
+    - Players are no longer teleported through platform teleporters if they are in a vehicle.
+    - Optimized teleporter code to save frames
+    - 10,000 Downloads Special: Compatibility with NewGamePlus courtesy of Bilka <3
 
 ---------------------------------------------------------------------------------------------------
 Version: 1.2.2
