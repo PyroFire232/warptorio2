@@ -931,12 +931,17 @@ function warptorio.WarpBuildPlanet(key)
 		local vplanet=warptorio.GetMainPlanet()
 		local lvl=research.level("warptorio-reactor")
 		if(lvl>=8)then local wx=global.planet_target
-			if(wx=="home" or wx=="nauvis")then if(research.has("warptorio-homeworld"))then local hf=(wx=="nauvis" and game.surfaces.nauvis or global.floor.home.host)
-				if(warptorio.GetMainSurface()~=hf and math.random(1,100)<=warptorio.setting("warpchance"))then local hp=remote.call("planetorio","GetBySurface",hf) or {name="Nauvis"}
-					game.print("-Successful Warp-") game.print(hp.name .. ". Home sweet home.")
-					return hf,hp
-				end
-			end elseif(wx and math.random(1,100)<=warptorio.setting("warpchance"))then
+			if(wx=="home" or wx=="nauvis") then 
+				if(research.has("warptorio-homeworld")) then
+					local hf=(wx=="nauvis" and game.surfaces.nauvis or global.floor.home.host)
+					if(warptorio.GetMainSurface()~=hf and math.random(1,100)<=warptorio.setting("warpchance")) then 
+						local hp=remote.call("planetorio","GetBySurface",hf) or {name="Nauvis"}
+						game.print("-Successful Warp-") 
+						game.print({"", hp.name, ". Home sweet home."})
+						return hf,hp
+					end
+				end 
+			elseif(wx and math.random(1,100)<=warptorio.setting("warpchance"))then
 				nplanet=remote.call("planetorio","FromTemplate","warpzone_"..global.warpzone,wx)
 				if(nplanet)then game.print("-Successful Warp-") end
 			end
