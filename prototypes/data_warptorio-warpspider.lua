@@ -13,6 +13,7 @@ spider.recipe=table.deepcopy(data.raw.recipe.spidertron)
 spider.recipe.name=spider.name
 spider.recipe.result=spider.name
 spider.recipe.icons=spider.item.icons
+spider.recipe["recipe-category"]="crafting" -- Hand-craft only does not exist
 
 spider.recipe.ingredients={{"spidertron",8},{"power-armor-mk2",8},{"fusion-reactor-equipment",8},{"raw-fish",9},{"satellite",8},{"artillery-turret",8},{"rocket-silo",1}}
 

@@ -112,7 +112,7 @@ local t=ExtendDataCopy("pipe-to-ground","pipe-to-ground",{name="warptorio-logist
 -- Fuel
 data:extend{{type="fuel-category", name="warp"}}
 
-ExtendDataCopy("item","uranium-fuel-cell",{name="warptorio-warponium-fuel-cell",fuel_category="warp",burnt_result="uranium-fuel-cell",fuel_value="24GJ",stack_size=50,
+ExtendDataCopy("item","uranium-fuel-cell",{name="warptorio-warponium-fuel-cell",fuel_category="warp",burnt_result="uranium-fuel-cell",fuel_value="32GJ",stack_size=50,
 	icon_size=64,icons={ {icon="__base__/graphics/icons/uranium-fuel-cell.png",tint={r=1,g=0.2,b=1,a=0.8}}, }, },false,{icon=false})
 
 ExtendDataCopy("recipe","uranium-fuel-cell",{name="warptorio-warponium-fuel-cell",enabled=false,result="warptorio-warponium-fuel-cell",result_count=1},false,
@@ -132,8 +132,8 @@ ExtendDataCopy("recipe","nuclear-fuel",{name="warptorio-warponium-fuel",enabled=
 
 
 -- The Reactor Itself
-local t=ExtendDataCopy("reactor","nuclear-reactor",{name="warptorio-reactor",max_health=5000,neighbour_bonus=12,consumption="20MW",
-	energy_source={fuel_category="warp"},heat_buffer={specific_heat="4MJ",max_temperature=1000}, light={ intensity=10, size=9.9, shift={0.0,0.0}, color={r=1.0,g=0.0,b=0.0} },
+local t=ExtendDataCopy("reactor","nuclear-reactor",{name="warptorio-reactor",max_health=5000,neighbour_bonus=12,consumption="160MW",
+	energy_source={fuel_category="warp"},heat_buffer={specific_heat="1MJ",max_temperature=1000}, light={ intensity=10, size=9.9, shift={0.0,0.0}, color={r=1.0,g=0.0,b=0.0} },
 	working_light_picture={ filename="__base__/graphics/entity/nuclear-reactor/reactor-lights-color.png", tint={r=1,g=0.4,b=0.4,a=1},
 		hr_version={ filename="__base__/graphics/entity/nuclear-reactor/hr-reactor-lights-color.png", tint={r=1,g=0.4,b=0.4,a=1}, },
 	},
@@ -720,7 +720,7 @@ ExtendTech(t,{name="warptorio-radar-1",unit={count=300,time=15},prerequisites={"
 
 -- ----
 -- Warp Armor
-local t={type="technology",icon_size=128,icons={ {icon="__base__/graphics/technology/power-armor-mk2.png",tint={r=0.3,g=0.3,b=1,a=1}},},prerequisites={"power-armor-mk2","warptorio-reactor-8","space-science-pack"} }
+local t={type="technology",icon_size=128,icons={ {icon="__base__/graphics/technology/power-armor-mk2.png",tint={r=0.3,g=0.3,b=1,a=1},icon_size=256},},prerequisites={"power-armor-mk2","warptorio-reactor-8","space-science-pack",} }
 ExtendTech(t,{name="warptorio-armor",unit={count=1000,time=60},effects={{recipe="warptorio-armor",type="unlock-recipe"}}},{red=4,green=4,blue=4,black=5,yellow=2,white=1})
 
 

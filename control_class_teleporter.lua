@@ -168,7 +168,7 @@ function TELL:ValidB() return isvalid(self.points[2].ent) end
 function TELL:ConnectCircuit() local p=self.points
 	if(self:ValidA() and self:ValidB())then
 		p[1].ent.connect_neighbour({target_entity=p[2].ent,wire=defines.wire_type.red})
-		p[2].ent.connect_neighbour({target_entity=p[2].ent,wire=defines.wire_type.green})
+		p[1].ent.connect_neighbour({target_entity=p[2].ent,wire=defines.wire_type.green})
 	end
 end
 
@@ -196,8 +196,10 @@ function TELL:DestroyPointSprites(i)
 end
 function TELL:CheckPointSprites(i)
 	local tps=self:Data() local t=tps.pair[i]
-	if(t.sprites)then self:MakePointSprites(tps,i,t.sprites) end
-	if(t.sprite_arrow)then self:MakePointArrow(tps,i,t.sprite_arrow) end
+	if(warptorio.setting("hide_sprites"))then self:DestroyPointSprites(i) else
+		if(t.sprites)then self:MakePointSprites(tps,i,t.sprites) end
+		if(t.sprite_arrow)then self:MakePointArrow(tps,i,t.sprite_arrow) end
+	end
 end
 
 function TELL:MakePointTeleporter(tps,i,t,pos)
@@ -373,7 +375,9 @@ function TELL:CheckPointLogistics(i,vxpos)
 		local vsize=offld+ldl+(tps.dopipes and 1 or 0)
 		local varea=vector.square(pos,vector(vsize*2,3))
 		if(f.count_entities_filtered{area=varea,collision_mask={"object-layer"}} >1)then
-			game.print("Unable to place teleporter logistics, something is in the way! - inner check")
+			f.create_entity{name="flying-text", position=pos, text="Logistics blocked - Needs more space", color={r=1,g=0.5,b=0.5}}
+			f.play_sound{path="utility/cannot_build",position=pos}
+			--game.print("Planet Teleporter Gate Logistics were blocked by nearby obstructions")
 			can=false
 		end
 	end

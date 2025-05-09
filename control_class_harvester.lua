@@ -64,9 +64,9 @@ function HARV:CheckTeleporterPairs(bSound) -- Call updates and stuff. Automatica
 	self:MakePointTeleporter(wps,1,wps.pair[1],self.position)
 	if(self.deployed)then
 		self:MakePointTeleporter(wps,2,wps.pair[2],self.deploy_position)
-	else
-		self:CheckPointLogistics(2)
 	end
+	self:CheckPointLogistics(1)
+	self:CheckPointLogistics(2)
 end
 
 function HARV:UpgradePlayerInventories()
@@ -96,9 +96,10 @@ function HARV:MakePointTeleporter(tps,i,t,pos)
 			local vepos=epos or (pos or t.position)
 			if(not vepos)then return end
 			local vpos=((t.gate and not epos) and f.find_non_colliding_position(vproto,vepos,0,1,1) or vepos)
-			if(not t.gate)then local varea=vector.square(vpos,vector(2,2)) vector.clean(f,varea) end
-
+			local varea
+			if(not t.gate)then varea=vector.square(vpos,vector(2,2)) vector.clean(f,varea) end
 			e=entity.protect(entity.create(f,vproto,vpos),t.minable~=nil and t.minable or false,t.destructible~=nil and t.destructible or false)
+			if(not t.gate)then vector.cleanplayers(f,varea) end
 			p.ent=e
 		end
 		if(p.energy)then e.energy=e.energy+p.energy p.energy=nil end
@@ -218,7 +219,7 @@ function HARV:CheckPointLogistics(i)
 	local belt=warptorio.GetBelt()
 	local pos=tps.position
 	local f=global.floor.harvester.host
-	if(i==2 and self.deployed)then f=global.floor.main.host end
+	if(i==2 and self.deployed)then f=global.floor.main.host pos=self.deploy_position end
 
 	local ldl=0
 	local lvLogs=research.level("warptorio-logistics")
@@ -420,7 +421,7 @@ function HARV:Deploy(surf,pos) -- deploy over a harvester platform
 	vector.clearplayers(f,planetArea)
 
 	self.deployed=true
-	game.print("deployed")
+	-- game.print("deployed")
 	self:CheckTeleporterPairs()
 end
 

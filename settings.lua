@@ -13,6 +13,8 @@ data:extend(
 	{type="bool-setting",name="warptorio_combinator_offset",order="1e",
 	setting_type="runtime-global",default_value=false,},
 
+	{type="bool-setting",name="warptorio_hide_sprites",order="1h",
+	setting_type="runtime-global",default_value=false,},
 
 	{type="string-setting",name="warptorio_loader_top",order="aaaa",
 	setting_type="runtime-global",default_value="up",
@@ -23,7 +25,7 @@ data:extend(
 	allowed_values={"up","down"}},
 
 	{type="string-setting", name="warptorio_loaderchest_provider",order="aaac",
-	setting_type="runtime-global", default_value="logistic-chest-active-provider",
+	setting_type="runtime-global", default_value="logistic-chest-passive-provider",
 	allowed_values={"logistic-chest-active-provider","logistic-chest-buffer","logistic-chest-passive-provider","logistic-chest-storage","steel-chest"},
 	},
 
@@ -45,6 +47,12 @@ data:extend(
 
 	{type="bool-setting",name="warptorio_no_lootchest",order="aab4c",
 	setting_type="runtime-global",default_value=false,},
+
+	{type="int-setting",name="warptorio_lootchest_chance",order="aab4e",
+	setting_type="runtime-global",default_value=150,},
+
+	{type="int-setting",name="warptorio_lootchest_distance",order="aab4g",
+	setting_type="runtime-global",default_value=196,},
 
 
 	{type="bool-setting",name="warptorio_autowarp_always",order="aaba",

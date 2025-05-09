@@ -91,10 +91,21 @@ end
 function entity.BalancePowerPair(a,b) local x=(a.energy+b.energy)/2 a.energy,b.energy=x,x end
 
 
+
+--[[Old version, now replaced with: https://mods.factorio.com/mod/warptorio2/discussion/646e46d9225f8dc82fa0a26e
 function entity.AutoBalanceHeat(t) -- Auto-balance heat between all entities in a table
 	local h=0 for k,v in pairs(t)do h=h+v.temperature end for k,v in pairs(t)do v.temperature=h/#t end
+end]]
+function entity.AutoBalanceHeat(t) -- Auto-balance heat between all entities in a table (respecting specific heat)
+	local e=0 sh=0 tsh=0
+	for k,v in pairs(t)do sh=v.prototype.heat_buffer_prototype.specific_heat e=e+v.temperature*sh tsh=tsh+sh end
+	for k,v in pairs(t)do v.temperature=e/tsh end
 end
-function entity.BalanceHeatPair(a,b) local x=(a.temperature+b.temperature)/2 a.temperature,b.temperature=x,x end
+
+function entity.BalanceHeatPair(a,b) -- with respect to specific heat
+	local ash,bsh = a.prototype.heat_buffer_prototype.specific_heat, b.prototype.heat_buffer_prototype.specific_heat
+	local x=(a.temperature*ash+b.temperature*bsh)/2 a.temperature,b.temperature=x,x
+end
 function entity.ShiftHeat(a,b) end -- move temperature from a to b
 
 function entity.ShiftContainer(a,b) -- Shift contents from a to b
@@ -260,6 +271,7 @@ function events.vraise(name,ev) ev=ev or {} ev.name=name script.raise_event(even
 function events.entity(ev) return ev.entity or ev.created_entity or ev.destination or ev.mine end
 function events.source(ev) return ev.source end
 function events.destination(ev) return ev.created_entity or ev.destination end
+function events.surface(ev) return ev.surface or game.surfaces[ev.surface_index] end
 
 function events.on_load(f) table.insert(events.loadfuncs,f) end
 function events.on_init(f) table.insert(events.initfuncs,f) end
@@ -297,7 +309,6 @@ function events.inject()
 	script.on_load(events.raise_load)
 	script.on_configuration_changed(events.raise_migrate)
 end
-function events.surface(ev) return ev.surface or game.surfaces[ev.surface_index] end
 
 
 

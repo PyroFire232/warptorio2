@@ -163,7 +163,9 @@ end
 function warptorio.ConstructFloor(fn,bhzd) warptorio.ConstructPlatform(platform.floors[fn],bhzd) end
 function warptorio.ConstructFloorHazard(fn) warptorio.ConstructHazard(platform.floors[fn]) end
 
-
+function warptorio.ConstructPlatformVoid(surf)
+	local vt=warptorio.platform.floors["main"] if(vt.tile)then lib.call(vt.tile,surf,true) end
+end
 function warptorio.ConstructPlatform(vt,bhzd)
 	if(isstring(vt))then vt=warptorio.platform.floors[vt] end
 	local floor=warptorio.GetPlatformFloor(vt) if(floor)then
@@ -577,7 +579,7 @@ cache.vgui("warptorio_homeworld",{
 local HUD={} warptorio.HUD=HUD
 function HUD.clocktick(menu) local ply=menu.host
 	if(global.warp_charging>=1)then menu.charge_time.caption={"warptorio.warp-in",util.formattime(val or (global.warp_time_left or 0))}
-	else menu.charge_time.caption={"warptorio.charge_time",util.formattime((global.warp_charge_time or 0)*60)}
+	elseif(menu.charge_time)then menu.charge_time.caption={"warptorio.charge_time",util.formattime((global.warp_charge_time or 0)*60)}
 	end
 
 	menu.time_passed.caption={"warptorio.time_passed",util.formattime(global.time_passed or 0)}
@@ -716,7 +718,7 @@ function HUD.rebuild_warptargets(menu,ev)
 end
 function HUD.warptarget(menu,ev) local ply=menu.host if(not menu.warptgt or ply.index==ev.ply)then return end
 	local elm,items=menu.warptgt if(elm)then items=elm.items end if(not items)then return end
-	for idx,kv in pairs(items)do if(kv:lower()==ev.tgt)then elm.selected_index=idx end end
+	for idx,kv in pairs(items)do if(type(kv)=="string" and kv:lower()==ev.tgt)then elm.selected_index=idx end end
 end
 
 function HUD.warpbtn(menu)
@@ -730,7 +732,7 @@ function HUD.warpbtn(menu)
 			if(cx>0)then r.caption={"warptorio.button-votewarp-count",cx,vcn}
 			else r.caption={"warptorio.button-votewarp","-"}
 			end
-		else r.enabled=true r.caption={"warptorio.button-warp","-"} menu.warpzone.caption="Warpzone: " .. global.warpzone or 0
+		else r.enabled=true r.caption={"warptorio.button-warp","-"} menu.warpzone.caption={"warptorio.warpzone_label",global.warpzone or 0}
 		end
 	end
 end
@@ -743,7 +745,7 @@ cache.vgui("warptorio_warptarget",{
 selection_changed=function(elm,ev) local ply=game.players[elm.player_index]
 	local s=elm.items[elm.selected_index] if(not s)then return end local sx=s:lower()
 	local vt=(sx=="(random)" and nil or (sx=="(homeworld)" and "home" or (sx=="(nauvis)" and "nauvis" or sx)))
-	if(vt~=global.planet_target)then global.planet_target=vt game.print(ply.name .. " set a course for: " .. s) cache.updatemenu("hud","warptarget",{ply=elm.player_index,tgt=sx}) end
+	if(vt~=global.planet_target)then global.planet_target=vt game.print({"warptorio.player_set_warp_target",ply.name,s}) cache.updatemenu("hud","warptarget",{ply=elm.player_index,tgt=sx}) end
 end,
 })
 
@@ -777,7 +779,7 @@ click=function(elm,ev) local ply=game.players[elm.player_index] local menu=cache
 				game.print(ply.name .. " started the warpout procedure.")
 			else
 				players.playsound("teleport")
-				game.print(ply.name .. " wants to Warp. " .. cx .. " / " .. vcn .. " votes")
+				game.print({"warptorio.player_want_vote_warp",ply.name,cx,vcn})
 				cache.updatemenu("hud","warpbtn")
 			end
 		elseif(warptorio.PlayerCanStartWarp(ply))then
@@ -933,12 +935,12 @@ function warptorio.WarpBuildPlanet(key)
 		if(lvl>=8)then local wx=global.planet_target
 			if(wx=="home" or wx=="nauvis")then if(research.has("warptorio-homeworld"))then local hf=(wx=="nauvis" and game.surfaces.nauvis or global.floor.home.host)
 				if(warptorio.GetMainSurface()~=hf and math.random(1,100)<=warptorio.setting("warpchance"))then local hp=remote.call("planetorio","GetBySurface",hf) or {name="Nauvis"}
-					game.print("-Successful Warp-") game.print(hp.name .. ". Home sweet home.")
+					game.print({"warptorio.successful_warp"}) game.print({"warptorio.home_sweet_home",hp.name})
 					return hf,hp
 				end
 			end elseif(wx and math.random(1,100)<=warptorio.setting("warpchance"))then
 				nplanet=remote.call("planetorio","FromTemplate","warpzone_"..global.warpzone,wx)
-				if(nplanet)then game.print("-Successful Warp-") end
+				if(nplanet)then game.print({"warptorio.successful_warp"}) end
 			end
 		end
 		if(not nplanet)then nplanet=remote.call("planetorio","SimplePlanetRoll","warpzone_"..global.warpzone,{zone=global.warpzone,prevplanet=vplanet}) end -- planetorio, modifiers={{"",stuff}})
@@ -1046,6 +1048,8 @@ function warptorio.WarpPost(cf,f)
 	--// build void
 	--for k,v in pairs({"nw","ne","sw","se"})do local ug=research.level("turret-"..v) or -1 if(ug>=0)then vector.LayCircle("out-of-map",c,vector.circleEx(vector(cx[v].x+0.5,cx[v].y+0.5),math.floor(10+(ug*6)) )) end end
 	--vector.LayTiles("out-of-map",c,marea)
+
+	if(cf and cf.valid)then warptorio.ConstructPlatformVoid(cf) end
 	
 
 end

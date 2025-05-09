@@ -122,6 +122,7 @@ function setter.warptorio_loaderchest_requester() warptorio.LoaderChestChanged(f
 function setter.warptorio_loader_top() warptorio.LoaderSideChanged(true) end
 function setter.warptorio_loader_bottom() warptorio.LoaderSideChanged(false) end
 function setter.warptorio_combinator_offset() warptorio.CombinatorOffsetChanged() end
+function setter.warptorio_hide_sprites() for k,v in pairs(global.Teleporters)do v:CheckPointSprites(1) v:CheckPointSprites(2) end end
 
 
 function warptorio.CombinatorOffsetChanged()
@@ -208,11 +209,11 @@ function warptorio.SpawnLootChest(f,pos,varg) pos=vector(pos) varg=varg or {}
 	return e
 end
 
-function warptorio.ChunkLootChest(ev) if(settings.global["warptorio_no_lootchest"].value==true or math.random(1,175)>1)then return end
+function warptorio.ChunkLootChest(ev) if(settings.global["warptorio_no_lootchest"].value==true or math.random(1,settings.global["warptorio_lootchest_chance"].value)>1)then return end
 	local f=ev.surface if(not (f.name=="nauvis" or f==warptorio.GetMainSurface()))then return end local a=ev.area
 	local x,y=math.random(a.left_top.x,a.right_bottom.x),math.random(a.left_top.y,a.right_bottom.y)
 	local dist=math.sqrt(math.abs(x^2)+math.abs(y^2))
-	if(dist>=256)then warptorio.SpawnLootChest(f,{x,y}) end
+	if(dist>=settings.global["warptorio_lootchest_distance"].value)then warptorio.SpawnLootChest(f,{x,y}) end
 end events.on_event(defines.events.on_chunk_generated,warptorio.ChunkLootChest)
 
 
@@ -250,10 +251,10 @@ events.on_tick(60,0,"clock",warptorio.ClockTick)
 
 function warptorio.ChargeCountdownTick(tick)
 	if(global.warp_charging<1 and global.warp_charge_time>30)then
-		local r=60-(research.level("warptorio-reactor")*3) if(tick%(r*5)==0)then global.warp_charge_time=math.max(global.warp_charge_time-1,30) end --warptorio.derma.charge_time() end
+		local r=(780)-(research.level("warptorio-reactor")*60) if(tick%r==0)then global.warp_charge_time=math.max(global.warp_charge_time-1,30) end -- 60t*13s=780t
 	end
 end
-events.on_tick(60*5,0,"charge_countdown",warptorio.ChargeCountdownTick)
+events.on_tick(60,0,"charge_countdown",warptorio.ChargeCountdownTick)
 
 function warptorio.WarpAlarmTick(tick)
 	if((global.warp_charging==1 and global.warp_time_left<=3600) or (warptorio.IsAutowarpEnabled() and global.warp_auto_end<=3600))then players.playsound("warp_alarm") end
@@ -266,7 +267,7 @@ function warptorio.PollutionTick(tick) if(tick%(warptorio.setting("pollution_tic
 	local vpol=0
 	if(warptorio.setting("pollution_disable")~=true)then
 		vpol=global.pollution_amount
-		global.pollution_amount=math.min( vpol+ (vpol^warptorio.setting("pollution_exponent"))*warptorio.setting("pollution_multiplier"), 1000000)
+		global.pollution_amount=math.min( vpol+ (vpol^warptorio.setting("pollution_exponent"))*(stb and 0.05 or warptorio.setting("pollution_multiplier")), 1000000)
 	end
 
 	for k,v in pairs(warptorio.GetPlatformSurfaces())do
@@ -704,21 +705,23 @@ local warploader={}
 
 function warploader.dofilters(e)
 	local tp=e.loader_type
-	local wpg=global.warploaders
-	if(tp~="output")then
-		for i=1,2,1 do table.RemoveByValue(wpg.output,e.get_transport_line(i)) end
-		for i=1,2,1 do table.insertExclusive(wpg.input,e.get_transport_line(i)) end
-		for k,v in pairs(wpg.outputf)do for i=1,2,1 do table.RemoveByValue(v,e.get_transport_line(i)) end  end
-	else
+	local lanes={e.get_transport_line(1),e.get_transport_line(2)}
+	for k,v in pairs(global.warploaders.outputf)do for i=1,2,1 do table.RemoveByValue(v,lanes[i]) end end
+	if(tp~="output")then --if(tp=="input")then
+		for i=1,2,1 do table.RemoveByValue(global.warploaders.output,lanes[i]) end
+		for i=1,2,1 do table.insertExclusive(global.warploaders.input,lanes[i]) end
+	else --if(tp=="output")then
 		local ct=global.warploaders.outputf
 		local hf=false
 		for i=1,5,1 do local f=e.get_filter(i) if(f)then hf=true
-			ct[f]=ct[f] or {} for a=1,2,1 do table.insertExclusive(ct[f],e.get_transport_line(a)) end
+			ct[f]=ct[f] or {} for a=1,2,1 do table.insertExclusive(ct[f],lanes[a]) end
 		end end
-		if(not hf)then
-			for a=1,2,1 do table.insertExclusive(global.warploaders.output,e.get_transport_line(a)) end
+		if(hf)then
+			for i=1,2,1 do table.RemoveByValue(global.warploaders.output,lanes[i]) end
+		else
+			for a=1,2,1 do table.insertExclusive(global.warploaders.output,lanes[a]) end
 		end
-		for a=1,2,1 do table.RemoveByValue(global.warploaders.input,e.get_transport_line(a)) end
+		for a=1,2,1 do table.RemoveByValue(global.warploaders.input,lanes[a]) end
 	end
 end
 function warploader.built(e,ev)
@@ -739,13 +742,14 @@ function warploader.destroy(e,ev)
 	local un=e.unit_number
 	local tp=e.loader_type
 	local wpg=global.warploaders
+	local lanes={e.get_transport_line(1),e.get_transport_line(2)}
 	if(tp=="output")then
 		local hf=false for i=1,5,1 do if(e.get_filter(i))then hf=true break end end
-		if(hf)then for k,v in pairs(wpg.outputf)do for i=1,2,1 do table.RemoveByValue(v,e.get_transport_line(i)) end end else
-			for i=1,2,1 do table.RemoveByValue(wpg.output,e.get_transport_line(i)) end
+		if(hf)then for k,v in pairs(wpg.outputf)do for i=1,2,1 do table.RemoveByValue(v,lanes[i]) end end else
+			for i=1,2,1 do table.RemoveByValue(wpg.output,lanes[i]) end
 		end
 	else
-		for i=1,2,1 do table.RemoveByValue(wpg.input,e.get_transport_line(i)) end
+		for i=1,2,1 do table.RemoveByValue(wpg.input,lanes[i]) end
 	end
 end
 function warploader.settings_pasted(e) warploader.dofilters(e) end
@@ -768,11 +772,13 @@ function warptorio.OutputWarpLoader(cv,c)
 		local wpfnext=wpg.outputf_next[cv]
 		local coutf=wpg.outputf[cv]
 		for k,v in pairs(coutf)do local rk,rv=warptorio.NextWarploader(coutf,wpfnext) wpfnext=rk if(rv and warptorio.InsertWarpLane(rv,cv))then ins=true break end end
+		wpg.outputf_next[cv]=wpfnext
 		if(ins)then return true end
 	end
 	local wpnext=wpg.output_next
 	local cout=wpg.output
 	for k,v in pairs(cout)do local rk,rv=warptorio.NextWarploader(cout,wpnext) wpnext=rk if(rv and warptorio.InsertWarpLane(rv,cv))then ins=true break end end
+	wpg.output_next=wpnext
 	if(ins)then return true end
 	return false
 end

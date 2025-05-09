@@ -76,7 +76,7 @@ platform.techs.triloader={tech="warptorio-triloader",effect={upgrade_logistics=t
 
 platform.techs.accelerator={tech="warptorio-accelerator",effect={ability="accelerator"},}
 platform.techs.stabilizer={tech="warptorio-stabilizer",effect={ability="stabilizer"},}
-platform.techs.charting={tech="warptorio-radar",effect={ability="charting",unlock_radars=true},}
+platform.techs.charting={tech="warptorio-charting",effect={ability="charting",special={"factory","boiler"}},}
 
 
 platform.techs.alt_combinator={tech="warptorio-alt-combinator",effect={do_combinators=true},}

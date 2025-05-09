@@ -190,9 +190,9 @@ function vector.LayBorder(tex,f,a) local t={}
 end
 function vector.clearplayers(f,area,tpo) for k,v in pairs(players.find(f,area))do players.safeclean(v,tpo) end end
 function vector.clear(f,area,tpo) local e=f.find_entities(area) for k,v in pairs(e)do if(v and v.valid)then
-	if(v.type=="character")then if(tpo)then entity.safeteleport(v,f,tpo) end else entity.destroy(v) end
+	if(v.type=="character" or v.type=="spider-leg")then if(tpo)then entity.safeteleport(v,f,tpo) end else entity.destroy(v) end
 end end end
-function vector.clearFiltered(f,area,tpo) for k,v in pairs(f.find_entities_filtered{type="character",invert=true,area=area})do
+function vector.clearFiltered(f,area,tpo) for k,v in pairs(f.find_entities_filtered{type={"character","spider-leg"},invert=true,area=area})do
 	if(isvalid(v) and v.force.name~="player" and v.force.name~="enemy" and v.name:sub(1,9)~="warptorio")then entity.destroy(v) end
 end end
 

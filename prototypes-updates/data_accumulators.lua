@@ -142,9 +142,10 @@ local t=ExtendDataCopy("accumulator","accumulator",{name="warptorio-accumulator"
 	energy_source={ type="electric", usage_priority="tertiary", emissions_per_minute=5,
 		input_flow_limit="5GW", output_flow_limit="5GW", buffer_capacity="1GJ",
 	},
-	picture={layers={ {tint=rtint,hr_version={tint=rtint}} }},
+	picture={layers={ {tint=rtint,hr_version={tint=rtint},} }},
 	minable={mining_time=2,result="warptorio-accumulator"},
-	icons={{icon="__base__/graphics/icons/accumulator.png",tint=rtint}}, icon_size=32,
+
+	icons={{icon="__base__/graphics/icons/accumulator.png",tint=rtint,icon_size=64,}},
 },false,{icon=false})
 local name="warptorio-accumulator"
 local item=table.deepcopy( data.raw.item.accumulator )
@@ -157,7 +158,7 @@ recipe.ingredients={{"accumulator",10},{"solar-panel",10},{"advanced-circuit",20
 data:extend{item,recipe}
 
 local t={type="technology",upgrade=true,icon_size=128,icons={
-	{icon="__base__/graphics/technology/electric-energy-acumulators.png",tint={r=0.3,g=0.3,b=1,a=1},priority="low"},
+	{icon="__base__/graphics/technology/electric-energy-acumulators.png",tint={r=0.3,g=0.3,b=1,a=1},priority="low",icon_size=256,},
 }, }
 ExtendTech(t,{name="warptorio-accumulator",unit={count=1000,time=5},effects={{recipe="warptorio-accumulator",type="unlock-recipe"}},
 	prerequisites={"warptorio-energy-4","warptorio-teleporter-4","production-science-pack"}}, {red=1,green=1,blue=1,purple=1})
