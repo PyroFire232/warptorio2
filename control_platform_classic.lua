@@ -884,7 +884,7 @@ cache.surface("platform_boiler",{
 
 --[[ General Platform Stuff ]]--
 
-function platform.PositionInPlatform(f,pos) local gf=global.floor
+function platform.PositionInPlatform(f,pos) local gf=storage.floor
 	if(f==gf.factory.surface)then return true
 	elseif(f==gf.boiler.surface)then return true
 	elseif(f==gf.harvester.surface)then return true
@@ -895,7 +895,7 @@ end
 
 function platform.GetWarpables(c,cf)
 	-- warptorio.IsWarping=true
-	--local m=global.floor.main
+	--local m=storage.floor.main
 	--local c=m.host
 	local mt=platform.floors.main.get_sizes()
 

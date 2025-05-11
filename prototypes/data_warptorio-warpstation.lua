@@ -178,53 +178,30 @@ data:extend{
       name = "warptorio-warpstation",
       pictures = {
         layers = {
-          { tint=rtint, scale=rsc,
+          { tint=rtint,
             direction_count = 4,
             filename = "__base__/graphics/entity/substation/substation.png",
-            height = 136,
-            hr_version = { tint=rtint,
-              direction_count = 4,
-              filename = "__base__/graphics/entity/substation/hr-substation.png",
-              height = 270,
-              priority = "high",
-              scale = 0.5*rsc,
-              shift = {
-                0,
-                -0.96875*rsc
-              },
-              width = 138
-            },
+            height = 270,
             priority = "high",
+            scale = 0.5*rsc,
             shift = {
               0,
               -0.96875*rsc
             },
-            width = 70
+            width = 138
           },
-          { tint=rtint, scale=rsc,
+          { tint=rtint,
             direction_count = 4,
             draw_as_shadow = true,
             filename = "__base__/graphics/entity/substation/substation-shadow.png",
-            height = 52,
-            hr_version = { tint=rtint,
-              direction_count = 4,
-              draw_as_shadow = true,
-              filename = "__base__/graphics/entity/substation/hr-substation-shadow.png",
-              height = 104,
-              priority = "high",
-              scale = 0.5*rsc,
-              shift = {
-                1.9375*rsc,
-                0.3125*rsc
-              },
-              width = 370
-            },
+            height = 104,
             priority = "high",
+            scale = 0.5*rsc,
             shift = {
               1.9375*rsc,
               0.3125*rsc
             },
-            width = 186
+            width = 370
           }
         }
       },

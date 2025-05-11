@@ -19,13 +19,11 @@ Status bar wastes screen space, don't use it.
 
 Use https://tools.stefankueng.com/grepWin.html to mass search, find and replace many files in bulk.
 
-]]---------------------------------------
+]]                  ---------------------------------------
 
---[[ Environment ]]--
-lib={PLANETORIO=true,REMOTES=true}
+--[[ Environment ]] --
+lib = { PLANETORIO = true, REMOTES = true }
 
 require("lib/lib")
 require("control_main")
 lib.lua()
-
-
