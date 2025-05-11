@@ -9,8 +9,14 @@ data:extend{
 	},
 
 	{ name="warptorio-warploader", type="recipe",category="crafting-with-fluid",enabled=false,energy_required=2,
-		ingredients={ {"iron-gear-wheel",400},{"express-underground-belt",50},{"express-transport-belt",100},{"express-splitter",50},{amount=200,name="lubricant",type="fluid"} },
-		result="warptorio-warploader",result_count=1,
+		ingredients={
+			{type="item", name="iron-gear-wheel", amount=400},
+			{type="item", name="express-underground-belt", amount=50},
+			{type="item", name="express-transport-belt", amount=100},
+			{type="item", name="express-splitter", amount=50},
+			{amount=200,name="lubricant",type="fluid"}
+		},
+		results={{type="item", name="warptorio-warploader", amount=1}}
 	},
 	
 
@@ -23,18 +29,10 @@ data:extend{
           direction_count = 20,
           filename = "__base__/graphics/entity/express-transport-belt/express-transport-belt.png",
           frame_count = 32,
-          height = 64,
-          hr_version = { tint=rtint,
-            direction_count = 20,
-            filename = "__base__/graphics/entity/express-transport-belt/hr-express-transport-belt.png",
-            frame_count = 32,
-            height = 128,
-            priority = "extra-high",
-            scale = 0.5,
-            width = 128
-          },
+          height = 128,
           priority = "extra-high",
-          width = 64
+          scale = 0.5,
+          width = 128
         },
         east_index = 1,
         east_to_north_index = 5,
@@ -72,8 +70,8 @@ data:extend{
       filter_count = 5,
       flags = {
         "placeable-neutral",
-        "player-creation",
-        "fast-replaceable-no-build-while-moving"
+        "player-creation"--,
+--        "fast-replaceable-no-build-while-moving"
       },
       icons = {{icon="__base__/graphics/icons/express-loader.png",tint=rtint}},
       icon_size = 32,

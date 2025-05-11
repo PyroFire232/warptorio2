@@ -1,48 +1,54 @@
-local spider={}
-spider.tint={r=0.4,g=0.4,b=1,a=0.7}
-spider.name="warptorio-warpspider"
-spider.size=0.5
+local spider = {}
+spider.tint = { r = 0.4, g = 0.4, b = 1, a = 0.7 }
+spider.name = "warptorio-warpspider"
+spider.size = 0.65
 
-spider.item=table.deepcopy(data.raw["item-with-entity-data"].spidertron)
-spider.item.name=spider.name
-spider.item.icons={{icon=spider.item.icon,icon_size=spider.item.icon_size,tint=spider.tint}}
-spider.item.place_result=spider.name
-spider.item.icon=nil
+spider.item = table.deepcopy(data.raw["item-with-entity-data"].spidertron)
+spider.item.name = spider.name
+spider.item.icons = { { icon = spider.item.icon, icon_size = spider.item.icon_size, tint = spider.tint } }
+spider.item.place_result = spider.name
+spider.item.icon = nil
 
-spider.recipe=table.deepcopy(data.raw.recipe.spidertron)
-spider.recipe.name=spider.name
-spider.recipe.result=spider.name
-spider.recipe.icons=spider.item.icons
-spider.recipe["recipe-category"]="crafting" -- Hand-craft only does not exist
+spider.recipe = table.deepcopy(data.raw.recipe.spidertron)
+spider.recipe.name = spider.name
+spider.recipe.results = { { type = "item", name = spider.name, amount = 1 } }
+spider.recipe.icons = spider.item.icons
 
-spider.recipe.ingredients={{"spidertron",8},{"power-armor-mk2",8},{"fusion-reactor-equipment",8},{"raw-fish",9},{"satellite",8},{"artillery-turret",8},{"rocket-silo",1}}
+spider.recipe.ingredients = {
+	{ type = "item", name = "spidertron",                amount = 1 },
+	{ type = "item", name = "power-armor-mk2",           amount = 1 },
+	{ type = "item", name = "fission-reactor-equipment", amount = 8 },
+	{ type = "item", name = "raw-fish",                  amount = 8 },
+	{ type = "item", name = "satellite",                 amount = 1 },
+	{ type = "item", name = "artillery-turret",          amount = 8 },
+	{ type = "item", name = "rocket-silo",               amount = 1 }
+}
 
+spider.tech = table.deepcopy(data.raw["technology"].spidertron)
+spider.tech.name = spider.name
+spider.tech.effects = { { type = "unlock-recipe", recipe = "warptorio-warpspider" } }
+spider.tech.prerequisites = { "spidertron", "space-science-pack", "warptorio-reactor-8", "artillery" }
+spider.tech.icons = { { icon = spider.tech.icon, icon_size = spider.tech.icon_size, tint = spider.tint } }
+spider.tech.icon = nil
+spider.tech.localised_description = { "technology-description.warptorio-warpspider" }
 
-spider.tech=table.deepcopy(data.raw["technology"].spidertron)
-spider.tech.name=spider.name
-spider.tech.effects={{type="unlock-recipe",recipe="warptorio-warpspider"}}
-spider.tech.prerequisites={"spidertron","space-science-pack","warptorio-reactor-8","artillery"}
-spider.tech.icons={{icon=spider.tech.icon,icon_size=spider.tech.icon_size,tint=spider.tint}}
-spider.tech.icon=nil
-spider.tech.localised_description={"technology-description.warptorio-warpspider"}
+spider.vehicle_grid = table.deepcopy(data.raw["equipment-grid"]["spidertron-equipment-grid"])
+spider.vehicle_grid.name = "warptorio-warpspider-equipment-grid"
+spider.vehicle_grid.height = 10 --6
+spider.vehicle_grid.width = 12  --10
 
-spider.vehicle_grid=table.deepcopy(data.raw["equipment-grid"]["spidertron-equipment-grid"])
-spider.vehicle_grid.name="warptorio-warpspider-equipment-grid"
-spider.vehicle_grid.height=10 --6
-spider.vehicle_grid.width=12 --10
+spider.vehicle = table.deepcopy(data.raw["spider-vehicle"].spidertron)
+spider.vehicle.name = spider.name
+spider.vehicle.equipment_grid = "warptorio-warpspider-equipment-grid"
+spider.vehicle.icons = { { icon = spider.vehicle.icon, icon_size = spider.vehicle.icon_size, tint = spider.tint } }
+spider.vehicle.icon = nil
 
-spider.vehicle=table.deepcopy(data.raw["spider-vehicle"].spidertron)
-spider.vehicle.name=spider.name
-spider.vehicle.equipment_grid="warptorio-warpspider-equipment-grid"
-spider.vehicle.icons={{icon=spider.vehicle.icon,icon_size=spider.vehicle.icon_size,tint=spider.tint}}
-spider.vehicle.icon=nil
-
-spider.vehicle.max_health=9001 --3000
-spider.vehicle.height=spider.vehicle.height*spider.size --12
-spider.vehicle.minable.result=spider.name
-spider.vehicle.inventory_size=200
-spider.vehicle.torso_rotation_speed = 0.01 --0.005
-spider.vehicle.movement_energy_consumption="250kW"
+spider.vehicle.max_health = 9000                            --3000
+spider.vehicle.height = spider.vehicle.height * spider.size --12
+spider.vehicle.minable.result = spider.name
+spider.vehicle.inventory_size = 200
+spider.vehicle.torso_rotation_speed = 0.01             --0.005
+spider.vehicle.movement_energy_consumption = "250kW"
 spider.vehicle.chain_shooting_cooldown_modifier = 0.35 --0.5
 
 --[[spider.vehicle.guns = {
@@ -53,31 +59,35 @@ spider.vehicle.chain_shooting_cooldown_modifier = 0.35 --0.5
       },
 ]]
 
-spider.legs={}
-for i=1,8,1 do
-	local leg=table.deepcopy(data.raw["spider-leg"]["spidertron-leg-"..i])
-	proto.TintImages(leg,spider.tint)
-	proto.SizeTo(leg,spider.size)
-	leg.name="warptorio-"..leg.name
-	leg.part_length=leg.part_length*spider.size
-	leg.movement_acceleration = leg.movement_acceleration/(spider.size/1.5) --0.3 --0.03
-	leg.movement_based_position_selection_distance= leg.movement_based_position_selection_distance*spider.size*1.5 -- 12 --4
-	leg.initial_movement_speed = leg.initial_movement_speed/(spider.size/1.5) --0.6 --0.06
-	spider.legs[i]=leg
+spider.legs = {}
+for i = 1, 8, 1 do
+	local leg = table.deepcopy(data.raw["spider-leg"]["spidertron-leg-" .. i])
+	proto.TintImages(leg, spider.tint)
+	proto.SizeTo(leg, spider.size)
+	--leg.type = "spider-leg"
+	leg.name = "warptorio-" .. leg.name
+	leg.knee_height = leg.knee_height * spider.size
+	leg.movement_acceleration = leg.movement_acceleration / (spider.size / 1.5)
+	leg.movement_based_position_selection_distance = leg.movement_based_position_selection_distance * spider.size * 1.5
+	leg.initial_movement_speed = leg.initial_movement_speed / (spider.size / 1.5)
+	--if leg.collision_mask == nil then
+	--leg.collision_mask = { layers = { item = true, meltable = true, object = true, player = true, water_tile = true, is_object = true, is_lower_object = true } } end
+	--if leg.collision_mask.layers == nil then leg.collision_mask.layers = { object = true } end
+	spider.legs[i] = leg
 end
 
-spider.vehicle.guns={}
-spider.guns={}
-for i=1,4,1 do
-	for x=1,2,1 do
-		local w=table.deepcopy(data.raw.gun["spidertron-rocket-launcher-"..i])
-		w.name="warptorio-spidertron-rocket-launcher-"..(i*2)-2+x
-		w.attack_parameters.cooldown=45 --60
-		w.attack_parameters.range=45 --60
-		w.localised_name={"item-name."..w.name}
-		table.insert(spider.guns,w)
-		table.insert(spider.vehicle.guns,w.name)
-		data:extend{w}
+spider.vehicle.guns = {}
+spider.guns = {}
+for i = 1, 4, 1 do
+	for x = 1, 2, 1 do
+		local w = table.deepcopy(data.raw.gun["spidertron-rocket-launcher-" .. i])
+		w.name = "warptorio-spidertron-rocket-launcher-" .. (i * 2) - 2 + x
+		w.attack_parameters.cooldown = 45 --60
+		w.attack_parameters.range = 45 --60
+		w.localised_name = { "item-name." .. w.name }
+		table.insert(spider.guns, w)
+		table.insert(spider.vehicle.guns, w.name)
+		data:extend { w }
 	end
 end
 
@@ -114,15 +124,15 @@ for i=1,2,1 do local w=table.deepcopy(spider.smg) w.name=w.name.."-"..i data:ext
 ]]
 
 
-for k,v in pairs(spider.vehicle.spider_engine.legs)do
-	v.leg="warptorio-"..v.leg
+for k, v in pairs(spider.vehicle.spider_engine.legs) do
+	v.leg = "warptorio-" .. v.leg
 end
 
-proto.SizeTo(spider.vehicle,spider.size)
-proto.TintImages(spider.vehicle,spider.tint)
-spider.vehicle.selection_box={{-1,-1},{1,1}}
+proto.SizeTo(spider.vehicle, spider.size)
+proto.TintImages(spider.vehicle, spider.tint)
+spider.vehicle.selection_box = { { -spider.size, -spider.size }, { spider.size, spider.size } }
 data:extend(spider.guns)
 data:extend(spider.legs)
-data:extend{spider.recipe,spider.item,spider.tech,spider.vehicle_grid,spider.vehicle}
+data:extend { spider.recipe, spider.item, spider.tech, spider.vehicle_grid, spider.vehicle }
 
 --error(serpent.block(spider.vehicle))

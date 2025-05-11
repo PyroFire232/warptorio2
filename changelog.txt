@@ -1,4 +1,16 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 09.05.2025
+  Major changes:
+    - Updated to Factorio 2.0 (thanks to Shadow_Man)
+    - Space Age is not supported. Elevated Rails and Quality is supported.
+    - New game recommended. No migration support for previous savegames.
+  Changes:
+    - Added custom Warptorio2 intro text and victory screen.
+    - Changed some technologies research cost to better match similar vanilla techs.
+    - Changed some recipes with non-stacking ingredients to have only 1 of these ingredients.
+
+---------------------------------------------------------------------------------------------------
 Version: 1.3.11
 Date: 18.2.2024
   Changes:
@@ -7,7 +19,6 @@ Date: 18.2.2024
     - Slightly increased the chance for loot chests to spawn and added a setting for it
     - Changed warp reactor specific heat from 10MJ to 1MJ to address heat distribution issues
     - Updated heat related code to better respect specific heats (Thanks chingis_khagan!)
-
 
 ---------------------------------------------------------------------------------------------------
 Version: 1.3.10
@@ -36,13 +47,11 @@ Date: 8.4.2022
   Changes:
     - Typo
 
-
 ---------------------------------------------------------------------------------------------------
 Version: 1.3.7
 Date: 7.4.2022
   Changes:
     - Lib bugfix related to cloning spider legs
-
 
 ---------------------------------------------------------------------------------------------------
 Version: 1.3.6
@@ -58,7 +67,6 @@ Version: 1.3.5
 Date: 13.3.2021
   Changes:
     - Fixed multiplayer crash, missing nil check on updating ownership and connection of cloned spidertrons to the remotes in players inventories between warps.
-
 
 ---------------------------------------------------------------------------------------------------
 Version: 1.3.4

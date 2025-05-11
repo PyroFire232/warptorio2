@@ -34,15 +34,17 @@ data:extend{
         "player-creation"
       },
       fluid_box = {
+		volume = 100,
         base_area = 5,
-        pipe_connections = {
-          {
-            position = {
-              0,
-              -1
-            }
-          }
-        },
+      pipe_connections =
+      {
+        { direction = defines.direction.north, position = {0, 0} },
+        {
+          connection_type = "underground",
+          direction = defines.direction.south,
+          position = {0, 0}
+        }
+      },
 
 
         pipe_covers = {
@@ -50,31 +52,18 @@ data:extend{
             layers = {
               { tint=rctint,
                 filename = "__base__/graphics/entity/pipe-covers/pipe-cover-east.png",
-                height = 64,
-                hr_version = { tint=rctint,
-                  filename = "__base__/graphics/entity/pipe-covers/hr-pipe-cover-east.png",
-                  height = 128,
-                  priority = "extra-high",
-                  scale = 0.5,
-                  width = 128
-                },
+                height = 128,
                 priority = "extra-high",
-                width = 64
+                scale = 0.5,
+                width = 128
               },
               {
                 draw_as_shadow = true,
                 filename = "__base__/graphics/entity/pipe-covers/pipe-cover-east-shadow.png",
-                height = 64,
-                hr_version = {
-                  draw_as_shadow = true,
-                  filename = "__base__/graphics/entity/pipe-covers/hr-pipe-cover-east-shadow.png",
-                  height = 128,
-                  priority = "extra-high",
-                  scale = 0.5,
-                  width = 128
-                },
+                height = 128,
                 priority = "extra-high",
-                width = 64
+                scale = 0.5,
+                width = 128
               }
             }
           },
@@ -82,31 +71,18 @@ data:extend{
             layers = {
               { tint=rctint,
                 filename = "__base__/graphics/entity/pipe-covers/pipe-cover-north.png",
-                height = 64,
-                hr_version = { tint=rctint,
-                  filename = "__base__/graphics/entity/pipe-covers/hr-pipe-cover-north.png",
-                  height = 128,
-                  priority = "extra-high",
-                  scale = 0.5,
-                  width = 128
-                },
+                height = 128,
                 priority = "extra-high",
-                width = 64
+                scale = 0.5,
+                width = 128
               },
               {
                 draw_as_shadow = true,
                 filename = "__base__/graphics/entity/pipe-covers/pipe-cover-north-shadow.png",
-                height = 64,
-                hr_version = {
-                  draw_as_shadow = true,
-                  filename = "__base__/graphics/entity/pipe-covers/hr-pipe-cover-north-shadow.png",
-                  height = 128,
-                  priority = "extra-high",
-                  scale = 0.5,
-                  width = 128
-                },
+                height = 128,
                 priority = "extra-high",
-                width = 64
+                scale = 0.5,
+                width = 128
               }
             }
           },
@@ -114,31 +90,18 @@ data:extend{
             layers = {
               { tint=rctint,
                 filename = "__base__/graphics/entity/pipe-covers/pipe-cover-south.png",
-                height = 64,
-                hr_version = { tint=rctint,
-                  filename = "__base__/graphics/entity/pipe-covers/hr-pipe-cover-south.png",
-                  height = 128,
-                  priority = "extra-high",
-                  scale = 0.5,
-                  width = 128
-                },
+                height = 128,
                 priority = "extra-high",
-                width = 64
+                scale = 0.5,
+                width = 128
               },
               {
                 draw_as_shadow = true,
                 filename = "__base__/graphics/entity/pipe-covers/pipe-cover-south-shadow.png",
-                height = 64,
-                hr_version = {
-                  draw_as_shadow = true,
-                  filename = "__base__/graphics/entity/pipe-covers/hr-pipe-cover-south-shadow.png",
-                  height = 128,
-                  priority = "extra-high",
-                  scale = 0.5,
-                  width = 128
-                },
+                height = 128,
                 priority = "extra-high",
-                width = 64
+                scale = 0.5,
+                width = 128
               }
             }
           },
@@ -146,31 +109,18 @@ data:extend{
             layers = {
               { tint=rctint,
                 filename = "__base__/graphics/entity/pipe-covers/pipe-cover-west.png",
-                height = 64,
-                hr_version = { tint=rctint,
-                  filename = "__base__/graphics/entity/pipe-covers/hr-pipe-cover-west.png",
-                  height = 128,
-                  priority = "extra-high",
-                  scale = 0.5,
-                  width = 128
-                },
+                height = 128,
                 priority = "extra-high",
-                width = 64
+                scale = 0.5,
+                width = 128
               },
               {
                 draw_as_shadow = true,
                 filename = "__base__/graphics/entity/pipe-covers/pipe-cover-west-shadow.png",
-                height = 64,
-                hr_version = {
-                  draw_as_shadow = true,
-                  filename = "__base__/graphics/entity/pipe-covers/hr-pipe-cover-west-shadow.png",
-                  height = 128,
-                  priority = "extra-high",
-                  scale = 0.5,
-                  width = 128
-                },
+                height = 128,
                 priority = "extra-high",
-                width = 64
+                scale = 0.5,
+                width = 128
               }
             }
           }
@@ -186,57 +136,33 @@ data:extend{
 	      order = "a[pipe]-b[pipe-to-ground]",
       name = "warptorio-logistics-pipe",
       pictures = {
-        down = { tint=rctint,
-          filename = "__base__/graphics/entity/pipe-to-ground/pipe-to-ground-down.png",
-          height = 64,
-          hr_version = { tint=rtint,
-            filename = "__base__/graphics/entity/pipe-to-ground/hr-pipe-to-ground-down.png",
+        south = { tint=rtint,
+            filename = "__base__/graphics/entity/pipe-to-ground/pipe-to-ground-down.png",
             height = 128,
             priority = "extra-high",
             scale = 0.5,
             width = 128
-          },
-          priority = "high",
-          width = 64
         },
-        left = { tint=rctint,
-          filename = "__base__/graphics/entity/pipe-to-ground/pipe-to-ground-left.png",
-          height = 64,
-          hr_version = { tint=rtint,
-            filename = "__base__/graphics/entity/pipe-to-ground/hr-pipe-to-ground-left.png",
+        west = { tint=rtint,
+            filename = "__base__/graphics/entity/pipe-to-ground/pipe-to-ground-left.png",
             height = 128,
             priority = "extra-high",
             scale = 0.5,
             width = 128
-          },
-          priority = "high",
-          width = 64
         },
-        right = { tint=rctint,
-          filename = "__base__/graphics/entity/pipe-to-ground/pipe-to-ground-right.png",
-          height = 64,
-          hr_version = { tint=rtint,
-            filename = "__base__/graphics/entity/pipe-to-ground/hr-pipe-to-ground-right.png",
+        east = { tint=rtint,
+            filename = "__base__/graphics/entity/pipe-to-ground/pipe-to-ground-right.png",
             height = 128,
             priority = "extra-high",
             scale = 0.5,
             width = 128
-          },
-          priority = "high",
-          width = 64
         },
-        up = { tint=rctint,
-          filename = "__base__/graphics/entity/pipe-to-ground/pipe-to-ground-up.png",
-          height = 64,
-          hr_version = { tint=rtint,
-            filename = "__base__/graphics/entity/pipe-to-ground/hr-pipe-to-ground-up.png",
+        north = { tint=rtint,
+            filename = "__base__/graphics/entity/pipe-to-ground/pipe-to-ground-up.png",
             height = 128,
             priority = "extra-high",
             scale = 0.5,
             width = 128
-          },
-          priority = "high",
-          width = 64
         }
       },
       resistances = {

@@ -60,33 +60,33 @@ function planets.on_template_updated(f) table.insert(planets.templateupfuncs,f) 
 function planets.on_template_removed(f) table.insert(planets.templatermvfuncs,f) end
 
 -- Internal function to raise the template events table
-function planets.raise_template_removed(ev) for i,f in pairs(planets.templatermvfuncs)do f(ev) end global._planetorio.template[ev.template.key]=nil end
-function planets.raise_template_event(ev) global._planetorio.template[ev.template.key]=ev.template for i,f in pairs(planets.templatefuncs)do f(ev) end end
-function planets.raise_template_updated_event(ev) table.merge(global._planetorio.template[ev.template.key],ev.template) for i,f in pairs(planets.templateupfuncs)do f(ev) end end
+function planets.raise_template_removed(ev) for i,f in pairs(planets.templatermvfuncs)do f(ev) end storage._planetorio.template[ev.template.key]=nil end
+function planets.raise_template_event(ev) storage._planetorio.template[ev.template.key]=ev.template for i,f in pairs(planets.templatefuncs)do f(ev) end end
+function planets.raise_template_updated_event(ev) table.merge(storage._planetorio.template[ev.template.key],ev.template) for i,f in pairs(planets.templateupfuncs)do f(ev) end end
 
 function planets.GetTemplates() -- returns internal copy of synced templates
-	return global._planetorio.template
+	return storage._planetorio.template
 end
 function planets.GetTemplate(key) -- returns internal synced copy of a template
-	return global._planetorio.template[key]
+	return storage._planetorio.template[key]
 end
 function planets.GetBySurface(f) return remote.call("planetorio","GetBySurface",f) end
 
 function planets.lua()
 	local pevents=remote.call("planetorio","GetEvents")
 
-	global._planetorio=global._planetorio or {}
+	storage._planetorio=storage._planetorio or {}
 	script.on_event(pevents.on_new_template,planets.raise_template_event)
 	script.on_event(pevents.on_template_updated,planets.raise_template_updated_event)
 	script.on_event(pevents.on_template_removed,planets.raise_template_removed)
 
 	local cur_data=remote.call("planetorio","GetTemplates")
-	global._planetorio.template=global._planetorio.template or {}
-	for key,val in pairs(global._planetorio.template)do
-		if(not cur_data[key])then planets.raise_template_removed({template=val}) global._planetorio.template[key]=nil end
+	storage._planetorio.template=storage._planetorio.template or {}
+	for key,val in pairs(storage._planetorio.template)do
+		if(not cur_data[key])then planets.raise_template_removed({template=val}) storage._planetorio.template[key]=nil end
 	end
 
-	table.merge(global._planetorio,{template=cur_data})
+	table.merge(storage._planetorio,{template=cur_data})
 	for k,v in pairs(cur_data)do planets.raise_template_event({template=v}) end
 end
 

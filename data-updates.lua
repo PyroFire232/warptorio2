@@ -73,7 +73,7 @@ local entIgnore={
 "big-electric-pole",
 }
 
-
+--[[
 local s=""
 for u,n in pairs(entTbl)do
 	for k,v in pairs(data.raw[n])do
@@ -90,4 +90,4 @@ for u,n in pairs(entTbl)do
 	end
 end
 --error(s)
-
+]]--

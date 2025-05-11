@@ -118,16 +118,16 @@ function cache.player(tbl) cache.players=tbl end
 cache.events={} -- Functions to distribute individual events among the caches in correct orders
 
 function cache.init()
-	global._lib=global._lib or {}
+	storage._lib=storage._lib or {}
 	cache.migrate()
 end
 
 function cache.migrate(ev)
-	if(global._libcache)then global._lib={cache=global._libcache} global._libcache=nil else global._lib=global._lib or {cache={}} end -- global._lib.cache
-	global._lib.cache=global._lib.cache or {}
-	for key,category in pairs(cache.primaries)do -- global._lib[raised_type]
-		global._lib[category]=global._lib[category] or {}
-		global._lib[category.."_idx"]=global._lib[category.."_idx"] or {}
+	if(storage._libcache)then storage._lib={cache=storage._libcache} storage._libcache=nil else storage._lib=storage._lib or {cache={}} end -- storage._lib.cache
+	storage._lib.cache=storage._lib.cache or {}
+	for key,category in pairs(cache.primaries)do -- storage._lib[raised_type]
+		storage._lib[category]=storage._lib[category] or {}
+		storage._lib[category.."_idx"]=storage._lib[category.."_idx"] or {}
 	end
 end
 
@@ -136,10 +136,10 @@ function cache.load()
 end
 
  -- helper functions for simple caching
-function cache.insert(n,ent) global._lib.cache[n]=global._lib.cache[n] or {} table.insertExclusive(global._lib.cache[n],ent) end
-function cache.validate(n) global._lib.cache[n]=global._lib.cache[n] or {} for k,v in pairs(global._lib.cache[n])do if(not isvalid(v))then global._lib.cache[n][k]=nil end end end
-function cache.remove(n,ent) global._lib.cache[n]=global._lib.cache[n] or {} table.RemoveByValue(global._lib.cache[n],ent) end
-function cache.get(n) if(isstring(n))then return global._lib.cache[n] or {} end  end
+function cache.insert(n,ent) storage._lib.cache[n]=storage._lib.cache[n] or {} table.insertExclusive(storage._lib.cache[n],ent) end
+function cache.validate(n) storage._lib.cache[n]=storage._lib.cache[n] or {} for k,v in pairs(storage._lib.cache[n])do if(not isvalid(v))then storage._lib.cache[n][k]=nil end end end
+function cache.remove(n,ent) storage._lib.cache[n]=storage._lib.cache[n] or {} table.RemoveByValue(storage._lib.cache[n],ent) end
+function cache.get(n) if(isstring(n))then return storage._lib.cache[n] or {} end  end
 --function cache.call(n,evn,ev,...) for k,v in pairs(cache.get(n))do ev.entity=v cache.call_ents(evn,ev,...) end end -- Call a simple event on all entities in a cache table.
 function cache.entcall(n,evn,ev,...) for k,v in pairs(cache.get(n))do ev.entity=v cache.call_ents(evn,ev,...) end end -- Call a simple event on all entities in a cache table.
 function cache.surfacecall(n,evn,ev,...) for k,v in pairs(cache.get(n))do ev.entity=v cache.call_surfaces(evn,ev,...) end end -- Call a simple event on all entities in a cache table.
@@ -179,14 +179,14 @@ function cache.get_index(host,key) return host[key] end
 function cache.raise_type(vtype,name,host,...)
 	local uid if(isnumber(host))then uid=host else local cx cx,uid=pcall(cache.get_index,host,"index") if(not cx)then cx,uid=pcall(cache.get_index,host,"unit_number") if(not cx)then uid=nil end end end
 	local hdx=uid
-	if(hdx)then local gc=global._lib[vtype.."_idx"][hdx] if(gc and name)then gc=gc[name] end if(gc)then return gc end end -- get existing hosted/index vtype
+	if(hdx)then local gc=storage._lib[vtype.."_idx"][hdx] if(gc and name)then gc=gc[name] end if(gc)then return gc end end -- get existing hosted/index vtype
 	local c=cache[vtype] -- cache["ents"][name]. You can call these manually if you need to for ptrn, surfaces etc.
 	if(not c)then return end if(name)then c=c[name] if(not c)then return end end -- only menus and vguis typically use names.
-	local idx=#global._lib[vtype]+1
-	local t={index=idx,name=name,type=vtype,host=host,hostindex=hdx} global._lib[vtype][idx]=t
+	local idx=#storage._lib[vtype]+1
+	local t={index=idx,name=name,type=vtype,host=host,hostindex=hdx} storage._lib[vtype][idx]=t
 	if(hdx)then
-		if(name)then local gc=global._lib[vtype.."_idx"][hdx] or {} global._lib[vtype.."_idx"][hdx]=gc gc[t.name]=t
-		else global._lib[vtype.."_idx"][hdx]=t
+		if(name)then local gc=storage._lib[vtype.."_idx"][hdx] or {} storage._lib[vtype.."_idx"][hdx]=gc gc[t.name]=t
+		else storage._lib[vtype.."_idx"][hdx]=t
 		end
 	end
 	if(c.raise)then c.raise(t,...) end
@@ -198,10 +198,10 @@ end
 function cache.destroy_type(obj,...) local vtype=obj.type
 	local c=cache[vtype] if(not c)then return end if(obj.name)then c=c[obj.name] if(not c)then return end end
 	if(c.unraise)then c.unraise(obj,...) end
-	global._lib[vtype][obj.index]=nil
-	if(obj.hostindex)then global._lib[vtype.."_idx"][obj.hostindex]=nil end
+	storage._lib[vtype][obj.index]=nil
+	if(obj.hostindex)then storage._lib[vtype.."_idx"][obj.hostindex]=nil end
 end
-function cache.get_type(vtype,name,host) local t=global._lib[vtype.."_idx"]
+function cache.get_type(vtype,name,host) local t=storage._lib[vtype.."_idx"]
 	if(t)then
 		local uid if(isnumber(host))then uid=host else local cx cx,uid=pcall(cache.get_index,host,"index") if(not cx)then cx,uid=pcall(cache.get_index,host,"unit_number") if(not cx)then uid=nil end end end
 		if(uid)then t=t[uid] else t=nil end
@@ -210,7 +210,7 @@ function cache.get_type(vtype,name,host) local t=global._lib[vtype.."_idx"]
 	return t
 end
 function cache.get_raise_type(vtype,name,host,...) return cache.get_type(vtype,name,host) or cache.raise_type(vtype,name,host,...) end
-function cache.get_types(vtype) local t=global._lib[vtype] return t end
+function cache.get_types(vtype) local t=storage._lib[vtype] return t end
 
 function cache.destroy(obj,...) return cache.destroy_type(obj,...) end -- This just destroys the cache object, not the actual in-game object.
 

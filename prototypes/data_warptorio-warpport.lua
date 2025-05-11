@@ -17,25 +17,16 @@ data:extend{
       enabled = false,
       energy_required = 5,
       ingredients = {
-        {
-          "steel-plate",
-          45
-        },
-        {
-          "iron-gear-wheel",
-          45
-        },
-        {
-          "advanced-circuit",
-          100
-        },
-	{"processing-unit",100},
-	{"flying-robot-frame",100},
-        {"roboport",10},
-	{"warptorio-warponium-fuel",1}
+        {type="item", name="steel-plate", amount=45},
+        {type="item", name="iron-gear-wheel", amount=45},
+        {type="item", name="advanced-circuit", amount=100},
+        {type="item", name="processing-unit", amount=100},
+        {type="item", name="flying-robot-frame", amount=100},
+        {type="item", name="roboport", amount=10},
+		{type="item", name="warptorio-warponium-fuel", amount=1}
       },
       name = "warptorio-warpport",
-      result = "warptorio-warpport",
+      results = {{type="item", name="warptorio-warpport", amount=1}},
       type = "recipe"
     },
 
@@ -43,142 +34,78 @@ data:extend{
    {
       base = {
         layers = {
-          { tint=rtint, scale = 1/2,
+          { tint=rtint,
             filename = "__base__/graphics/entity/roboport/roboport-base.png",
-            height = 135,
-            hr_version = { tint=rtint,
-              filename = "__base__/graphics/entity/roboport/hr-roboport-base.png",
-              height = 277,
-              scale = 0.5/2,
-              shift = {
-                0.0625/2,
-                0.2421875/2
-              },
-              width = 228
-            },
+            height = 277,
+            scale = 0.5/2,
             shift = {
-              0.5/2,
-              0.25/2
+              0.0625/2,
+              0.2421875/2
             },
-            width = 143
+            width = 228
           },
           {
-            draw_as_shadow = true, scale = 1/2,
+            draw_as_shadow = true,
             filename = "__base__/graphics/entity/roboport/roboport-shadow.png",
-            height = 101,
-            hr_version = {
-              draw_as_shadow = true,
-              filename = "__base__/graphics/entity/roboport/hr-roboport-shadow.png",
-              height = 201,
-              scale = 0.5/2,
-              shift = {
-                0.890625/2,
-                0.6015625/2
-              },
-              width = 294
-            },
+            height = 201,
+            scale = 0.5/2,
             shift = {
               0.890625/2,
               0.6015625/2
             },
-            width = 147
+            width = 294
           }
         }
       },
       base_animation = { tint=rtint,
-        animation_speed = 0.5, scale = 1/2,
+        animation_speed = 0.5,
         filename = "__base__/graphics/entity/roboport/roboport-base-animation.png",
         frame_count = 8,
-        height = 31,
-        hr_version = { tint=rtint,
-          animation_speed = 0.5,
-          filename = "__base__/graphics/entity/roboport/hr-roboport-base-animation.png",
-          frame_count = 8,
-          height = 59,
-          priority = "medium",
-          scale = 0.5/2,
-          shift = {
-            -0.5546875/2,
-            -1.9140625/2
-          },
-          width = 83
-        },
+        height = 59,
         priority = "medium",
+        scale = 0.5/2,
         shift = {
-          -0.53149999999999995/2,
-          -1.9375/2
+          -0.5546875/2,
+          -1.9140625/2
         },
-        width = 42
+        width = 83
       },
-      base_patch = { tint=rtint, scale = 1/2,
+      base_patch = { tint=rtint,
         filename = "__base__/graphics/entity/roboport/roboport-base-patch.png",
         frame_count = 1,
-        height = 50,
-        hr_version = { tint=rtint,
-          filename = "__base__/graphics/entity/roboport/hr-roboport-base-patch.png",
-          frame_count = 1,
-          height = 100,
-          priority = "medium",
-          scale = 0.5/2,
-          shift = {
-            0.046875/2,
-            0.15625/2
-          },
-          width = 138
-        },
+        height = 100,
         priority = "medium",
+        scale = 0.5/2,
         shift = {
-          0.03125/2,
-          0.203125/2
+          0.046875/2,
+          0.15625/2
         },
-        width = 69
+        width = 138
       },
 
       door_animation_down = { tint=rtint,
         filename = "__base__/graphics/entity/roboport/roboport-door-down.png",
         frame_count = 16,
-        height = 22,
-        hr_version = { tint=rtint,
-          filename = "__base__/graphics/entity/roboport/hr-roboport-door-down.png",
-          frame_count = 16,
-          height = 41,
-          priority = "medium",
-          scale = 0.5/2,
-          shift = {
-            -0.0078125/2,
-            -0.3046875/2
-          },
-          width = 97/2
-        },
+        height = 41,
         priority = "medium",
+        scale = 0.5/2,
         shift = {
-          0.015625,
-          -0.234375
+          -0.0078125/2,
+          -0.3046875/2
         },
-        width = 52
+        width = 97/2
       },
       door_animation_up = { tint=rtint,
         filename = "__base__/graphics/entity/roboport/roboport-door-up.png",
         frame_count = 16,
-        height = 20,
-        hr_version = { tint=rtint,
-          filename = "__base__/graphics/entity/roboport/hr-roboport-door-up.png",
-          frame_count = 16,
-          height = 38,
-          priority = "medium",
-          scale = 0.5/2,
-          shift = {
-            -0.0078125/2,
-            -0.921875/2
-          },
-          width = 97
-        },
+        height = 38,
         priority = "medium",
+        scale = 0.5/2,
         shift = {
-          0.015625/2,
-          -0.890625/2
+          -0.0078125/2,
+          -0.921875/2
         },
-        width = 52
+        width = 97
       },
 
       charging_offsets = {

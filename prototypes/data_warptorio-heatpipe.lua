@@ -16,631 +16,355 @@ data:extend{
         corner_left_down = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-corner-down-left-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-corner-down-left-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-corner-down-left-2.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-corner-down-left-2.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-corner-down-left-3.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-corner-down-left-3.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-corner-down-left-4.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-corner-down-left-4.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-corner-down-left-5.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-corner-down-left-5.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-corner-down-left-6.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-corner-down-left-6.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         corner_left_up = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-corner-up-left-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-corner-up-left-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-corner-up-left-2.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-corner-up-left-2.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-corner-up-left-3.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-corner-up-left-3.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-corner-up-left-4.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-corner-up-left-4.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-corner-up-left-5.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-corner-up-left-5.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-corner-up-left-6.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-corner-up-left-6.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         corner_right_down = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-corner-down-right-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-corner-down-right-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-corner-down-right-2.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-corner-down-right-2.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-corner-down-right-3.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-corner-down-right-3.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-corner-down-right-4.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-corner-down-right-4.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-corner-down-right-5.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-corner-down-right-5.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-corner-down-right-6.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-corner-down-right-6.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         corner_right_up = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-corner-up-right-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-corner-up-right-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-corner-up-right-2.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-corner-up-right-2.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-corner-up-right-3.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-corner-up-right-3.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-corner-up-right-4.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-corner-up-right-4.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-corner-up-right-5.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-corner-up-right-5.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-corner-up-right-6.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-corner-up-right-6.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         cross = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-t-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-t-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         ending_down = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-ending-down-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-ending-down-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         ending_left = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-ending-left-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-ending-left-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         ending_right = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-ending-right-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-ending-right-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         ending_up = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-ending-up-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-ending-up-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         single = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-straight-vertical-single.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-straight-vertical-single.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         straight_horizontal = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-straight-horizontal-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-straight-horizontal-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-straight-horizontal-2.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-straight-horizontal-2.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-straight-horizontal-3.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-straight-horizontal-3.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-straight-horizontal-4.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-straight-horizontal-4.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-straight-horizontal-5.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-straight-horizontal-5.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-straight-horizontal-6.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-straight-horizontal-6.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         straight_vertical = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-straight-vertical-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-straight-vertical-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-straight-vertical-2.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-straight-vertical-2.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-straight-vertical-3.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-straight-vertical-3.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-straight-vertical-4.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-straight-vertical-4.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-straight-vertical-5.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-straight-vertical-5.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-straight-vertical-6.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-straight-vertical-6.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         t_down = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-t-down-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-t-down-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         t_left = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-t-left-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-t-left-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         t_right = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-t-right-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-t-right-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         t_up = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heat-pipe-t-up-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heat-pipe-t-up-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         }
       },
@@ -699,396 +423,222 @@ data:extend{
         corner_left_down = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-corner-down-left-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-corner-down-left-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-corner-down-left-2.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-corner-down-left-2.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-corner-down-left-3.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-corner-down-left-3.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-corner-down-left-4.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-corner-down-left-4.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-corner-down-left-5.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-corner-down-left-5.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-corner-down-left-6.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-corner-down-left-6.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         corner_left_up = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-corner-up-left-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-corner-up-left-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-corner-up-left-2.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-corner-up-left-2.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-corner-up-left-3.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-corner-up-left-3.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-corner-up-left-4.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-corner-up-left-4.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-corner-up-left-5.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-corner-up-left-5.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-corner-up-left-6.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-corner-up-left-6.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         corner_right_down = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-corner-down-right-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-corner-down-right-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-corner-down-right-2.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-corner-down-right-2.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-corner-down-right-3.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-corner-down-right-3.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-corner-down-right-4.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-corner-down-right-4.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-corner-down-right-5.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-corner-down-right-5.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-corner-down-right-6.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-corner-down-right-6.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         corner_right_up = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-corner-up-right-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-corner-up-right-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-corner-up-right-2.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-corner-up-right-2.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-corner-up-right-3.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-corner-up-right-3.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-corner-up-right-4.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-corner-up-right-4.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-corner-up-right-5.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-corner-up-right-5.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-corner-up-right-6.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-corner-up-right-6.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         cross = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-t-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-t-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         ending_down = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-ending-down-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-ending-down-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         ending_left = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-ending-left-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-ending-left-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         ending_right = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-ending-right-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-ending-right-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         ending_up = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-ending-up-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-ending-up-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         single = {
@@ -1100,232 +650,136 @@ data:extend{
         straight_horizontal = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-straight-horizontal-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-straight-horizontal-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-straight-horizontal-2.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-straight-horizontal-2.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-straight-horizontal-3.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-straight-horizontal-3.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-straight-horizontal-4.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-straight-horizontal-4.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-straight-horizontal-5.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-straight-horizontal-5.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-straight-horizontal-6.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-straight-horizontal-6.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         straight_vertical = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-straight-vertical-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-straight-vertical-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-straight-vertical-2.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-straight-vertical-2.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-straight-vertical-3.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-straight-vertical-3.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-straight-vertical-4.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-straight-vertical-4.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-straight-vertical-5.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-straight-vertical-5.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           },
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-straight-vertical-6.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-straight-vertical-6.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         t_down = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-t-down-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-t-down-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         t_left = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-t-left-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-t-left-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         t_right = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-t-right-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-t-right-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         },
         t_up = {
           {
             filename = "__base__/graphics/entity/heat-pipe/heated-t-up-1.png",
-            tint=heatpipe_tint, height= 32,
-            hr_version = {
-              filename = "__base__/graphics/entity/heat-pipe/hr-heated-t-up-1.png",
-              tint=heatpipe_tint, height= 64,
-              priority = "extra-high",
-              scale = 0.5,
-              width = 64
-            },
+            tint=heatpipe_tint, height= 64,
             priority = "extra-high",
-            width = 32
+            scale = 0.5,
+            width = 64
           }
         }
       },
       --icon = "__base__/graphics/icons/heat-pipe.png",
       --icon_size = 64,
-	icon_size=64,icons={{icon="__base__/graphics/icons/heat-pipe.png",tint={r=0.2,g=0.2,b=1,a=0.8},hr_version={tint={r=0.2,g=0.2,b=1,a=0.8}} }},
+	icon_size=64,icons={{icon="__base__/graphics/icons/heat-pipe.png",tint={r=0.2,g=0.2,b=1,a=0.8}}},
 
       max_health = 200,
       minable = {
         mining_time = 0.1,
-        result = "warptorio-heatpipe"
+        result = "warptorio-heatpipe",
       },
       minimum_glow_temperature = 350,
       name = "warptorio-heatpipe",
