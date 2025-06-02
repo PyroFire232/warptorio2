@@ -328,7 +328,7 @@ events.on_init(function()
 	--warptorio.HookNewGamePlus()
 
 	-- Custom Intro Message
-	remote.call("freeplay", "set_custom_intro_message", { "warptorio_lore.intro" })
+	remote.call("freeplay", "set_custom_intro_message", { "warptorio.intro" })
 	-- Disable Rocket Victory
 	if remote.interfaces.silo_script then
 		remote.call("silo_script", "set_no_victory", true)
@@ -741,6 +741,21 @@ function warptorio.ToolRecallGate(ply)
 	end
 end
 
+function HomeSweetHome()
+	--Warptorio Victory Screen
+	game.set_win_ending_info({
+		title = { "warptorio.victory-title" },
+		message = { "warptorio.victory-text" },
+		final_message = { "warptorio.victoty-text2" },
+		image_path = "__warptorio2__/graphics/victory.png"
+	})
+	game.set_game_state({
+		can_continue = true,
+		game_finished = true,
+		player_won = true,
+	})
+end
+
 cache.vgui("warptorio_toolbutton",
 	{
 		click = function(elm, ev)
@@ -772,19 +787,7 @@ cache.vgui("warptorio_homeworld", {
 			game.print({ "warptorio.homeworld-set" })
 			menu.hometmr = 0
 			cache.call_menu("clocktick", menu)
-
-			--Warptorio Victory Screen
-			game.set_win_ending_info({
-				title = "Victory!",
-				message = "Finally, You found your Home!",
-				final_message = "With best regards,\nWarptorio Team.",
-			})
-			game.set_game_state({
-				can_continue = true,
-				game_finished = true,
-				victorious_force = player.force,
-				player_won = true,
-			})
+			HomeSweetHome() --victory screen
 		end
 	end,
 })
