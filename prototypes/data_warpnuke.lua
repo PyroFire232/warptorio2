@@ -10,10 +10,12 @@ data:extend{
       enabled = false,
       energy_required = 50,
       ingredients = {
-	{"atomic-bomb",1},{"warptorio-warponium-fuel-cell",1},{"warptorio-warponium-fuel",1}
+		{type="item", name="atomic-bomb", amount=1},
+		{type="item", name="warptorio-warponium-fuel-cell", amount=1},
+		{type="item", name="warptorio-warponium-fuel", amount=1}
       },
       name = "warptorio-atomic-bomb",
-      result = "warptorio-atomic-bomb",
+      results = {{type="item", name="warptorio-atomic-bomb", amount=1}},
       type = "recipe"
     },
 
@@ -43,7 +45,8 @@ data:extend{
       order = "d[rocket-launcher]-c[atomic-bomb]",
       stack_size = 10,
       subgroup = "ammo",
-      type = "ammo"
+      type = "ammo",
+      ammo_category = "rocket"
     },
 
 
@@ -168,15 +171,15 @@ data:extend{
       },
       animation = { tint=rtint,
         filename = "__base__/graphics/entity/rocket/rocket.png",
-        frame_count = 8,
-        height = 35,
-        line_length = 8,
+        frame_count = 1,
+        height = 60,
+        line_length = 1,
         priority = "high",
         shift = {
           0,
           0
         },
-        width = 9
+        width = 20
       },
       flags = {
         "not-on-map"
@@ -186,17 +189,6 @@ data:extend{
         size = 15
       },
       name = "warptorio-atomic-rocket",
-      shadow = {
-        filename = "__base__/graphics/entity/rocket/rocket-shadow.png",
-        frame_count = 1,
-        height = 24,
-        priority = "high",
-        shift = {
-          0,
-          0
-        },
-        width = 7
-      },
       smoke = {
         {
           deviation = {
@@ -276,56 +268,30 @@ animations = {
           animation_speed = 0.5,
           filename = "__base__/graphics/entity/explosion/explosion-1.png",
           frame_count = 17,
-          height = 22,
-          hr_version = {tint=rtint,
-            animation_speed = 0.5,
-            filename = "__base__/graphics/entity/explosion/hr-explosion-1.png",
-            frame_count = 17,
-            height = 42,
-            line_length = 6,
-            priority = "high",
-            scale = 0.5,
-            shift = {
-              0.140625,
-              0.1875
-            },
-            width = 48
-          },
+          height = 42,
           line_length = 6,
           priority = "high",
+          scale = 0.5,
           shift = {
-            0.15625,
+            0.140625,
             0.1875
           },
-          width = 26
+          width = 48
         },
         {tint=rtint,
           animation_speed = 0.5,
           filename = "__base__/graphics/entity/explosion/explosion-3.png",
           frame_count = 17,
-          height = 46,
-          hr_version = {tint=rtint,
-            animation_speed = 0.5,
-            filename = "__base__/graphics/entity/explosion/hr-explosion-3.png",
-            frame_count = 17,
-            height = 88,
-            line_length = 6,
-            priority = "high",
-            scale = 0.5,
-            shift = {
-              -0.03125,
-              0.046875
-            },
-            width = 102
-          },
+          height = 88,
           line_length = 6,
           priority = "high",
+          scale = 0.5,
           shift = {
             -0.03125,
-            0.0625
+            0.046875
           },
-          width = 52
-        }
+          width = 102
+        },
       },
 
 
